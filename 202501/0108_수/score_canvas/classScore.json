@@ -7,42 +7,64 @@
             "name": "zard",
             "kor": 80,
             "math": 89,
-            "eng": 70
+            "eng": 70,
+            "soc": 99
         },
         {
             "no": 2,
-            "name": "cdr",
+            "name": "csr",
             "kor": 50,
             "math": 45,
-            "eng": 66
+            "eng": 66,
+            "soc": 67
         },
         {
             "no": 3,
             "name": "love",
             "kor": 88,
             "math": 65,
-            "eng": 81
+            "eng": 81,
+            "soc": 90
         },
         {
             "no": 4,
             "name": "ive",
             "kor": 69,
             "math": 55,
-            "eng": 72
+            "eng": 72,
+            "soc": 88
         },
         {
             "no": 5,
             "name": "blackpink",
             "kor": 70,
             "math": 49,
-            "eng": 65
+            "eng": 78,
+            "soc": 77
         },
         {
             "no": 6,
             "name": "Yujin",
-            "kor": 70,
-            "math": 49,
-            "eng": 65
+            "kor": 90,
+            "math": 79,
+            "eng": 78,
+            "soc": 87
+        },
+        {
+            "no": 7,
+            "name": "BJH",
+            "kor": 40,
+            "math": 79,
+            "eng": 78,
+            "soc": 87
+        },
+        {
+            "no": 8,
+            "name": "SDH",
+            "kor": 40,
+            "math": 79,
+            "eng": 78,
+            "soc": 87
         }
     ]
 }

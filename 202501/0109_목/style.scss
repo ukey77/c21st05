@@ -1,0 +1,45 @@
+$gray-color: #cccccc;
+
+
+*{
+    margin: 0;
+    padding: 0;
+    font-size: 10px;
+}
+
+.wrapper{
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 60vw;
+    height: 50vh;
+    border: 1px solid $gray-color;
+    .layout{
+        margin: 0 auto;
+        margin-top: .5rem;
+        width: calc(100% - 1rem);
+        height: calc(100% - 1rem);
+        border: 2px solid $gray-color;
+    
+        .line-box{
+            display: flex;
+            margin: 0 auto;
+            width: calc(100% - .5rem);
+            height: 50%;
+            border: 1px solid red;
+            .large-box{
+                width: calc(50% - .5rem);
+                height: 100%;
+            border: 1px solid red;
+
+            }
+            .small-box{
+                display: flex;
+                width: calc(25% - .5rem);
+                height: 100%;
+                border: 1px solid red;
+            }
+        }
+    } 
+}

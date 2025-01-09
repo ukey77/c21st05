@@ -44,27 +44,11 @@
         },
         {
             "no": 6,
-            "name": "Yujin",
-            "kor": 90,
-            "math": 79,
-            "eng": 78,
-            "soc": 87
-        },
-        {
-            "no": 7,
-            "name": "BJH",
-            "kor": 40,
-            "math": 79,
-            "eng": 78,
-            "soc": 87
-        },
-        {
-            "no": 8,
-            "name": "SDH",
-            "kor": 40,
-            "math": 79,
-            "eng": 78,
-            "soc": 87
+            "name": "ive",
+            "kor": 69,
+            "math": 55,
+            "eng": 72,
+            "soc": 88
         }
     ]
 }

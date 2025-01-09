@@ -62,20 +62,22 @@
                     }
                     sumArr.push(temp);
                 });
-                const sortArr = [...sumArr].sort((a, b) => b[1] - a[1]); // 정렬
+                const avgArr = sumArr.map((arr) => [arr[0], arr[1] / (this.data[0]["name"].length)]); // 평균
+                const sortArr = [...avgArr].sort((a, b) => b[1] - a[1]); // 정렬
                 return sortArr;
             }
             drawCanvas(data) {
                 // canvas 동적 생성 함수
-                const makeCanvas = (key) => {
+                const makeCanvas = (key,size) => {
+                    const width = (size > 6) ? (size*70) : 420;
                     const divElement = document.createElement("div");
                     divElement.setAttribute("class", `canvas-area`);
                     divElement.id = `${key}CanvasArea`;
                     const canvas = document.createElement("canvas");
                     canvas.setAttribute("id", `${key}Canvas`);
                     canvas.setAttribute("class", `canvas`);
-                    canvas.setAttribute("width", `350`);
-                    canvas.setAttribute("height", `350`);
+                    canvas.setAttribute("width", `${width}`);
+                    canvas.setAttribute("height", `420`);
                     divElement.append(canvas);
                     document.getElementById("wrapper").append(divElement);
                 }
@@ -99,7 +101,18 @@
                         this.canvas = null;
                         this.pen = null;
                         this.start = 40;
+                        this.width = 0;
+                        this.height = 0;
                         this.scaleFactor = 10;
+                    }
+                    setting() {
+                        this.canvas = document.getElementById(`${this.id}`);
+                        this.pen = this.canvas.getContext("2d");
+                        this.width = Number(getComputedStyle(this.canvas).width.split("px")[0]);
+                        this.height = Number(getComputedStyle(this.canvas).height.split("px")[0]);
+                    }
+                    modiDot(x, y) {
+                        this.pen.fillRect((x * this.scaleFactor) + this.start, -(y * this.scaleFactor) + this.height - this.start, 1, 1);
                     }
                     displayTitle() {
                         const titleName = {
@@ -113,14 +126,10 @@
                         h2Element.innerText = (titleName[this.id]) ? titleName[this.id] : (this.id);
                         document.getElementById(`${this.id}Area`).append(h2Element);
                     }
-                    setting() {
-                        this.canvas = document.getElementById(`${this.id}`);
-                        this.pen = this.canvas.getContext("2d");
-                    }
                     renderAxisCrossHair() {
                         const [width, height, size, devideWidth] = [
-                            Math.floor(this.canvas.width),
-                            Math.floor(this.canvas.height),
+                            Math.floor(this.width),
+                            Math.floor(this.height),
                             Number(4),
                             Number(this.data["name"].length) + 1
                         ];
@@ -135,13 +144,14 @@
                                 (isX) || this.pen.fillText((i * 10), this.start - 20, -i * ((range - this.start) / 11) + range - this.start, 15); // y축 text
                             }
                         }
+
                         crossHair(width, true);
                         crossHair(height, false);
                     }
                     drawDataGraph() {
                         const chartColor = ["#FF6F61", "#6B5B95", "#88B04B", "#F7CAC9", "#92A8D1", "#FFD662", "#009B77", "#D65076", "#45B8AC", "#E94B3C"];
                         const devideNum = (Number(this.data["name"].length) + 1);
-                        const devideWidth = ((this.canvas.width - 60) / devideNum);
+                        const devideWidth = ((this.width - 60) / devideNum);
                         const getAverage = (dataArr) => {
                             const averageValue = dataArr.reduce((acc, cur) => acc += cur, 0) / dataArr.length;
                             return averageValue;
@@ -150,21 +160,21 @@
                         for (const key in this.data) {
                             if (key === "name") {
                                 for (let i = 0; i < this.data[key].length; i++) {
-                                    this.pen.fillText(this.data[key][i], ((i + 1) * (this.canvas.width - (this.start * 1.5)) / devideNum) + this.start, this.canvas.height - (this.start / 2), 30);
+                                    this.pen.fillText(this.data[key][i], ((i + 1) * (this.width - (this.start * 1.5)) / devideNum) + this.start, this.height - (this.start / 2), 30);
                                 }
                             } else {
                                 let start = devideWidth;
-                                const [height, avgValue] = [(this.canvas.height / 120), getAverage([...this.data[key]])];
+                                const [height, avgValue] = [(this.height / 120), getAverage([...this.data[key]])];
                                 this.data[key].forEach((item, index) => {
                                     // 그래프
                                     for (let i = start; i < (start + 20); i++) {
                                         for (let j = 0; j < height * item; j++) {
                                             this.pen.fillStyle = chartColor[index % (chartColor.length)];
-                                            this.pen.fillRect(i + this.start, -j + (this.canvas.width - this.start), 1, 1);
+                                            this.pen.fillRect(i + this.start, -j + (this.height - this.start), 1, 1);
                                         }
                                     }
                                     // 평균
-                                    for (let i = 0; i <= this.canvas.width; i++) {
+                                    for (let i = 0; i <= this.width; i++) {
                                         this.modiDot(i / this.scaleFactor, (height * avgValue) / this.scaleFactor)
                                     }
                                     start += devideWidth;
@@ -172,12 +182,11 @@
                             }
                         }
                     }
-                    modiDot(x, y) {
-                        this.pen.fillRect((x * this.scaleFactor) + this.start, -(y * this.scaleFactor) + this.canvas.height - this.start, 1, 1);
-                    }
                     control(data) {
                         this.data = data;
                         this.setting();
+                        // this.updateSize();
+
                         this.displayTitle();
                         this.renderAxisCrossHair();
                         this.drawDataGraph();
@@ -187,7 +196,7 @@
                 // Canvas 동적 생성
                 for (const key in parsingObj) {
                     if ((key !== "no") && (key != "name") && !(key in classObj)) {
-                        makeCanvas(key);
+                        makeCanvas(key,parsingObj[key].length);
                         classObj[key] = new Canvas(`${key}Canvas`);
                         const resourceObj = {}
                         resourceObj["name"] = parsingObj["name"];

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="wrapper" class="wrapper">
+    </div>
+    <script>
+        class Canvas {
+            constructor(id) {
+                this.id = id;
+                this.canvas = null;
+                this.pen = null
+                this.scaleFactor = 0;
+            }
+            initDom(element) {
+                const htmlTemplate = `
+                    <canvas id="canvas" class="canvas" width="600" height="200"></canvas>
+                `;
+                const cssTemplate = `
+                    <style>
+                        * {
+                            margin: 0;
+                            padding: 0;
+                        }
+                        .canvas {
+                            border: 1px solid blueviolet;
+                        }
+                    </style>
+                `;
+                document.getElementById(element).innerHTML = `${htmlTemplate}${cssTemplate}`;
+            }
+            initialSettings() {
+                this.canvas = document.getElementById("canvas");
+                this.pen = this.canvas.getContext("2d");
+                this.scaleFactor = (this.canvas.width / 20);
+            }
+            modiDot(x, y) {
+                this.pen.fillRect(-x + this.canvas.width - 10, y - 10, 3, 3);
+            }
+            drawFactor() {
+                const size = this.scaleFactor / 6;
+                // 너비
+                for (let i = -Math.floor(this.canvas.width / (this.scaleFactor * 2)); i <= Math.floor(this.canvas.width / (this.scaleFactor * 2)); i++) {
+                    for (let j = -size; j < size; j++) {
+                        this.pen.fillStyle = "red";
+                        this.pen.fillRect((i * this.scaleFactor) + (this.canvas.width / 2), j + (this.canvas.height / 2), 1, 1);
+                    }
+                    this.pen.fillText(i, (i * this.scaleFactor) + (this.canvas.width / 2) - 2.5, (this.canvas.height / 2) + 15, 10);
+                }
+
+                // 높이
+                for (let i = -Math.floor((this.canvas.height) / (this.scaleFactor * 2)); i <= Math.floor((this.canvas.height) / (this.scaleFactor * 2)); i++) {
+                    for (let j = -size; j < size; j++) {
+                        this.pen.fillStyle = "blue";
+                        this.pen.fillRect(j + this.canvas.width / 2, i * this.scaleFactor + (this.canvas.height / 2), 1, 1);
+                    }
+                    this.pen.fillText(i,this.canvas.width / 2 + 5, i * this.scaleFactor + (this.canvas.height / 2)+3.5,10);
+                }
+            }
+            crosshair() {
+                for (let i = 1; i < this.canvas.width; i++) {
+                    this.pen.fillRect(i, (this.canvas.height / 2), 1, 1);
+                }
+                for (let i = 1; i < this.canvas.height; i++) {
+                    this.pen.fillRect((this.canvas.width / 2), i, 1, 1);
+                }
+            }
+            run(element) {
+                this.initDom(element);
+                this.initialSettings();
+                this.crosshair();
+                this.drawFactor();
+            }
+        }
+        const canvas = new Canvas("canvas");
+        canvas.run("wrapper");
+
+    </script>
+</body>
+
+</html>

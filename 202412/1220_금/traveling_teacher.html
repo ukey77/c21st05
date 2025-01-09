@@ -1,0 +1,68 @@
+<script>
+    const myZard = {
+        name: "Zard",
+        age: 21,
+        job: 'singer',
+        album: [
+            "A1",
+            "A2",
+            "A3",
+            {
+                myObj: [
+                    "B1",
+                    "B2",
+                    "B3"
+                ]
+            }
+        ],
+        hitSong: {
+            title: "HOHO",
+            song: "HAHA"
+        },
+        sing: () => {
+            document.write('LALALALALALL');
+        }
+    }
+
+    const doNumber = (item) => {
+        document.write(String(item));
+    }
+    const doString = (item) => {
+        document.write(item);
+    }
+    const doArray = (item) => {
+        for (let i = 0; i < item.length; i++) {
+            document.write(item);
+        }
+    }
+    const doObject = (item) => {
+        for (let key in item) {
+            document.write(item[key]);
+        }
+    }
+    const doFunction = (item) => {
+        item();
+    }
+    const checkType = (item) => {
+        switch (typeof item) {
+            case 'number':
+                doNumber(item);
+                break;
+            case 'string':
+                doString(item);
+                break;
+            case 'object':
+                if (Array.isArray(item)) {
+                    doArray(item);
+                } else {
+                    doObject(item);
+                }
+                break;
+            case 'function':
+                doFunction();
+                break;
+        }
+
+    }
+    // checkType( myZard );
+</script>

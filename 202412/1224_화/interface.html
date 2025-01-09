@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚗Interface(DashBoard)🚗</title>
+</head>
+
+<body>
+    <script>
+        // == ^Engine == 
+        class Engine {
+            constructor(id) {
+                this.id = id;
+                this.status = '';
+            }
+            run(speed) {
+                if (this.status === "On") {
+                    document.write(`속도: ${speed}Km/h<br>`);
+                } else {
+                    document.write("시동을 거세요."+"<br>");
+                }
+            }//
+            on() {
+                this.status = "On";
+            }//
+            off() {
+                this.status = "Off";
+            }//
+        }//end_Engine
+
+        /*      
+        // [여태 우리가 사용하고 있었던 방식]   
+        const engine = new Engine("engine");
+        engine.on();
+        engine.run(50);
+        document.write("<hr>");
+        engine.off();
+        engine.run(70);
+        */
+
+        // ==^Windows==
+        class Windows {
+            constructor(id) {
+                this.id = id;
+            }
+            up(){
+                document.write("🪟 닫힘"+"<br>");
+            }
+            down(){
+                document.write("🎃 열림"+"<br>")
+            }
+        }//end_Windows
+
+        // == ^Interface_dashBoard == 
+        class Interface_dashBoard {
+            constructor(id) {
+                this.id = id;
+                this.engine = new Engine(this.id);
+                this.windows = new Windows(this.id);
+            }
+            // engineConnect(){
+            //     this.engine = new Engine('myCar');
+            // }//
+            engineOn() {
+                this.engine.on();
+            }//
+            accel(speed) {
+                this.engine.run(speed);
+            }
+            windowUp(){
+                this.windows.up();
+            }
+            windowDown(){
+                this.windows.down();
+            }
+        }//end_Interface_dashBoard
+
+        const myCar = new Interface_dashBoard('dB');
+        myCar.engineOn();
+        myCar.accel(70);
+        myCar.windowUp();
+
+        /* 
+        --------------------------------------------
+        - 인터페이스도 클래스(객체) 로 봐도 무방하다     
+        - 대시보드에서 모든걸 컨트롤 중
+        --------------------------------------------
+        */
+
+    </script>
+</body>
+
+</html>

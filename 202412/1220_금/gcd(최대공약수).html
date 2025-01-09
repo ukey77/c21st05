@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>greatest common divisor</title>
+</head>
+
+<body>
+    <div id="wrapper" class="wrapper">
+    </div>
+    <script>
+        class GreatestCommonDivisor {
+            constructor(id) {
+                this.id = id;
+            }
+            initDom(outputDom) {
+                const htmlTemplate = `
+                    <input type="number" id="numberValue1">
+                    <input type="number" id="numberValue2">
+                    <button id="outputBtn">최대공약수</button>
+                    <ul id="outputArea">
+                    </ul>
+                `;
+                document.getElementById(outputDom).innerHTML = htmlTemplate;
+            }
+            eventListener(){
+                window.addEventListener("click",(e)=>{
+                    const numberValues =[ 
+                        Number(document.getElementById("numberValue1").value),
+                        Number(document.getElementById("numberValue2").value)];
+                    switch(e.target.id){
+                        case "outputBtn":
+                        this.gcdSelect(numberValues);
+                            break;
+                    }
+                })
+            }
+            gcdSelect(numberValues){
+                const [numberValue1,numberValue2] = [...numberValues];
+                const minNum = Math.min(numberValue1, numberValue2);
+                let resultValue = 0;
+                for(let i=minNum; i>1; i++){
+                    if(numberValue1 % i === 0 && numberValue2 % i === 0){
+                        resultValue = i;
+                        break;
+                    }
+                }
+                this.outputDom(resultValue);
+            }
+            outputDom(resultValue){
+                document.getElementById("outputArea").innerHTML = 
+                `<li>${resultValue}</li>`;
+            }
+            run(){
+                this.initDom("wrapper");
+                this.eventListener();
+            }
+        }
+        const gcdFunc = new GreatestCommonDivisor("gcdFunc");
+        gcdFunc.run();
+    </script>
+</body>
+
+</html>

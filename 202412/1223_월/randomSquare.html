@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .wrapper {
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .outputArea {
+            width: 80%;
+            height: 80%;
+            position: relative;
+            border: 2px solid orange;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        [id^=random] {
+            position: absolute;
+            display: inline-block;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="wrapper" class="wrapper">
+        <section id="outputArea" class="outputArea"></section>
+    </div>
+    <script>
+        class RandomOutput {
+            constructor(id) {
+                this.id = id;
+            }
+            display() {
+                const htmlTemplate = `<div id="${this.id}" class="${this.id}"></div>`;
+                const [minV, maxV] = [3, 15]
+                const cssTemplate = `
+                <style>
+                    .${this.id}{
+                        width : ${(Math.floor(Math.random() * (maxV - minV + 1)) + minV)}px;
+                        height: ${(Math.floor(Math.random() * (maxV - minV + 1)) + minV)}px;
+                        top: ${(Math.floor(Math.random() * (90 - minV)) + minV)}%;
+                        left: ${(Math.floor(Math.random() * (90 - minV)) + minV)}%;
+                        background-color: rgb(${Math.floor(Math.random() * 256)},${Math.floor(Math.random() * 256)},${Math.floor(Math.random() * 256)});
+                    }
+                </style>
+                `;
+                this.outputDom(htmlTemplate,cssTemplate);
+            }
+            outputDom(htmlTemplate,cssTemplate){
+                document.getElementById("outputArea").innerHTML += (htmlTemplate + cssTemplate);
+            }
+            run() {
+                this.display();
+            }
+        }
+
+        const main = (() => {
+            const randomArray = [];
+            for (let i = 0; i < 100; i++) {
+                randomArray.push(new RandomOutput(`random${i + 1}`));
+                randomArray[i].run();
+            }
+        })();
+
+        const hexList = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, "A", "B", "C", "D", "E", "F"];
+        const hexValue = Math.floor(Math.random() * 16);
+        console.log(hexValue, hexList[hexValue]);
+    </script>
+
+</body>
+
+</html>

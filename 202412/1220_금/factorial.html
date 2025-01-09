@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="wrapper" class="wrapper">
+        <input type="number" id="numberValue">
+        <button id="outputBtn">factorial</button><br>
+        result= <input type="number" id="outputDom">
+    </div>
+    <script>
+        class Factorial {
+            constructor(id) {
+                this.id = id;
+            }
+            eventListener() {
+                window.addEventListener("click", (e) => {
+                    const numberValue = Number(document.getElementById("numberValue").value);
+                    switch (e.target.id) {
+                        case "outputBtn":
+                            this.factorialCalc(numberValue);
+                            break;
+                    }
+                })
+            }
+            factorialCalc(numberValue) {
+                let resultValue = 1;
+                for (let i = 1; i <= numberValue; i++) {
+                    resultValue *= i;
+                }
+                console.log(resultValue)
+                this.outputDom("outputDom", resultValue);
+            }
+            outputDom(domElement, resultValue) {
+                document.getElementById(domElement).value = resultValue;
+            }
+            run() {
+                this.eventListener();
+            }
+        }
+        const factorial = new Factorial("factorial");
+        factorial.run();
+
+    </script>
+</body>
+
+</html>

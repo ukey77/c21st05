@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        input[type="number"] {
+            width: 30px;
+        }
+
+        .wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .resultArea {
+            text-align: center;
+            margin: 0 auto
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <div>
+            (
+            <input type="number" id="num1"> +
+            <input type="number" id="iNum1"> i
+            )
+        </div>
+        <div>
+            <button id="sumBtn">합</button><br>
+            <button id="multiBtn">곱</button>
+        </div>
+        <div>
+            (
+            <input type="number" id="num2"> +
+            <input type="number" id="inum2"> i
+            )
+        </div>
+    </div>
+    <br>
+    <div class="resultArea">
+        =
+        <input type="number" id="result1"> +
+        <input type="number" id="result2"> i
+
+    </div>
+    <script>
+        class Calc {
+            constructor(id) {
+                this.id = id;
+            }
+            setDom() {
+                const domValue = {
+                    num1: Number(document.getElementById("num1").value),
+                    iNum1: Number(document.getElementById("iNum1").value),
+                    num2: Number(document.getElementById("num2").value),
+                    inum2: Number(document.getElementById("inum2").value),
+                }
+                return domValue;
+            }
+            eventListener() {
+                window.addEventListener("click", (e) => {
+                    switch (e.target.id) {
+                        case "sumBtn":
+                            this.sumCalc(this.setDom());
+                            break;
+
+                        case "multiBtn":
+                            this.multiCalc(this.setDom());
+                            break;
+                    }
+                })
+            }
+            sumCalc(domValue) {
+                const { num1, iNum1, num2, inum2 } = { ...domValue };
+                const [numberCalc, iNumberCalc] = [
+                    num1 + num2,
+                    iNum1 + inum2
+                ]
+                this.outputDom(numberCalc, iNumberCalc);
+            }
+            multiCalc(domValue) {   
+                const { num1, iNum1, num2, inum2 } = { ...domValue };
+                const value1 = (num1 *  num2) + (-(iNum1 * inum2));
+                const value2 = (iNum1 * num2) +  (num1 *  inum2);
+                this.outputDom(value1, value2);
+
+            }
+            outputDom(value1, value2) {
+                document.getElementById("result1").value = value1;
+                document.getElementById("result2").value = value2;
+            }
+            run() {
+                this.eventListener();
+            }
+}
+        const calc = new Calc("calc");
+        calc.run();
+    </script>
+</body>
+
+</html>

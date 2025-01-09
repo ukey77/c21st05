@@ -1,0 +1,74 @@
+<div id="numberContainer">
+    <span class="number" draggable="true">0</span>
+    <span class="number" draggable="true">1</span>
+    <span class="number" draggable="true">2</span>
+    <span class="number" draggable="true">3</span>
+    <span class="number" draggable="true">4</span>
+    <span class="number" draggable="true">5</span>
+    <span class="number" draggable="true">6</span>
+    <span class="number" draggable="true">7</span>
+    <span class="number" draggable="true">8</span>
+    <span class="number" draggable="true">9</span>
+</div>
+<div id="inputArea">
+    <input type="number" id="num1" class="input">
+    <span>+</span>
+    <input type="number" id="num2" class="input">
+    <span>=</span>
+    <input type="number" id="result">
+</div>
+<button id="sum">계산</button>
+
+<script>
+    class Sum {
+        constructor(id) {
+            this.id = id;
+        }
+
+        setDrag() {
+            const numList = document.querySelectorAll(".number");
+            const inputList = document.querySelectorAll(".input");
+
+            numList.forEach((num) => {
+                num.addEventListener("dragstart", () => {
+                    num.classList.add("choice");
+                });
+                num.addEventListener("dragend", () => {
+                    num.classList.remove("choice");
+                })
+            });
+            inputList.forEach((input) => {
+                input.addEventListener("dragover", (e) => {
+                    e.preventDefault();
+                });
+                input.addEventListener("drop", (e) => {
+                    e.preventDefault();
+                    const chooseNum = document.querySelector(".choice");
+
+                    e.target.value = chooseNum.innerText;
+                });
+            });
+        }
+
+        eventManager() {
+            addEventListener("click", (e) => {
+                if (e.target.id === "sum") {
+                    const num1 = Number(document.getElementById("num1").value === "" ? 0 : document.getElementById("num1").value);
+                    const num2 = Number(document.getElementById("num1").value === "" ? 0 : document.getElementById("num2").value);
+
+                    const result = document.getElementById("result");
+                    result.value = `${num1 + num2}`;
+                }
+            });
+        }
+
+        run() {
+            this.setDrag();
+            this.eventManager();
+        }
+    }
+
+    onload = () => {
+        const sum = new Sum("main")
+        sum.run();
+    }

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .canvas {
+            border: 1px solid purple;
+            background-color: lavender;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="wrapper" class="wrapper">
+        <canvas id="canvas" class="canvas" width="500" height="300"></canvas>
+    </div>
+
+    <script>
+        class Canvas {
+            constructor(id) {
+                this.id = id; // 식별자
+                this.canvas = null;
+                this.pen = null;
+            }
+            setting() {
+                this.canvas = document.getElementById("canvas");
+                this.pen = this.canvas.getContext("2d");
+            }
+            drawScaleFactor(scaleFactor) {
+                const size = scaleFactor / 5;
+                // x축
+                for (let i = - Math.floor(this.canvas.width / (scaleFactor * 2)); i <= Math.floor(this.canvas.width / (scaleFactor * 2)); i++) {
+                    for (let j = -size; j < size; j++) {
+                        this.pen.fillStyle = "red";
+                        this.pen.fillRect((i * scaleFactor) + this.canvas.width / 2, -j + this.canvas.height / 2, 1, 1);
+                    }
+                    this.pen.fillText(i, (i * scaleFactor) + (this.canvas.width / 2) - 3, this.canvas.height / 2 + 15, 10)
+                };
+                
+                // y축
+                for (let i = -Math.floor(this.canvas.height / (scaleFactor * 2)); i <= Math.floor(this.canvas.height / (scaleFactor * 2)); i++) {
+                    for (let j = -size; j < size; j++) {
+                        this.pen.fillStyle = "blue";
+                        this.pen.fillRect(j+this.canvas.width/2, -i*scaleFactor + (this.canvas.height / 2), 1, 1);
+                    }
+                    this.pen.fillText(i,this.canvas.width/2 + 5,-i*scaleFactor + (this.canvas.height / 2)+3,10);
+                }
+            }
+            crossHair() {
+                for (let x = 0; x < this.canvas.width; x++) {
+                    this.pen.fillRect(x, this.canvas.height / 2, 1, 1);
+                }
+                for (let y = 0; y < this.canvas.height; y++) {
+                    this.pen.fillRect(this.canvas.width / 2, y, 1, 1);
+                }
+            }
+            run(scaleFactor) {
+                this.setting();
+                this.crossHair();
+                // this.drawScaleFactor(scaleFactor)
+            }
+        }
+
+        const canvas = new Canvas("canvas");
+        canvas.run(20);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>컴퓨터의 빼기~</title>
+</head>
+
+<body>
+    <main id="main"></main>
+
+    <script>
+        class Deck {
+            constructor(id) {
+                this.id = id;
+                this.storage = [];
+            }
+
+            pushItem(item) {
+                this.storage.push(item);
+            }
+            popItem() {
+                return this.storage.pop();
+            }
+            unshiftItem(item) {
+                this.storage.unshift(item);
+            }
+            shiftItem() {
+                this.storage.shift();
+            }
+            clear() {
+                this.storage = [];
+            }
+        }
+        class Complement {
+            constructor(id) {
+                this.id = id;
+                this.inputDec1 = 0;
+                this.inputDec2 = 0;
+                this.firstDeck = new Deck("firstDeck");
+                this.secondDeck = new Deck("secondDeck");
+                this.carryDeck = new Deck("carryDeck");
+                this.resultDeck = new Deck("resultDeck");
+            }
+            setValues() {
+                this.inputDec1 = document.getElementById("inputDec1").value;
+                this.inputDec2 = document.getElementById("inputDec2").value;
+                this.carryDeck.storage = [1, 0, 0, 0, 0, 0, 0, 0];
+                this.resultDeck.storage = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+            }
+            clear(flagNum) {
+                if (flagNum === 1) {
+                    this.firstDeck.clear();
+                } else {
+                    this.secondDeck.clear();
+                }
+                this.carryDeck.clear();
+                this.resultDeck.clear();
+                this.maxLength = 0;
+            }
+            changeToBinary(flagNum) {
+                let tempNum = flagNum === 1 ? this.inputDec1 : this.inputDec2;
+                while (1) {
+                    if (tempNum < 2) {
+                        flagNum === 1 ? this.firstDeck.pushItem(tempNum) : this.secondDeck.pushItem(tempNum);
+                        tempNum = 0; //0값으로 채워주기 위해서 
+                        while (1) {
+                            let length = flagNum === 1 ? this.firstDeck.storage.length : this.secondDeck.storage.length;
+                            if (length >= 8) {
+                                break;
+                            }
+                            flagNum === 1 ? this.firstDeck.pushItem(0) : this.secondDeck.pushItem(0);
+                        }
+                        break;
+                    }
+                    const mod = tempNum % 2; // 나머지
+                    flagNum === 1 ? this.firstDeck.pushItem(mod) : this.secondDeck.pushItem(mod);
+                    tempNum = Math.floor(tempNum / 2); // 몫 
+                }
+            }
+            getDecimal() {
+                let sumDecimal = 0;
+                this.resultDeck.storage.forEach((v, i, a) => {
+                    sumDecimal += (v * (2 ** i));
+                })
+                return sumDecimal;
+            }
+            binaryToComplement() {
+                const secondArray = [...this.secondDeck.storage];
+                secondArray.forEach((v, i, a) => {
+                    a[i] = v == 0 ? 1 : 0 // 1의보수를 위한 값의 반전.
+                })
+                // console.log("===============================")
+                // console.log("1_Deck : " + this.firstDeck.storage)
+                // console.log("===============================")
+                // console.log("2_보수 : " + secondArray)
+                // console.log("===============================")
+                // console.log("3_캐리 : " + this.carryDeck.storage)
+                // console.log("===============================")
+                // console.log("4_결과 : " + this.resultDeck.storage)
+                // console.log("===============================")
+
+                this.carryDeck.storage.forEach((v, i, a) => {
+                    let sum = 0;
+                    sum = this.firstDeck.storage[i] + secondArray[i] + this.carryDeck.storage[i];
+                    if (sum >= 2) {
+                        this.carryDeck.storage[i + 1] = 1;
+                        sum = sum - 2;
+                    }
+                    this.resultDeck.storage[i] = sum;
+                    // console.log(`${i} = ${this.firstDeck.storage[i]} + ${secondArray[i]} + ${this.carryDeck.storage[i]}`)
+                });
+                // console.log(this.resultDeck.storage);
+            }
+            event() {
+                window.addEventListener('click', (e) => {
+                    this.setValues();
+                    switch (e.target.id) {
+                        case "changeToBinary1":
+                            this.clear(1);
+                            this.setValues();
+                            this.changeToBinary(1);
+                            this.displayBinary(1);
+                            break;
+                        case "changeToBinary2":
+                            this.clear(2);
+                            this.setValues();
+                            this.changeToBinary(2);
+                            this.displayBinary(2);
+                            break;
+                        case "minusBtn":
+                            this.binaryToComplement();
+                            this.displayResult();
+                            break;
+                    }
+                })
+            }
+            displayBinary(flagNum) {
+                const tempArray = flagNum === 1 ? [...this.firstDeck.storage] : [...this.secondDeck.storage];
+                const htmlElement = flagNum === 1 ? document.getElementById("topInputContainer") : document.getElementById("bottomInputContainer");
+                let dynamicHtml = "";
+                tempArray.forEach((v, i) => {
+                    dynamicHtml = `<input type=number value=${tempArray[i]}>` + dynamicHtml;
+                });
+                htmlElement.innerHTML = dynamicHtml;
+            }
+            displayResult() {
+                let dynamicHtml = "";
+                for (let i = 0; i < 8; i++) {
+                    dynamicHtml = `<input type=number value=${this.resultDeck.storage[i]}>` + dynamicHtml;
+                }
+                document.getElementById("resultDiv").innerHTML = dynamicHtml;
+                document.getElementById("decimalDiv").innerHTML = `<input type="number" value = ${this.getDecimal()}>`;
+            }
+
+            init() {
+                const style = `
+                <style>
+                * {
+                    margin: 2px;
+                    font-size: 30px;
+                    color: white;
+                    font-weight: 900;
+                    /* text-shadow: 2px 2px #3700ff; */
+                }
+
+                h1 {
+                    font-size: 50px;
+                    border: 5px solid white;
+                    border-radius: 30px;
+                    padding: 10px 30px;
+                    margin-bottom: 20px;
+                }
+
+                button {
+                    color: #333;
+                    background-color: white;
+                    border-radius: 30px;
+                    font-size: 30px;
+                }
+
+                body {
+                    background-color: #333;
+                }
+
+                main {
+                    width: 1000px;
+                    height: 350px;
+                    border: 5px solid white;
+                    background-color: rgb(53, 19, 177);
+                    border-radius: 10px;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    margin: auto;
+                }
+
+                input[type="number"]::-webkit-inner-spin-button {
+                    -webkit-appearance: none;
+                }
+
+                input {
+                    width: 30px;
+                    height: 30px;
+                    color: #333;
+                    border-radius: 10px;
+                    text-align: right;
+                }
+
+                .decimal {
+                    width: 100px;
+                }
+
+                .decimal input {
+                    width: 100px;
+                }
+
+                .topInputContainer,
+                .bottomInputContainer,
+                .resultDiv {
+                    display: inline;
+                }
+
+                .buttonDiv button {
+                    width: 200px;
+                    height: 50px;
+                }
+
+                .decimalDiv input {
+                    width: 70px;
+                }
+                </style>`;
+                const html = `<h1>BINARY MINUS CALCULATOR</h1>
+                <div id="topDiv">Dec <input id="inputDec1" class="decimal" type="number" placeholder="0~255"> <button
+                        id="changeToBinary1">2진수변환</button>
+                    <div id="topInputContainer" class="topInputContainer"></div>
+                </div>
+                <div id="bottomDiv">Dec <input id="inputDec2" class="decimal" type="number" placeholder="0~255"> <button
+                        id="changeToBinary2">2진수변환</button>
+                    <div id="bottomInputContainer" class="topInputContainer"></div>
+                </div>
+                <div id="buttonDiv" class="buttonDiv"><button id="minusBtn">Minus</button></div>
+                <div>Binary : <div id="resultDiv" class="resultDiv"></div> Decimal : <div id="decimalDiv" class="resultDiv decimalDiv">
+                    </div>
+                </div>`;
+
+                document.getElementById("main").innerHTML = html + style;
+
+                const htmlElement1 = ["Num0", "Num1", "Num2", "Num3", "Num4", "Num5", "Num6", "Num7"];
+                let htmltopElement = "";
+                let htmlbottomElement = "";
+                let htmlresultElement = "";
+
+                htmlElement1.forEach(v => {
+                    htmltopElement += `<input id=top${v} type=number>`;
+                    htmlbottomElement += `<input id=bottom${v} type=number>`;
+                    htmlresultElement += `<input id=result${v} type=number>`;
+                });
+
+                document.getElementById('topInputContainer').innerHTML += htmltopElement;
+                document.getElementById('bottomInputContainer').innerHTML += htmltopElement;
+                document.getElementById('resultDiv').innerHTML += htmltopElement;
+            }
+
+            run() {
+                this.init();
+                this.event();
+            }
+        }
+
+        const complement = new Complement();
+        complement.run();
+    </script>
+</body>
+
+</html>

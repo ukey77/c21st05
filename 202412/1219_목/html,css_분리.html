@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="targetArea"></div>
+    <script>
+        const divElement = document.createElement("div");
+        divElement.setAttribute("class", "myZard");
+        divElement.innerText = "ZARD";
+        console.log(divElement);
+
+        const cssTemplate = `<style>
+                .myZard{
+                    width: 100px;
+                    height: 100px;
+                    background-color: orange;
+                    font-size: 30px;
+                    color: #fff;
+                    text-align: center;
+                    line-height: 100px;
+                }
+            </style>`;
+
+        document.getElementById("targetArea").appendChild(divElement);
+        // CSS를 <head> 또는 <body>에 추가
+        document.head.insertAdjacentHTML("beforeend", cssTemplate);
+    </script>
+</body>
+
+</html>

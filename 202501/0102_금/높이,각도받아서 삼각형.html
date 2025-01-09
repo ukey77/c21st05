@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<div id="wrapper" class="wrapper">
+
+</div>
+
+<body>
+    <script>
+        class DrawTriangle {
+            constructor(id) {
+                this.id = id;
+            }
+            domId(element) {
+                return document.getElementById(element);
+            }
+            initDisplay() {
+                const htmlTemplate = `
+                <div>
+                <p><label>Height: </label><input type="number" id="heightValue" value="5"></p>
+                <p><label>Deg A: </label><input type="number" id="aDegValue" value="35"></p>
+                <p><label>Deg B: </label><input type="number" id="bDegValue" value="45"></p>
+                <button id="drawBtn">DRAW Triangle</button>
+                <div>
+                <canvas id="canvas" class="canvas" width="800" height="400"></canvas>
+                `;
+                const cssTEmplate = `
+                <style>
+                *{margin: 0; padding: 0;}
+                .canvas{border: 5px solid lavender;
+                    border-radius: 1rem;
+                    margin: 1rem 0;
+                }
+                </style>
+                `;
+                this.domId("wrapper").innerHTML = `${htmlTemplate}${cssTEmplate}`
+            }
+            eventManage() {
+                window.addEventListener("click", (e) => {
+                    switch (e.target.id) {
+                        case "drawBtn":
+                            const domValues = {
+                                heightValue: Number(this.domId("heightValue").value),
+                                aDegValue: Number(this.domId("aDegValue").value),
+                                bDegValue: Number(this.domId("bDegValue").value),
+                            }
+                            this.drawCanvas(this.domId("canvas"), domValues);
+                            // console.log(domValues);
+                            break;
+                    }
+                });
+            }
+            drawCanvas(canvasElement, domValues) {
+                // == Canvas == 
+                class Canvas {
+                    constructor(id) {
+                        this.id = id;
+                        this.canvas = null;
+                        this.pen = null;
+                        this.scaleFactor = 20;
+                    }
+                    initSetting(canvasElement) {
+                        this.canvas = canvasElement;
+                        this.pen = this.canvas.getContext("2d");
+                    }
+                    domId(element) {
+                        return document.getElementById(element);
+                    }
+                    renderAxisCrosshair() {
+                        // 범위 설정값
+                        const [width, height, size] = [Math.floor(this.canvas.width), Math.floor(this.canvas.height / 2), Number(4)];
+                        const changerRad = (deg) => { return deg * Math.PI / 180; }
+
+                        // == 십자선 ==
+                        const crossLine = (range, isX) => {
+                            this.pen.fillStyle = "#333";
+                            for (let i = -(range); i < (range); i++) {
+                                (isX) && (this.modiDot(i / this.scaleFactor, 0)); // x축-line
+                                (isX) || (this.modiDot(0, i / this.scaleFactor)); // y축
+                            }
+                        }
+
+                        const drawScale = (range, isX) => {
+                            for (let i = -(range); i <= (range); i++) {
+                                for (let j = -size; j < size; j++) {
+                                    (isX) && (this.modiDot(i, j / this.scaleFactor)); // x축-scale
+                                    (isX) || (this.modiDot(j / this.scaleFactor, i)); // y축
+                                }
+                                (isX) && (this.pen.fillText(i, i * this.scaleFactor + this.canvas.width / 2 - 4, this.canvas.height / 2 + 14, 10)); // x축-text
+                                (isX) || (i !== 0) && (this.pen.fillText(i, this.canvas.width / 2 + 5, -i * this.scaleFactor + this.canvas.height / 2 + 3, 10)); // y축
+                            }
+                        }
+
+                        crossLine(width, true); // x축
+                        crossLine(height, false); // y축
+                        drawScale(width, true); // x축
+                        drawScale(height, false); // y축
+                    }
+                    cosPen() {
+                        this.pen.fillRect((x * this.scaleFactor), (-y * this.scaleFactor + this.canvas.height / 2), 1, 1);
+                    }
+                    drawTriangle(domValues) {
+                        const { heightValue: height, aDegValue: aDeg, bDegValue: bDeg } = { ...domValues };
+                        // 높이
+                        const cDeg = 180 - (aDeg + bDeg);
+
+                        const changerRad = (deg) => (deg * Math.PI / 180);
+
+                        console.log(height);
+                        for (let i = 0; i < height; i += 0.01) {
+                            this.pen.fillStyle = "red";
+                            this.modiDot(0, i);
+                        }
+
+                        const x = height / Math.sin(changerRad(cDeg)) * Math.sin(changerRad(aDeg));
+                        console.log(x);
+
+                        const [a2Deg, b2Deg, c2Deg] = [(90 - bDeg), bDeg, 90];
+                        let [height2, width2] = [0, 0];
+
+                        height2 = Math.sin(changerRad(b2Deg))*5;
+                        width2 = Math.cos(changerRad(b2Deg))*5;
+
+                        //(width2, height2) (0,0)
+
+                        for (let i = 0; i < width2; i += 0.01) {
+                            const m = height2 / width2 * i;
+                            this.modiDot(i, m);
+                        }
+                        this.modiDot(width2*5, height2*5);
+
+                        //(width2, height2) (0,height)
+                        for(let i=0; i<=width2; i+=0.01){
+                            const m =  (height2 - height) / width2;
+                            const f = m * i + height;
+                            this.modiDot(i, f);
+                        }
+
+
+                    }
+                    modiDot(x, y) {
+                        this.pen.fillRect((x * this.scaleFactor) + this.canvas.width / 2, (-y * this.scaleFactor + this.canvas.height / 2), 1, 1);
+                    }
+                    control(canvasElement, domValues) {
+                        this.initSetting(canvasElement);
+                        this.pen.clearRect(0, 0, this.canvas.width, this.canvas.height)
+                        this.renderAxisCrosshair();
+                        this.drawTriangle(domValues);
+                    }
+                }//END_Canvas
+                const canvas = new Canvas("canvas");
+                canvas.control(canvasElement, domValues);
+            }
+            run() {
+                this.initDisplay();
+                this.eventManage();
+            }
+        }
+        const main = (() => {
+            const drawTriangle = new DrawTriangle("drawTriangle");
+            drawTriangle.run();
+        })();
+    </script>
+</body>
+
+</html>

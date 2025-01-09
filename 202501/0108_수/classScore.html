@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Score</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            font-size: 20px;
+        }
+        .canvas {
+            border: 1px solid red;
+        }
+
+        [class^=canvas] {
+            border: 1px solid #333;
+            margin-left: 2rem;
+            border-radius: .5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="wrapper" class="wrapper">
+
+    </div>
+    <script>
+        class Score {
+            constructor(id) {
+                this.id = id;
+                this.data = null;
+            }
+            $(element) {
+                return document.querySelector(element);
+            }
+            getData() {
+                const xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = () => {
+                    if (xhttp.readyState == 4 && xhttp.status == 200) {
+                        const { className, classNumber, studentList } = JSON.parse(xhttp.responseText)
+                        this.data = studentList;
+                        this.outputDisplay(className, classNumber);
+                        this.drawCanvas(this.data);
+                    }
+                }
+                xhttp.open("GET", "classScore.json?t=" + Math.random(), true);
+                xhttp.send();
+            }
+            outputDisplay(className, classNumber) {
+                const htmlString = `
+                <h1>${classNumber}호 ${className}</h1>
+                `;
+                this.$("#wrapper").innerHTML = htmlString;
+            }
+            drawCanvas(data) {
+                // canvas 동적 생성 함수수
+                const makeCanvas = (key) => {
+                    const canvas = document.createElement("canvas");
+                    canvas.setAttribute("id", `${key}Canvas`);
+                    canvas.setAttribute("class", `canvas${key}`);
+                    canvas.setAttribute("width", `400`);
+                    canvas.setAttribute("height", `400`);
+                    document.getElementById("wrapper").append(canvas);
+                }
+                const [parsingObj, classObj] = [{}, {}];
+
+                data.forEach((obj) => {
+                    for (const key in obj) {
+                        if ((key !== "no")) {
+                            if ((key in parsingObj)) {
+                                parsingObj[key].push(obj[key]);
+                            } else {
+                                parsingObj[key] = [obj[key]];
+                            }
+                        }
+                    }
+                });
+
+                // == Canvas ==
+                class Canvas {
+                    constructor(id) {
+                        this.id = id;
+                        this.data = null
+                        this.canvas = null;
+                        this.pen = null;
+                        this.start = 40;
+                        this.scaleFactor = 10;
+                    }
+                    setting() {
+                        this.canvas = document.getElementById(`${this.id}`);
+                        this.pen = this.canvas.getContext("2d");
+                    }
+                    renderAxisCrossHair() {
+                        const [width, height, size, devideWidth] = [
+                            Math.floor(this.canvas.width),
+                            Math.floor(this.canvas.height),
+                            Number(4),
+                            Number(this.data["name"].length) + 1
+                        ];
+                        // console.log(devideWidth);
+                        const crossHair = (range, isX) => {
+                            for (let i = 0; i <= range; i++) {
+                                (isX) && this.modiDot(i / this.scaleFactor, 0);
+                                (isX) || this.modiDot(0, i / this.scaleFactor);
+                                for (let j = -size; j <= size; j++) {
+                                    (isX) && this.modiDot((i + 1) / this.scaleFactor * ((range - this.start) / devideWidth), j / this.scaleFactor);
+                                    (isX) || this.modiDot(j / this.scaleFactor, (i + 1) / this.scaleFactor * ((range - this.start) / 11));
+                                }
+                                (isX) || this.pen.fillText((i*10), this.start - 20, -i * ((range - this.start) / 11) + range - this.start, 10);
+                            }
+                        }
+                        crossHair(width, true);
+                        crossHair(height, false);
+                    }
+                    drawData() {
+                        const chartColor = ["#FF6F61", "#6B5B95", "#88B04B", "#F7CAC9", "#92A8D1","#FFD662", "#009B77", "#D65076", "#45B8AC", "#E94B3C" ];
+                        const devideNum = (Number(this.data["name"].length) + 1);
+                        const devideWidth = ((this.canvas.width - 60) / devideNum);
+                        for (const key in this.data) {
+                            if (key === "name") {
+                                for (let i = 0; i <= this.canvas.height; i++) {
+                                    this.pen.fillText(this.data[key][i], ((i + 1) * this.canvas.width / devideNum) + (this.start / 2), this.canvas.height - (this.start / 2), 30)
+                                }
+                            } else {
+                                let start = devideWidth;
+                                this.data[key].forEach((item, index) => {
+                                    const itemHeight = (this.canvas.height / 120) * item;
+                                    for (let i = start; i < (start + 20); i++) {
+                                        for (let j = 0; j < itemHeight; j++) {
+                                            this.pen.fillStyle = chartColor[index];
+                                            this.pen.fillRect(i + this.start, -j + (this.canvas.width - this.start), 1, 1);
+                                        }
+                                    }
+                                    start += devideWidth
+                                });
+                            }
+                        }
+                    }
+                    modiDot(x, y) {
+                        this.pen.fillRect((x * this.scaleFactor) + this.start, -(y * this.scaleFactor) + this.canvas.height - this.start, 1, 1);
+                    }
+                    control(data) {
+                        this.data = data;
+                        this.setting();
+                        this.renderAxisCrossHair();
+                        this.drawData();
+                    }
+                }//END_Canvas
+
+                for (const key in parsingObj) {
+                    if ((key !== "no") && (key != "name") && !(key in classObj)) {
+                        makeCanvas(key);
+                        classObj[key] = new Canvas(`${key}Canvas`);
+                        const resourceObj = {}
+                        resourceObj["name"] = parsingObj["name"];
+                        resourceObj[key] = parsingObj[key];
+                        classObj[key].control({ ...resourceObj })
+                    }
+                }
+
+            }//
+            run() {
+                this.getData();
+            }
+        }
+        const main = (() => {
+            const score = new Score("score");
+            score.run();
+        })()
+    </script>
+</body>
+
+</html>

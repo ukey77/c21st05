@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-size: 20px;
+        }
+
+        .wrapper {
+            padding: 1rem;
+        }
+
+        hr {
+            margin: 1rem 0;
+        }
+
+        input[type="number"] {
+            width: 4rem;
+        }
+
+        .numberChoice {
+            width: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="wrapper" class="wrapper">
+        <div class="container">
+            <input type="number" class="numberChoice" draggable="true" value="0">
+            <input type="number" class="numberChoice" draggable="true" value="1">
+            <input type="number" class="numberChoice" draggable="true" value="2">
+            <input type="number" class="numberChoice" draggable="true" value="3">
+            <input type="number" class="numberChoice" draggable="true" value="4">
+            <input type="number" class="numberChoice" draggable="true" value="5">
+            <input type="number" class="numberChoice" draggable="true" value="6">
+            <input type="number" class="numberChoice" draggable="true" value="7">
+            <input type="number" class="numberChoice" draggable="true" value="8">
+            <input type="number" class="numberChoice" draggable="true" value="9">
+        </div>
+        <hr>
+        <div class="container">
+            <input type="number" id="value1" class="input"> +
+            <input type="number" id="value2" class="input"> =
+            <input type="number" id="resultValue" readonly>
+            <button id="resultBtn">계산하기</button>
+        </div>
+    </div>
+    <script>
+        class Summation {
+            constructor(id) {
+                this.id = id;
+            }
+            domId(element) {
+                return document.getElementById(element);
+            }
+            eventListener() {
+                window.addEventListener("click", (e) => {
+                    switch (e.target.id) {
+                        case "resultBtn":
+                            const sumValues = [
+                                Number(this.domId("value1").value),
+                                Number(this.domId("value2").value),
+                            ];
+                            this.domId("resultValue").value = sumValues[0] + sumValues[1];
+                            // this.summation();
+                            break;
+                    }
+                });
+            }
+            dragEvent() {
+                const $ = (select) => document.querySelectorAll(select);
+                $(".numberChoice").forEach((element) => {
+                    element.addEventListener("dragstart", (e) => {
+                        e.dataTransfer.setData("data", String(e.target.value));
+                    });
+                })
+                $(".input").forEach((element) => {
+                    element.addEventListener("dragover", (e) => {
+                        e.preventDefault();
+
+                    })
+                });
+                $(".input").forEach((element) => {
+                    element.addEventListener("drop", (e) => {
+                        e.preventDefault();
+                        e.dataTransfer.getData("data");
+                        document.getElementById(e.target.id).value = e.dataTransfer.getData("data")
+                        // console.log(e.dataTransfer.getData("data"))
+                    })
+                });
+            }
+            run() {
+                this.eventListener();
+                this.dragEvent();
+            }
+        }
+
+        const main = (() => {
+            const sum = new Summation("sum");
+            sum.run();
+        })();
+    </script>
+</body>
+
+</html>

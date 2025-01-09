@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- <link rel="stylesheet" href="./css/captChar.css"> -->
+</head>
+
+<body>
+    <main id="inputArea">
+    </main>
+    <script>
+        class CaptChar {
+            constructor(id) {
+                this.id = id;
+                this.canvas = null;
+                this.pen = null;
+                this.CaptChar = "";
+            }
+
+            getValue() {
+                return document.getElementById("inputV").value;
+            }
+
+            getRandom() {
+                class Queue {
+                    constructor(id) {
+                        this.id = id;
+                        this.storage = [];
+                    }
+                    shiftItem() {
+                        return this.storage.shift();
+                    }
+                    pushItem(item) {
+                        this.storage.push(item);
+                    }
+                    getLength() {
+                        return this.storage.length;
+                    }
+                }
+
+                const queue = new Queue("queue");
+                for (let i = 0; i <= 9; i++) {
+                    queue.pushItem(i);
+                }
+                // console.log(queue);
+
+                const queueLength = queue.getLength();
+                const randomArray = [];
+
+                for (let i = 0; i < queueLength; i++) {
+                    for (let j = 0; j < Math.floor(Math.random() * queue.getLength()); j++) {
+                        queue.pushItem(queue.shiftItem());
+                    }
+                    randomArray.push(queue.shiftItem());
+                }
+                return randomArray;
+            }
+
+            makeCaptChar() {
+                let captChar = "";
+                for (let i = 0; i < 4; i++) {
+                    captChar += Math.ceil(Math.random() * 10) - 1
+                }
+                this.captChar = captChar;
+                return captChar;
+            }
+
+            display() {
+                this.pen.font = "30px Comic Sans MS";
+                this.pen.fillStyle = "red";
+                this.pen.textAlign = "center";
+                this.pen.fillText(this.makeCaptChar(), this.canvas.width / 2, this.canvas.height / 2);
+            }
+
+            displayKeyPad() {
+                const randomArray = this.getRandom();
+                document.getElementById("keyPadAreaLeft").innerHTML = '';
+                document.getElementById("keyPadAreaRight").innerHTML = '';
+                randomArray.forEach((v, i) => {
+                    if (i != randomArray.length - 1) {
+                        document.getElementById("keyPadAreaLeft").innerHTML += `<div id="btn${v}"class="keyLeft" data-value=${v}>${v}</div>`
+                    } else {
+                        document.getElementById("keyPadAreaRight").innerHTML += `<div id="btn${v}" class="keyRight" data-value=${v}>${v}</div>`
+                    }
+                })
+            }
+
+            event() {
+                addEventListener('click', (e) => {
+                    if ((e.target.id).substring(0, 3) === "btn") {
+                        document.getElementById("inputV").value += (e.target.dataset.value);
+                    }
+
+                    switch (e.target.id) {
+                        case "resultBtn":
+                            console.log(this.captChar)
+                            if (this.getValue() === this.captChar) {
+                                document.getElementById("resultArea").innerHTML = "당신은 로봇이 아닙니다."
+                            } else {
+                                document.getElementById("resultArea").innerHTML = "다시 시도 하세요"
+                            }
+                            break;
+                        case "resetBtn":
+                            this.displayKeyPad();
+                            break;
+                    }
+                })
+            }
+
+            initArea(inputArea) {
+                console.log(document.getElementById(inputArea))
+                document.getElementById("inputArea").innerHTML = `
+                <canvas id="myCanvas" width="200" height="100"></canvas>
+                <input id="inputV" type="text"><button id="resultBtn">확인</button>
+                <div id="resultArea" class="resultArea">위의 숫자를 입력하세요</div>
+                <section id="keyPadArea" class="keyPadArea">
+                    <article id="keyPadAreaLeft" class="keyPadAreaLeft"></article>
+                    <article id="keyPadAreaRight" class="keyPadAreaRight"></article>
+                </section> 
+                <article id="resetArea" class="resetArea"> <button id="resetBtn" class="resetBtn">reset</button> </article>
+                `;
+                this.canvas = document.getElementById("myCanvas");
+                this.pen = this.canvas.getContext("2d");
+
+            }
+            run(inputArea) {
+                this.initArea(inputArea);
+                this.display();
+                this.displayKeyPad();
+                this.event();
+            }
+        }
+
+        const captChar = new CaptChar("captChar");
+        captChar.run("inputArea");
+    </script>
+</body>
+
+</html>

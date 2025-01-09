@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+    </style>
+</head>
+
+<body>
+    <div id="wrapper" class="wrapper"></div>
+    <script>
+        class TelBook {
+            constructor(id) {
+                this.id = id;
+                this.data = null;
+            }
+            $(element) {
+                return document.querySelector(element);
+            }
+            getData() {
+                const xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = () => {
+                    if (xhttp.readyState == 4 && xhttp.status == 200) {
+                        const { tel: data } = JSON.parse(xhttp.responseText);
+                        this.data = data;
+                        console.log(this.data);
+                        this.makeDom();
+                    }
+                }
+                xhttp.open("GET", "telBook.json", true);
+                xhttp.send();
+            }
+            makeDom() {
+                const dataArr = [...this.data];
+                let htmlString = ``;
+                dataArr.forEach((item) => {
+                    const { name, tel, gender, address } = item;
+                    const genderIcon = gender === "M" ? "👽" : "👑";
+                    htmlString += `
+                    <div class="item-box">
+                    <p>${name} <span>(${genderIcon})</span></p>
+                    <p>${tel}</p>
+                    <p>${address}</p>
+                    </div>
+                    `;
+                });
+                this.outputDisplay(htmlString);
+            }
+            outputDisplay(htmlTemplate) {
+                const cssString = `
+                <style>
+                    *{
+                        margin: 0;
+                        padding: 0;
+                        font-size: 20px;
+                    }
+                    .wrapper{
+                        position: absolute;
+                        transform: translate(-50%, -50%);
+                        left: 50%;
+                        top: 50%;
+                        background-color: lavender;
+                        width: 20rem;
+
+                    }
+                    .item-box{
+                        border: 2px solid lavender;
+                        padding: 1rem 0;
+                    }
+                    p{
+                        padding: 0.3rem 1rem;
+                    }
+                </style> `;
+                this.$("#wrapper").innerHTML = `${htmlTemplate}${cssString}`;
+            }
+            run() {
+                this.getData();
+            }
+        }
+        window.onload = () => {
+            const main = (() => {
+                const telBook = new TelBook("telBook");
+                telBook.run();
+            })();
+        }
+
+    </script>
+</body>
+
+</html>

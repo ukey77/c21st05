@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>두점의 좌표를 입력하여 점찍기</title>
+    <style>
+        * {
+            font-size: 20px;
+        }
+
+        body {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        main {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            /* width: 900px;
+            height: 1200px; */
+            border: 5px dashed #333;
+            padding:20px;
+        }
+
+        h1 {
+            font-size: 30px;
+        }
+
+        main input {
+            width: 50px;
+            height: 30px;
+            text-align: right;
+        }
+
+        main button {
+            background-color: white;
+            border-radius: 20px;
+            width: 150px;
+            height: 70px;
+        }
+
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+        }
+
+        canvas {
+            border: 1px dashed red;
+        }
+
+        .inputContainer {
+            display: flex;
+        }
+
+        .inputSection {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #333;
+            border-radius: 10px;
+            margin: 10px;
+            padding: 10px;
+
+        }
+    </style>
+</head>
+
+<body>
+    <main id="container">
+    </main>
+    <script>
+        class CanvasDrawLine {
+            constructor(id) {
+                this.id = id;
+                this.canvas = null;
+                this.pen = null;
+                this.width = 0;
+                this.height = 0;
+                this.scaleFactor = 0;
+            }
+
+            initLine() {
+                console.log("initLine : " +this.width, this.height)
+                for (let x = 0; x < this.width; x++) {
+                    this.pen.fillRect(x, this.height / 2, 1, 1)
+                    console.log("initLine : ")
+                }
+                for (let y = 0; y < this.height; y++) {
+                    this.pen.fillRect(this.width / 2, y, 1, 1)
+                    console.log("initLine : ")
+                }
+                this.initScale();
+            }
+
+            initScale() {
+                const halfWidth = this.width / 2;
+                const halfHeight = this.height / 2;
+                for (let x = 0; x <= halfWidth; x = x + this.scaleFactor) {
+                    for (let y = -5; y <= 5; y++) {
+                        this.fillDot(x, y);
+                        this.fillDot(-x, y);
+                    }
+                    //x축 오른쪽 
+                    this.pen.fillText((x / this.scaleFactor), x + halfWidth, halfHeight + 10);
+                    //x축 왼쪽 
+                    this.pen.fillText(-x / this.scaleFactor, -x + halfWidth, halfHeight + 10);
+                }
+
+                for (let y = 0; y <= halfHeight; y = y + this.scaleFactor) {
+                    for (let x = -5; x <= 5; x++) {
+                        this.fillDot(x, y);
+                        this.fillDot(x, -y);
+
+                    }
+                    //y축 위
+                    this.pen.fillText((-y / this.scaleFactor) === 0 ? "" : (-y / this.scaleFactor), halfWidth + 10, halfHeight + y + 5);
+                    //y축 아래 
+                    this.pen.fillText((y / this.scaleFactor) === 0 ? "" : (y / this.scaleFactor), halfWidth + 10, halfHeight - y + 5);
+                }
+            }
+
+            fillDot(x, y) {
+                this.pen.fillRect(this.width / 2 + x, this.height / 2 + (y * -1), 1, 1)
+            }
+
+            fillDotWidthScale(x, y) {
+                this.pen.fillRect(this.width / 2 + (x * this.scaleFactor), this.height / 2 + (y * this.scaleFactor * -1), 1, 1)
+            }
+
+            event() {
+                window.addEventListener('click', (e) => {
+                    switch (e.target.id) {
+                        case "drawLineBtn":
+                            console.log(this.getValues());
+                            this.printCanvas();
+                            this.drawLine(this.getValues())
+                            break;
+                    }
+                })
+            }
+
+            drawLine(values) {
+                let [firstX, firstY, secondX, secondY] = [...values]
+                console.log("drawLine : " + firstX, firstY, secondX, secondY)
+
+                    //First X 가 크면 둘이 자리 바꿔줘라.
+                    if (firstX > secondX) {
+                        [firstX, firstY, secondX, secondY] = [secondX, secondY, firstX, firstY]
+                    }
+                    // (firstX > secondX) && ([firstX, firstY, secondX, secondY] = [secondX, secondY, firstX, firstY])
+
+
+                //1. 기울기 구하기
+                const slope = (firstY - secondY) / (firstX - secondX);
+                console.log("slope : " + slope)
+                //2. 상수 구하기
+                const c = (-1 * (slope * firstX)) + firstY;
+                console.log("c : " + c)
+                for (let x = firstX; x <= secondX; x = x + 0.01) {
+                    const y = (slope * x) + c;
+                    console.log(x, y)
+                    this.fillDotWidthScale(x, y);
+                }
+            }
+            getValues() {
+                const inputValues =
+                    [
+                        Number(document.getElementById("firstX").value),
+                        Number(document.getElementById("firstY").value),
+                        Number(document.getElementById("secondX").value),
+                        Number(document.getElementById("secondY").value),
+                        Number(document.getElementById("canvasX").value),
+                        Number(document.getElementById("canvasY").value),
+                        Number(document.getElementById("scale").value)
+                    ]
+                return inputValues;
+            }
+
+            init(inputArea) {
+                const html = ` <h1>"두 점의 좌표를 입력받아 그래프에 점 찍기"</h1>
+                    <div id="inputContainer" class="inputContainer">
+                        <div class="inputSection">
+                            <p> A [ X = <input id="firstX" type="number"> Y = <input id="firstY" type="number"> ]</p>
+                            <p> B [ X = <input id="secondX" type="number"> Y = <input id="secondY" type="number"> ]</p>
+                        </div>
+                        <div class="inputSection">
+                            <p> 캔버스 X = <input id="canvasX" type="number"> </p>
+                            <p> 캔버스 Y = <input id="canvasY" type="number"> </p>
+                        </div>
+                        <div class="inputSection">
+                            <p> 스케일 = <input id="scale" type="number"> </p>
+                        </div>
+                    </div>
+                    <p><button id="drawLineBtn">직선그리기</button></p>
+                    <article id="canvasArea"></article>
+                    </div>`
+                document.getElementById(inputArea).innerHTML = html;
+            }
+
+            printCanvas() {
+                const [firstX, firstY, secondX, secondY, canvasX, canvasY, scale] = [...this.getValues()]
+                //여기서 width height 값 받아서 다시 넣어주기
+                const canvasString = `<canvas id="canvas" class="canvas" width="${canvasX}" height="${canvasY}""></canvas>`
+                document.getElementById("canvasArea").innerHTML = canvasString;
+
+                this.canvas = document.getElementById("canvas");
+                this.pen = this.canvas.getContext('2d');
+                this.width = this.canvas.getAttribute("width");
+                this.height = this.canvas.getAttribute("height");
+                this.scaleFactor = scale;
+
+                console.log("여기까진 오나?");
+                this.initLine();
+            }
+
+            run(inputArea) {
+                this.init(inputArea);
+                this.event();
+            }
+        }
+
+        const canvasDrawLine = new CanvasDrawLine("id")
+        canvasDrawLine.run("container");
+
+    </script>
+</body>
+
+</html>

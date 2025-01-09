@@ -1,0 +1,48 @@
+{
+    "classNumber": "606",
+    "className": "NODEJS",
+    "studentList": [
+        {
+            "no": 1,
+            "name": "zard",
+            "kor": 80,
+            "math": 89,
+            "eng": 70
+        },
+        {
+            "no": 2,
+            "name": "cdr",
+            "kor": 50,
+            "math": 45,
+            "eng": 66
+        },
+        {
+            "no": 3,
+            "name": "love",
+            "kor": 88,
+            "math": 65,
+            "eng": 81
+        },
+        {
+            "no": 4,
+            "name": "ive",
+            "kor": 69,
+            "math": 55,
+            "eng": 72
+        },
+        {
+            "no": 5,
+            "name": "blackpink",
+            "kor": 70,
+            "math": 49,
+            "eng": 65
+        },
+        {
+            "no": 6,
+            "name": "Yujin",
+            "kor": 70,
+            "math": 49,
+            "eng": 65
+        }
+    ]
+}

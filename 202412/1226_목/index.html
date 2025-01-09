@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <link rel="icon" href="images/calculator.ico">
+
+    <!--MathJax-->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!--Font-->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+    <!--XEIcon-->
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/xeicon@2.3.3/xeicon.min.css">
+
+    <!--Style-->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            font-family: "Rubik", sans-serif;
+        }
+
+        body {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none
+        }
+
+        button {
+            font-family: "Rubik", sans-serif;
+            cursor: pointer;
+        }
+
+        input,
+        label {
+            cursor: pointer;
+        }
+
+        .calAddButton {
+            position: fixed;
+            right: 30px;
+            bottom: 30px;
+
+            width: 300px;
+            height: 90px;
+
+            padding: 5px;
+
+            border: 5px solid #1B1A55;
+            border-radius: 25px;
+            font-size: 27px;
+            font-weight: 600;
+            background: #535C91;
+            color: #ffffff;
+
+            z-index: 1000;
+        }
+
+        .calAddButton:active {
+            background: #737CB1;
+        }
+    </style>
+
+</head>
+
+<body>
+    <button id="calAddButton" class="calAddButton">Add new calculator</button>
+    <div id="calculatorsArea">
+        <div id="calc" class="target"></div>
+    </div>
+
+    <div id="test" class="target"></div>
+
+    <script>
+        class Calculator {
+            constructor(id) {
+                this.id = id;
+            }
+
+            controller() {
+                class Deque {
+                    constructor(id) {
+                        this.id = id;
+                        this.storage = [];
+                    }
+                    unshiftData(data) {
+                        this.storage.unshift(data);
+                    }
+                    pushData(data) {
+                        this.storage.push(data);
+                    }
+                    shiftData() {
+                        return this.storage.shift();
+                    }
+                    popData() {
+                        return this.storage.pop();
+                    }
+                    getSize() {
+                        let count = 0;
+                        this.storage.forEach(() => {
+                            count++;
+                        });
+
+                        return count;
+                    }
+                }
+                const formula = new Deque(`${this.id}formula`);
+
+                const mainArea = document.getElementById(`${this.id}`);
+
+                mainArea.addEventListener("click", (clickEvent) => {
+                    const e = clickEvent ? clickEvent : event;
+                    const currentInput = e.target.dataset.value;
+                    if (currentInput != null) {
+                        let displayString = "";
+                        let result = null;
+
+                        switch (currentInput) {
+                            case "back":
+                                formula.popData();
+                                break;
+                            case "clear":
+                                while (formula.getSize() > 0) {
+                                    formula.popData();
+                                }
+                                break;
+                            case "=":
+                                let calculateString = "";
+
+                                while (formula.getSize() > 0) {
+                                    calculateString += formula.shiftData();
+                                }
+
+                                result = String(this.calculate(calculateString));
+
+                                for (let i = 0; i < result.length; i++) {
+                                    formula.pushData(result[i]);
+                                }
+
+                                if (result === "0") {
+                                    formula.popData();
+                                }
+                                break;
+                            default:
+                                formula.pushData(currentInput);
+                        }
+
+                        this.displayNumber(formula, result);
+                    }
+                });
+
+            }
+            displayNumber(formula, result) { // Visualize
+                const numberDisplay = document.getElementById(`${this.id}Result`);
+                const formatValue = Number(document.getElementById(`${this.id}formatNumber`).value);
+                const formatForm = {
+                    format1: 4,
+                    format2: 3,
+                    format3: 2,
+                    format4: 0
+                };
+
+                const loopCount = formula.getSize();
+                let displayString = "";
+
+                if (loopCount === 0) {
+                    displayString = "0";
+                } else if (result !== null) {
+                    if (formatValue === 0) {
+                        displayString = Number(result).toLocaleString("ko-KR",
+                            { maximumFractionDigits: 10 }
+                        );
+                    } else {
+                        displayString = Number(result).toLocaleString("ko-KR",
+                            {
+                                minimumFractionDigits: formatForm[`format${formatValue}`],
+                                maximumFractionDigits: formatForm[`format${formatValue}`]
+                            }
+                        );
+                    }
+                }
+                else {
+                    //displayString = "";
+                    for (let i = 0; i < loopCount; i++) {
+                        const oneNumber = formula.shiftData();
+                        displayString += oneNumber;
+                        formula.pushData(oneNumber);
+                    }
+                }
+
+                numberDisplay.innerHTML = displayString;
+            }
+
+            calculate(resultString) {
+                try {
+                    const resultValue = eval(resultString);
+
+                    if (resultValue !== undefined) {
+                        return resultValue;
+                    } else {
+                        return 0;
+                    }
+
+                } catch (error) {
+                    return 0;
+                }
+            }
+
+            toggleGraph() {
+                const graphButton = document.getElementById(`${this.id}GraphButton`);
+                const graphDrawer = document.getElementById(`${this.id}GraphDrawer`);
+                const mainArea = document.getElementById(`${this.id}`);
+
+                let isGraphOn = false;
+
+                graphButton.addEventListener("click", () => {
+                    isGraphOn = !isGraphOn;
+                    graphDrawer.style.display = isGraphOn ? "flex" : "none";
+                    mainArea.style.left = isGraphOn ? "calc( 50vw - 750px )" : "calc( 50vw - 150px )";
+                });
+            }
+
+            graphDrawer() {
+                class CanvasDrawer {
+                    constructor(id) {
+                        this.id = id;
+                        this.canvas = null;
+                        this.pen = null;
+
+                        this.scale = 25;
+                        this.deltaScale = 25;
+                        this.moveX = 0;
+                        this.moveY = 0;
+                        this.deltaMove = 25;
+                    }
+                    initCanvas() {
+                        const graphButton = document.getElementById(`${this.id}GraphButton`);
+                        const graphDrawer = document.getElementById(`${this.id}GraphDrawer`);
+                        const mainArea = document.getElementById(`${this.id}`);
+                        let isGraphOn = false;
+
+                        graphButton.addEventListener("click", () => {
+                            isGraphOn = !isGraphOn;
+                            graphDrawer.style.display = isGraphOn ? "flex" : "none";
+                            mainArea.style.left = isGraphOn ? "calc( 50vw - 700px )" : "calc( 50vw - 150px )";
+                        });
+
+                        this.canvas = document.getElementById(`canvas${this.id}`);
+                        this.pen = this.canvas.getContext("2d");
+                        this.pen.fillStyle = "#1B1A55";
+                    }
+
+                    printDot(x, y) {
+                        this.pen.fillRect(x, y, 1, 1);
+                    }
+                    modiDot(x, y) {
+                        this.printDot(this.canvas.width / 2 + this.moveX + x * this.scale, this.canvas.height / 2 + this.moveY - y * this.scale);
+                    }
+
+                    crosshair() {
+                        for (let i = 0; i < this.canvas.width; i++) {
+                            this.printDot(i, this.canvas.height / 2 + this.moveY);
+                        }
+                        for (let i = 0; i < this.canvas.height; i++) {
+                            this.printDot(this.canvas.width / 2 + this.moveX, i);
+                        }
+                    }
+                    drawRatio() {
+                        for (let i = this.canvas.width / 2 + this.moveX; i < this.canvas.width; i += this.scale) {
+                            for (let j = -5 - this.moveY; j <= 5 - this.moveY; j++) {
+                                this.printDot(i, this.canvas.height / 2 - j);
+                            }
+                        }
+                        for (let i = this.canvas.width / 2 + this.moveX; i > 0; i -= this.scale) {
+                            for (let j = -5 - this.moveY; j <= 5 - this.moveY; j++) {
+                                this.printDot(i, this.canvas.height / 2 - j);
+                            }
+                        }
+                        // + Axis Y
+                        for (let i = this.canvas.height / 2 + this.moveY; i < this.canvas.height; i += this.scale) {
+                            for (let j = -5 - this.moveX; j <= 5 - this.moveX; j++) {
+                                this.printDot(this.canvas.width / 2 - j, i);
+                            }
+                        }
+                        // - Axis Y
+                        for (let i = this.canvas.height / 2 + this.moveY; i > 0; i -= this.scale) {
+                            for (let j = -5 - this.moveX; j <= 5 - this.moveX; j++) {
+                                this.printDot(this.canvas.width / 2 - j, i);
+                            }
+                        }
+                    }
+                    displayGraph( graphPosition ) {
+                        for (const key in graphPosition) {
+                            switch (key) {
+                                case "linear":
+                                    // y = a * x + b
+                                    this.pen.fillStyle = "red";
+                                    graphPosition[key].forEach((position) => {
+                                        const [linearA, linearB] = position;
+                                        for (let i = (-(this.canvas.width / 2)); i < this.canvas.width / 2; i += 1 / this.scale) {
+                                            const y = linearA * i + linearB;
+                                            this.modiDot(i, y);
+                                        }
+                                    });
+
+                                    break;
+                                case "quadratic":
+                                    // y = a * i**2 * b * i + c
+                                    this.pen.fillStyle = "blue";
+                                    graphPosition[key].forEach((position) => {
+                                        const [quadraticA, quadraticB, quadraticC] = position;
+                                        for (let i = (-(this.canvas.width / 2)); i < this.canvas.width / 2; i += 1 / this.scale) {
+                                            const y = quadraticA * i ** 2 + quadraticB * i + quadraticC;
+                                            this.modiDot(i, y);
+                                        }
+                                    });
+
+                                    break;
+                                case "cubic":
+                                    // y = a * x**3 + b * x**2 + c*x + d
+                                    this.pen.fillStyle = "green";
+                                    graphPosition[key].forEach((position) => {
+                                        const [cubicA, cubicB, cubicC, cubicD] = position;
+                                        for (let i = (-(this.canvas.width / 2)); i < this.canvas.width / 2; i += 1 / this.scale) {
+                                            const y = cubicA * i ** 3 + cubicB * i ** 2 + cubicC * i + cubicD
+                                            this.modiDot(i, y);
+                                        }
+                                    });
+
+                                    break;
+                                case "circle":
+                                    // cos sin
+                                    this.pen.fillStyle = "violet";
+                                    graphPosition[key].forEach((position) => {
+                                        const [circleX, circleY, radian] = position;
+                                        for (let i = 0; i < 360; i += 1 / this.scale) {
+                                            const cos = Math.cos((i * Math.PI) / 180) * radian + circleX;
+                                            const sin = Math.sin((i * Math.PI) / 180) * radian + circleY;
+                                            this.modiDot(cos, sin);
+                                        }
+                                    });
+
+                                    break;
+                            }
+                            this.pen.fillStyle = "#1B1A55";
+                        }
+                    }
+                    graphControler(controlInput) {
+                        switch (controlInput) {
+                            case "plus":
+                                this.scale = this.scale < 300 ? this.scale + this.deltaScale : this.scale;
+                                this.deltaMove = this.scale;
+                                break;
+                            case "minus":
+                                this.scale = this.scale > 25 ? this.scale - this.deltaScale : 10;
+                                this.deltaMove = this.scale;
+                                break;
+                            case "up":
+                                this.moveY += this.deltaMove;
+                                break;
+                            case "left":
+                                this.moveX += this.deltaMove;
+                                break;
+                            case "right":
+                                this.moveX -= this.deltaMove;
+                                break;
+                            case "down":
+                                this.moveY -= this.deltaMove;
+                                break;
+                            case "resetView":
+                                this.scale = 25;
+                                this.deltaMove = this.scale;
+                                this.moveX = 0;
+                                this.moveY = 0;
+                                break;
+                            case "clear":
+                                this.scale = 25;
+                                this.deltaMove = this.scale;
+                                this.moveX = 0;
+                                this.moveY = 0;
+                                break;
+                        }
+                    }
+                    resetCanvas() {
+                        this.pen.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                        this.crosshair();
+                        this.drawRatio(this.scale);
+                    }
+
+                    getLinearCoord() {
+                        try {
+                            const a = document.getElementById(`${this.id}LinearA`).value !== "" ? eval(document.getElementById(`${this.id}LinearA`).value) : 0;
+                            const b = document.getElementById(`${this.id}LinearB`).value !== "" ? eval(document.getElementById(`${this.id}LinearB`).value) : 0;
+
+                            return [a, b];
+                        } catch (error) {
+                            console.log(error);
+                        }
+                    }
+
+                    getQuadraticCoord() {
+                        try {
+                            const a = document.getElementById(`${this.id}QuadraticA`).value !== "" ? eval(document.getElementById(`${this.id}QuadraticA`).value) : 0;
+                            const b = document.getElementById(`${this.id}QuadraticB`).value !== "" ? eval(document.getElementById(`${this.id}QuadraticB`).value) : 0;
+                            const c = document.getElementById(`${this.id}QuadraticC`).value !== "" ? eval(document.getElementById(`${this.id}QuadraticC`).value) : 0;
+
+                            return [a, b, c];
+                        } catch (error) {
+
+                        }
+
+                    }
+
+                    getCubicCoord() {
+                        try {
+                            const a = document.getElementById(`${this.id}CubicA`).value !== "" ? eval(document.getElementById(`${this.id}CubicA`).value) : 0;
+                            const b = document.getElementById(`${this.id}CubicB`).value !== "" ? eval(document.getElementById(`${this.id}CubicB`).value) : 0;
+                            const c = document.getElementById(`${this.id}CubicC`).value !== "" ? eval(document.getElementById(`${this.id}CubicC`).value) : 0;
+                            const d = document.getElementById(`${this.id}CubicD`).value !== "" ? eval(document.getElementById(`${this.id}CubicD`).value) : 0;
+
+                            return [a, b, c, d];
+                        } catch (error) {
+
+                        }
+
+                    }
+
+                    getCircleCoord() {
+                        try {
+                            const x = document.getElementById(`${this.id}CircleX`).value !== "" ? eval(document.getElementById(`${this.id}CircleX`).value) : 0;
+                            const y = document.getElementById(`${this.id}CircleY`).value !== "" ? eval(document.getElementById(`${this.id}CircleY`).value) : 0;
+                            const radian = document.getElementById(`${this.id}CircleR`).value !== "" ? eval(document.getElementById(`${this.id}CircleR`).value) : 1;
+
+                            return [x, y, radian];
+                        } catch (error) {
+
+                        }
+
+                    }
+                    canvasControl() {
+                        this.initCanvas();
+                        this.crosshair(); // 십자
+                        this.drawRatio();
+                    }
+
+                }
+
+                const canvas = new CanvasDrawer(`${this.id}`);
+                canvas.canvasControl();
+
+                const choiceChecker = {
+                    linear: false,
+                    quadratic: false,
+                    cubic: false,
+                    circle: false
+                }
+                let graphPosition = {};
+
+                const graphDrawArea = document.getElementById(`${this.id}GraphDrawer`);
+                graphDrawArea.addEventListener("click", (clickEvent) => {
+                    const e = clickEvent ? clickEvent : event;
+
+                    const choiceInput = e.target.dataset.choice;
+                    const graphInput = e.target.dataset.graph;
+                    const controlInput = e.target.dataset.control;
+
+                    if (choiceInput != null) { // 그래프 타입 체크박스
+                        choiceChecker[choiceInput] = !choiceChecker[choiceInput];
+
+                        this.showGraphInputs(choiceInput, choiceChecker[choiceInput]);
+                    }
+                    if (graphInput != null) { // 그래프 그리기
+                        if (!(graphInput in graphPosition)) {
+                            graphPosition[graphInput] = [];
+                        }
+                        switch (graphInput) {
+                            case "linear":
+                                graphPosition[graphInput].push(canvas.getLinearCoord());
+                                break;
+                            case "quadratic":
+                                graphPosition[graphInput].push(canvas.getQuadraticCoord());
+                                break;
+                            case "cubic":
+                                graphPosition[graphInput].push(canvas.getCubicCoord());
+                                break;
+                            case "circle":
+                                graphPosition[graphInput].push(canvas.getCircleCoord());
+                                break;
+                        }
+                        canvas.displayGraph(graphPosition);
+                    }
+                    if (controlInput != null) { // 그래프 확대 이동
+                        canvas.graphControler(controlInput);
+                        if (controlInput === "clear") { graphPosition = {}; }
+
+                        canvas.resetCanvas();
+                        canvas.displayGraph(graphPosition);
+                    }
+                });
+            }
+
+
+            showGraphInputs(choiceInput, choiceChecker) {
+                const targetDom = document.getElementById(`${this.id}${choiceInput}Target`);
+                switch (choiceInput) {
+                    case "Linear":
+                        targetDom.innerHTML = choiceChecker ? `
+                            <h3 class="formula"> \\(f(x) = ax + b\\) </h3>
+                            <label>a : <input id="${this.id}LinearA" type="text"></label>
+                            <label>b : <input id="${this.id}LinearB" type="text"></label>
+                            <br>
+                            <button id="drawLinear" class="drawButton" data-graph="linear">
+                                Draw
+                            </button>
+                        ` : ``;
+                        break;
+                    case "Quadratic":
+                        targetDom.innerHTML = choiceChecker ? `
+                            <h3 class="formula"> \\(f(x) = ax^2 + bx + c\\) </h3>
+                            <label>a : <input id="${this.id}QuadraticA" type="text"></label>
+                            <label>b : <input id="${this.id}QuadraticB" type="text"></label>
+                            <label>c : <input id="${this.id}QuadraticC" type="text"></label>
+                            <br>
+                            <button id="drawQuadratic" class="drawButton" data-graph="quadratic">
+                                Draw
+                            </button>
+                        ` : ``;
+                        break;
+                    case "Cubic":
+                        targetDom.innerHTML = choiceChecker ? `
+                            <h3 class="formula"> \\(f(x) = ax^3 + bx^2 + cx + d\\) </h3>
+                            <label>a : <input id="${this.id}CubicA" type="text"></label>
+                            <label>b : <input id="${this.id}CubicB" type="text"></label>
+                            <label>c : <input id="${this.id}CubicC" type="text"></label>
+                            <label>d : <input id="${this.id}CubicD" type="text"></label>
+                            <br>
+                            <button id="drawCubic" class="drawButton" data-graph="cubic">
+                                Draw
+                            </button>
+                        ` : ``;
+                        break;
+                    case "Circle":
+                        targetDom.innerHTML = choiceChecker ? `
+                            <h3 class="formula"> \\(r^2 = (x-a)^2 + (y-b)^2\\) </h3>
+                            <label>Radius : <input id="${this.id}CircleR" type="text"></label>
+                            <label>a : <input id="${this.id}CircleX" type="text"></label>
+                            <label>b : <input id="${this.id}CircleY" type="text"></label>
+                            <br>
+                            <button id="drawCircle" class="drawButton" data-graph="circle">
+                                Draw
+                            </button>
+                        ` : ``;
+                        break;
+                }
+                MathJax.typeset();
+            }
+
+            initCalculator(targetDom) {
+                const calculatorHTML = `
+                    <!--<button></button>-->
+                    <div id="${this.id}Result" class="resultArea">0</div>
+                    <div id="interface" class="interface">
+                        <button id="${this.id}GraphButton" class="graphButton">
+                            GRAPH
+                        </button>
+                        <div class="formater">
+                            <input type="range" id="${this.id}formatNumber" class="formatNumber" min="0" max="4" value="0" />
+                            <p>F 4 3 2 0</p>
+                        </div>
+                    </div>
+                    <div id="buttons" class="buttons">
+                        <button class="button clear" data-value="clear">C</button>
+                        <button class="button operator" data-value="(">(</button>
+                        <button class="button operator" data-value=")">)</button>
+                        <button class="button operator paddingTop" data-value="back">
+                            <i data-value="back" class="xi-play"></i>
+                        </button>    
+                        <button class="button" data-value="7">7</button>
+                        <button class="button" data-value="8">8</button>
+                        <button class="button" data-value="9">9</button>
+                        <button class="button operator symbol" data-value="/">÷</button>    
+                        <button class="button" data-value="4">4</button>
+                        <button class="button" data-value="5">5</button>
+                        <button class="button" data-value="6">6</button>
+                        <button class="button operator paddingTop" data-value="*">
+                            <i data-value="*" class="xi-close"></i>
+                        </button>    
+                        <button class="button" data-value="1">1</button>
+                        <button class="button" data-value="2">2</button>
+                        <button class="button" data-value="3">3</button>
+                        <button class="button operator paddingTop" data-value="-">
+                            <i data-value="-" class="xi-minus"></i>
+                        </button>    
+                        <button class="button" data-value="0">0</button>
+                        <button class="button" data-value=".">.</button>
+                        <button class="button operator paddingTop" data-value="=">
+                            <i data-value="=" class="xi-drag-handle"></i>
+                        </button> 
+                        <button class="button operator paddingTop" data-value="+">
+                            <i data-value="+" class="xi-plus"></i>
+                        </button>
+                    </div>
+                `;
+                const calculatorCSS = `
+                    .resultArea { 
+                        margin: auto;
+                        margin-top: 2px;
+                        width: 270px; /*90%*/ 
+                        height: 70px; 
+                        color: black; font-size: 50px; line-height: 70px;
+                        text-align: right; border-radius: 10px;
+                        margin-bottom: 10px;
+                        color: #ffffff;
+                        font-weight: 600;
+                        overflow: scroll;
+                    }
+                        .resultArea::-webkit-scrollbar {
+                            display: none;
+                        }
+                    .interface {
+                        margin: auto;
+                        width: 285px; /*95%*/
+                        height: 60px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                    }
+                        .graphButton {
+                            border: none;
+                            background: none;
+                            
+                            width: 140px;
+                            height: 45px;
+
+                            background: #9290C3;
+                            border-radius: 25px;
+
+                            font-size: 25px;
+                            font-weight: 600;
+                            color: #1B1A55;
+                        }
+                            .graphButton:active {
+                                background-color: #7270A3;
+                            }
+                        .formater {
+                            height: 30px;
+                        }
+                        .formatNumber {
+                            appearance: none;
+                            border-radius: 3px;
+                            width: 125px;
+                            height: 5px;
+                            margin-bottom: 10px;
+                            padding: 0;
+                        }
+                            .formatNumber::-webkit-slider-thumb {
+                                appearance: none;
+                                width: 20px;
+                                height: 20px;
+                                border-radius: 50%;
+                                border: 3px white solid;
+                                
+
+                                background: #535C91;
+                            }
+                            p {
+                                margin-left: 4px;
+                                color: #ffffff;
+                                letter-spacing: 6.5px;
+                                font-weight: 600;
+                            }
+                    .buttons {
+                        width: 300px;
+                        margin-top: 10px;
+                    }
+                    .button { 
+                        width: 67px; height: 67px; float: left;
+                        border: none; border-radius: 50%;
+                        margin: 4px;
+                        font-size: 30px;
+                        font-weight: 400;
+                        background: #535C91;
+                        color: #ffffff;
+                    }
+                        .button:active {
+                            background-color: #434C71;
+                        }
+                        .paddingTop {
+                            padding-top: 5px;
+                        }
+                    .operator {
+                        color: #1B1A55;
+                        background: #9290C3;
+                    }
+                        .operator:active {
+                            background-color: #7270A3;
+                        }
+                    .clear {
+                        color: #BF3131;
+                        font-weight: 600;
+                        background: #9290C3;
+                    }
+                        .clear:active {
+                            background-color: #7270A3;
+                        }
+                    .symbol { 
+                        font-size: 50px; 
+                        font-weight: 300;
+                    }
+            `;
+
+                const graphDrawerHTML = `
+                <div id="${this.id}GraphDrawer" class="graphDrawer">
+                    <div id="graphInterface" class="graphInterface">
+                        <div id="${this.id}Linear" class="inputArea marginTop">
+                            <label>
+                                <input class="graphChoice" type="checkbox" data-choice="Linear">
+                                <h2 class="graphName">Linear Equation</h2>
+                            </label>
+                            <br>
+                            
+                            <div id="${this.id}LinearTarget" class="inputTargetArea">
+                            </div>
+                        </div>
+                        <div id="${this.id}Quadratic" class="inputArea">
+                            <label>
+                                <input class="graphChoice" type="checkbox"  data-choice="Quadratic">
+                                <h2 class="graphName">Quadratic Equation</h2>
+                            </label>
+                            <br>
+                            <div id="${this.id}QuadraticTarget" class="inputTargetArea">
+                                
+                            </div>
+                        </div>
+                        <div id="${this.id}Cubic" class="inputArea">
+                            <label>
+                                <input class="graphChoice" type="checkbox"  data-choice="Cubic">
+                                <h2 class="graphName">Cubic Equation</h2>
+                            </label>
+                            <br>
+                            <div id="${this.id}CubicTarget" class="inputTargetArea">
+                            </div>
+                        </div>
+                        <div id="${this.id}Circle" class="inputArea">
+                            <label>
+                                <input class="graphChoice" type="checkbox"  data-choice="Circle">
+                                <h2 class="graphName">Circle Equation</h2>
+                            </label>
+                            <br>
+                            <div id="${this.id}CircleTarget" class="inputTargetArea">
+                            </div>
+                        </div>
+                    </div>
+                    <div id="canvasArea">
+                        <canvas id="canvas${this.id}" width="500" height="500"></canvas>
+                    </div>
+                    <div id="canvasControler" class="canvasControler">
+                        <div id="scaleControl" class="scaleControl">
+                            <button class="scaleButton" data-control="plus">
+                                <i data-control="plus" class="xi-plus"></i>
+                            </button>
+                            <button class="scaleButton marginBottom" data-control="minus">
+                                <i data-control="minus" class="xi-minus"></i>
+                            </button>
+                        </div>
+                        <div id="positionControl" class="positionControl">
+                            <div id="arrowButtons" class="arrowButtons">
+                                <button class="positionButton upButton" data-control="up">
+                                    <i data-control="up" class="xi-angle-up"></i>
+                                </button><br>
+                                <button class="positionButton leftButton" data-control="left">
+                                    <i data-control="left" class="xi-angle-left"></i>
+                                </button>
+                                <button class="positionButton resetButton" data-control="resetView">
+                                    <i data-control="resetView" class="xi-refresh"></i>
+                                </button>
+                                <button class="positionButton rightButton" data-control="right">
+                                    <i data-control="right" class="xi-angle-right"></i>
+                                </button><br>
+                                <button class="positionButton downButton" data-control="down">
+                                    <i data-control="down" class="xi-angle-down"></i>
+                                </button><br>
+                            </div>
+                            <button class="canvasClear" data-control="clear">
+                                CLEAR
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+                const graphDrawerCSS = `
+                    .graphDrawer {
+                        width: 1100px;
+                        height: 540px;
+                        position: absolute;
+                        top: 25px;
+                        left: 340px;
+
+                        background: #535C91;
+                        border-top-right-radius: 30px;
+                        border-bottom-right-radius: 30px;
+
+                        display: none;
+                        /*display: flex;*/
+                        justify-content: space-between;
+                        align-items: center;
+
+                        color: #ffffff;
+                    }
+
+                        .graphInterface {
+                            width: 300px;
+                            height: 100%;
+
+                            margin-left: 20px;
+                            margin-right: 20px;
+                        }
+                            .graphChoice {
+                                width: 30px;
+                                color: red;
+                            }
+                            .graphName {
+                                display: inline-block;
+                                font-size: 27px;
+                                margin-top: -10px;
+                            }
+                            .formula {
+                                font-size: 20px;
+                                margin-bottom: 5px;
+                            }
+                            .inputArea {
+                                width: 300px;
+                            }
+                                .inputTargetArea {
+                                    width: 100%;
+                                    height: 100px;
+
+                                    margin-left: 40px;
+                                }
+                                    input {
+                                        width: 40px;
+                                        height: 20px;
+
+                                        font-size: 20px;
+                                        text-align: right;
+
+                                        padding-right: 10px;
+
+                                        border: none;
+                                        border-radius: 10px;
+                                        outline: none;
+                                    }
+                                    .drawButton {
+                                        width: 70px;
+                                        height: 32px;
+
+                                        background: #9290C3;
+                                        color: #1B1A55;
+                                        border: none;
+                                        border-radius: 10px;
+
+                                        margin: 5px 0 0px 230px;
+
+                                        font-size: 20px;
+                                        font-weight: 600;
+                                        text-align: center;
+                                    }
+                                        .drawButton:active {
+                                            background-color: #7270A3;
+                                        }
+                        canvas {
+                            margin-top: 4px;
+                            background: #ffffff;
+                            border-radius: 30px;
+                        }
+
+                        .canvasControler {
+                            width: 200px;
+                            height: 450px;
+                        }
+                            .arrowButtons {
+                                width: 165px;
+                                height: 165px;
+                                border-radius: 50%;
+                                
+                                position: relative;
+                                overflow: hidden;
+
+                                background: #1B1A55;
+                            }
+                                .upButton {
+                                    top: 0px;
+                                    left: 0;
+
+                                    height: 55px;
+                                    width: 100%;
+
+                                    z-index: 5;
+                                }
+                                .downButton {
+                                    top: 110px;
+                                    left: 0;
+
+                                    height: 55px;
+                                    width: 100%;
+                                }
+                                .leftButton {
+                                    top: 0px;
+                                    left: 0;
+
+                                    height: 100%;
+                                    width: 55px;
+                                }
+                                .rightButton {
+                                    
+                                    top: 0;
+                                    left: 110px;
+
+                                    height: 100%;
+                                    width: 55px;
+                                }
+                            .scaleControl {
+                                width: 165px;
+                                height: 50px;
+
+                                border-radius: 20px;
+                                overflow: hidden;
+                            }
+                                .scaleButton {
+                                    width: 50%;
+                                    height: 100%;
+
+                                    border:none;
+                                    float:left;
+
+                                    background: #1B1A55;
+                                    color: #ffffff;
+
+                                    font-size: 35px;
+                                    padding: 5px 0 0 0px;
+                                }
+                                    .scaleButton:active {
+                                        background: #7270A3;
+                                    }
+                            .positionControl {
+                                width: 100%;
+                                margin-top: 180px;
+                            }
+                                .positionButton {
+                                    position: absolute;
+                                    background: #1B1A55;
+                                    color: #ffffff;
+
+                                    font-size: 35px;
+
+                                    border: none;
+
+                                    padding: 5px 0 0 0;
+                                }
+                                .resetButton {
+                                    background: #9290C3;
+                                    color: #BF3131;
+
+                                    border-radius: 50%;
+                                    border: none;
+
+                                    width: 50px;
+                                    height: 50px;
+
+                                    top: calc( 50% - 25px );
+                                    left: calc( 50% - 25px );
+                                    z-index: 10;
+                                }
+                                    .resetButton:active {
+                                        background: #7270A3;
+                                    }
+                                .canvasClear {
+                                    width: 166px;
+                                    height: 50px;
+
+                                    background-color: #9290C3;
+                                    border-radius: 25px;
+                                    border: none;
+
+                                    font-size: 35px;
+                                    font-weight: 600;
+                                    color: #BF3131;
+
+                                    margin-top: 20px;
+                                }
+                                    .canvasClear:active {
+                                        background-color: #7270A3;
+                                    }
+                    .marginTop { margin-top: 25px; }
+                    .marginLeft { margin-left: 58px; }
+                    .marginRight { margin-right: 55px; }
+                    .marginBottom { margin-bottom: 50px; }
+
+            `;
+
+                const HTMLStruct = `
+                    <div id="${this.id}" class="mainBox">
+                        ${calculatorHTML}
+                        ${graphDrawerHTML}
+                        
+                    </div>
+                `;
+                const CssStruct = `
+                    <style>
+                        .mainBox { 
+                            position: absolute;
+                            top: calc( 15vh );
+                            left: calc( 50vw - 150px );
+                            width: 300px; height: 550px; padding: 20px; 
+                            border: 1px solid darkgrey;
+                            border-radius: 30px;
+                            background: #1B1A55;
+                            position: relative;
+
+                            margin-bottom: 50px;
+                            transition: 1s;
+                        }
+                        
+                        ${calculatorCSS}
+                        ${graphDrawerCSS}
+                    </style>
+                `;
+
+                targetDom.innerHTML = HTMLStruct + CssStruct;
+            }
+            control(targetDom) {
+                this.initCalculator(targetDom);
+
+                this.controller();
+                this.toggleGraph();
+                this.graphDrawer();
+            }
+        }
+
+        class ShowCalculator {
+            constructor(id) {
+                this.id = id;
+                this.calculatorCounter = 0;
+                this.storage = null;
+            }
+            setStorage( ) {
+                class Stack {
+                    constructor(id) {
+                        this.id = id;
+                        this._data = [];
+                    }
+                    pushData(value) {
+                        this._data.push(value);
+                    }
+                    popData() {
+                        return this._data.pop();
+                    }
+                    getSize() {
+                        return this._data.length;
+                    }
+                }
+                this.storage = new Stack("calculators");
+            }
+
+            addCalculator( targetDom ) {
+                const addCalButton = document.getElementById("calAddButton");
+                addCalButton.addEventListener("click", () => {
+                    // HTML 영역 추가
+                    const newCalculator = document.createElement("div");
+                    newCalculator.setAttribute("id", `area${this.calculatorCounter}`);
+                    targetDom.appendChild(newCalculator);
+                    // 계산기 추가
+                    const calculator = new Calculator(`calculator${this.calculatorCounter}`);
+                    calculator.control(document.getElementById(`area${this.calculatorCounter}`));
+                    this.storage.pushData(calculator);
+
+                    this.calculatorCounter ++;
+                });
+            }
+
+            initScreen() {
+                const calculator = new Calculator('calculator');
+                calculator.control(document.getElementById('calc'));
+                this.storage.pushData( calculator );
+            }
+
+            control( targetDom ) {
+                this.setStorage();
+                this.initScreen();
+                this.addCalculator( targetDom );
+            }
+        }
+
+        const main = (() => {
+            const showCalculator = new ShowCalculator("main");
+            showCalculator.control( document.getElementById("calculatorsArea") );
+        })();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>여러가지</title>
+</head>
+
+<body>
+    <div id="main">
+        <button id="fibonacci">Fibonacci</button>
+        <button id="oneToHundred">0 ~ 100</button>
+        <button id="palindrome">Palindrome</button>
+        <button id="exponent">지수 표기</button>
+        <button id="pizza">피자</button>
+        <div id="contentArea">
+            <!-- <div id="fibonacciArea"></div>
+            <div id="oneToHundredArea"></div> -->
+        </div>
+
+
+    </div>
+    <script>
+        /*
+            피보나치 (100보다 작은 값)
+            0 ~ 100까지 정수 100개 입력받고 평균, 중앙값, 최대, 최소 출력
+            문자열 palindrome 체크
+            -100,000 ~ 100,000 실수 100개를 생성해 평균을 지수표기로 출력
+            원(반지름 100)을 숫자를 입력 받아 n 등분
+        */
+        class MathSet {
+            constructor(id) {
+                this.id = id;
+            }
+
+            initScreen() {
+                const html = `
+                    
+                `;
+            }
+
+            fibonacci() {
+                const limit = 100;
+                const resultArr = [1, 1];
+                while (true) {
+                    const len = resultArr.length;
+                    const cur = resultArr[len - 1] + resultArr[len - 2];
+                    if (cur > limit) break;
+                    resultArr.push(cur);
+                }
+
+                return resultArr;
+            }
+
+            fibonacciScreen() {
+                const html = `
+                    <h2>100보다 작은 피보나치 수열</h2>
+                    <p id="fibonacciResult">${this.fibonacci().reduce((acc, cur) => `${acc}, ${cur}`)}</p>
+                `;
+
+                return html;
+            }
+
+            drawDispersion() {
+                class Canvas {
+                    constructor(id) {
+                        this.id = id;
+                        this.numberArray = [];
+                        this.scaleFactor = 5;
+
+                        this.canvas = null;
+                        this.pen = null;
+                    }
+
+                    init() {
+                        //const html = `<canvas id="canvas" class="canvas" width="500" height="500"></canvas>`;
+                        //const css = `<style>.canvas { border: 1px solid skyblue; }</style>`
+
+                        //document.getElementById("contentArea").innerHTML += html + css;
+
+                        this.canvas = document.getElementById("canvas");
+                        this.pen = this.canvas.getContext("2d");
+                    }
+
+                    setNumberArray(numberArray) {
+                        this.numberArray = numberArray;
+                    }
+
+                    modiDot(x, y) {
+                        this.pen.fillRect(x * this.scaleFactor, this.canvas.height - y * this.scaleFactor, 1, 1);
+                    }
+
+                    drawDots() {
+                        this.numberArray.forEach((num, i) => {
+                            this.modiDot(i + 1, num);
+                        });
+                    }
+
+                    run(numberArray) {
+                        this.init();
+                        this.setNumberArray(numberArray);
+                        this.drawDots();
+                    }
+                }
+                const canvas = new Canvas(this.id);
+                canvas.run([]);
+            }
+
+            sortArr(numberArray, len) {
+                const merge = (arr1 = [], arr2 = []) => { // merge
+                    let [pos1, pos2] = [0, 0];
+                    const mergeList = [];
+
+                    for (let i = 0; i < (arr1.length + arr2.length); i++) {
+                        if (arr1[pos1] <= arr2[pos2] || arr2.length === pos2) {
+                            mergeList.push(arr1[pos1]);
+                            pos1 += 1;
+                            continue;
+                        }
+                        if (arr2[pos2] <= arr1[pos1] || arr1.length === pos1) {
+                            mergeList.push(arr2[pos2]);
+                            pos2 += 1;
+                            continue;
+                        }
+                    }
+
+                    return mergeList;
+                }
+
+                const divisionArr = numberArray.map((num) => { // division
+                    return [num];
+                });
+
+                let resultList = [...divisionArr];
+                while (true) {
+                    const len = resultList.length;
+                    let temp = [];
+                    for (let i = 0; i < len; i += 2) {
+                        temp.push(merge(resultList[i], resultList[i + 1]));
+                    }
+                    resultList = [...temp];
+                    console.log(resultList)
+                    if (resultList.length === 1) break;
+                }
+
+                console.log(...resultList);
+                return resultList[0];
+            }
+
+            oneToHundred(numberArray) {
+                const len = numberArray.reduce((acc, cur) => {
+                    return acc + 1;
+                }, 0);
+
+                const sortedList = this.sortArr(numberArray, len);
+
+                const getAverage = () => {
+                    return numberArray.reduce((acc, cur) => acc + cur) / len;
+                }
+                const getMedium = () => {
+                    if (len % 2 === 0) {
+                        return (sortedList[len / 2 - 1] + sortedList[len / 2]) / 2;
+                    } else {
+                        return sortedList[Math.floor(len / 2)];
+                    }
+                }
+                const getMax = () => {
+                    return Math.max(...numberArray);
+                }
+                const getMin = () => {
+                    return Math.min(...numberArray);
+                }
+                const getMode = () => {
+                    const result = [];
+
+                    let key = undefined;
+
+                    for (let i = 0; i < sortedList.length; i++) {
+                        if (key === sortedList[i]) {
+                            result[result.length - 1][1] += 1;
+                        } else {
+                            key = sortedList[i];
+                            result.push([key, 1]); // [value, count]
+                        }
+                    }
+
+                    const resultObj = {
+                        "value": 0,
+                        "count": 0
+                    }
+
+                    for (const value of result) {
+                        if (value[1] > resultObj["count"]) {
+                            resultObj["value"] = value[0];
+                            resultObj["count"] = value[1];
+                        }
+                    }
+
+                    return resultObj["value"];
+                }
+
+                const getStandardDeviation = () => {
+                    const avg = getAverage();
+
+                    return (numberArray.reduce((acc, cur) => {
+                        return acc + ((cur - avg) ** 2)
+                    }, 0) / len) ** (1 / 2);
+                }
+
+                const dispersion = () => {
+                    const sortedList = this.sortArr(numberArray, len);
+                }
+
+                return {
+                    "average": getAverage(),
+                    "medium": getMedium(),
+                    "max": getMax(),
+                    "min": getMin(),
+                    "mode": getMode(),
+                    "standardDeviation": getStandardDeviation(),
+                }
+            }
+
+            oneToHundredScreen() {
+                const randomHundred = [...new Array(100)].map((_, i) => Math.floor(Math.random() * (100 + 1)));
+                const inputList = [];
+                randomHundred.forEach((num, index) => {
+                    const inputTag = `<input type="number" class="number" id="num${index}" value="${num}">`;
+                    inputList.push(inputTag);
+                });
+
+                const result = this.oneToHundred(randomHundred);
+
+                const html = `
+                    ${inputList.join("")}
+                    <div id="oneToHundredResult">
+                        <p>평균 : ${result["average"]}</p>
+                        <p>중앙값 : ${result["medium"]}</p>
+                        <p>최댓값 : ${result["max"]}</p>
+                        <p>최솟값 : ${result["min"]}</p>
+                        <p>최빈값 : ${result["mode"]}</p>
+                        <p>표준편차 : ${result["standardDeviation"]}</p>
+                        <p>분산도</p>
+                    </div>
+                `;
+
+                const css = `
+                    <style>
+                        .number {
+                            width: 40px;
+                            text-align: right;
+                            margin: 3px;
+                        }
+                        p::after{
+                            content: "🧛‍♀️";
+                        }
+                    </style>
+                `;
+
+                return html + css;
+            }
+
+            palindromeScreen() {
+                const id = "inputString";
+                const html = `
+                    <input type="text" id="${id}">
+                    <button id="palindromeButton">결과 보기</button>
+                `;
+            }
+
+            eventManager() {
+                const buttonList = ["fibonacci", "oneToHundred", "palindrome", "exponent", "pizza"];
+
+                addEventListener("click", (e) => {
+                    if (buttonList.includes(e.target.id)) {
+                        let content = null;
+                        switch (e.target.id) {
+                            case "fibonacci":
+                                content = this.fibonacciScreen();
+                                break;
+                            case "oneToHundred":
+                                content = this.oneToHundredScreen();
+                                break;
+                            case "palindrome":
+                                content = "";
+                                break;
+                            case "exponent":
+                                content = "";
+                                break;
+                            case "pizza":
+                                content = "";
+                                break;
+                        }
+                        if (content !== null) {
+                            document.getElementById("contentArea").innerHTML = content;
+                        }
+                    }
+                });
+            }
+
+            run() {
+                this.initScreen();
+                this.eventManager();
+            }
+        }
+        const mathSet = new MathSet("main");
+        mathSet.run();
+    </script>
+</body>
+
+</html>

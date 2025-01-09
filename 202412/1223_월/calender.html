@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-size: 10px;
+        }
+
+        .wrapper {
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .layout {
+            width: 50%;
+            height: 80%;
+        }
+
+        article {
+            margin: 1rem;
+        }
+
+        .calenderArea {
+            width: 100%;
+            /* height: 100%; */
+            border-radius: .5rem;
+            overflow: hidden;
+            box-shadow: 0px 3px 5px #7c7c7c;
+        }
+
+        .weekArea {
+            width: 100%;
+            height: 5rem;
+            display: flex;
+        }
+
+        .weekBox {
+            width: calc((100% / 7));
+            height: 100%;
+            text-align: center;
+            line-height: 5rem;
+            border-left: 1px solid orange;
+            background: #ffe8c7;
+            font-size: 2rem;
+        }
+
+        .weekBox:nth-child(1) {
+            border: none;
+        }
+
+        .dayArea {
+            width: 100%;
+            float: left;
+        }
+
+        .dayBox {
+            width: calc(100% / 7);
+            height: 7rem;
+            float: left;
+            border-bottom: 1px solid orange;
+            border-right: 1px solid orange;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="wrapper" class="wrapper">
+        <section class="layout">
+            <article>
+                <input type="number" id="yearValue" value="2024">년도
+                <select name="month" id="month">
+                    <option value="jan">1월</option>
+                    <option value="feb">2월</option>
+                    <option value="mar">3월</option>
+                    <option value="apr">4월</option>
+                    <option value="may">5월</option>
+                    <option value="jun">6월</option>
+                    <option value="jul">7월</option>
+                    <option value="aug">8월</option>
+                    <option value="sep">9월</option>
+                    <option value="oct">10월</option>
+                    <option value="nov">11월</option>
+                    <option value="dec">12월</option>
+                </select>
+                <button id="calenderBtn">달력보기</button>
+            </article>
+            <article class="calenderArea">
+                <section class="weekArea">
+                    <div class="weekBox">일</div>
+                    <div class="weekBox">월</div>
+                    <div class="weekBox">화</div>
+                    <div class="weekBox">수</div>
+                    <div class="weekBox">목</div>
+                    <div class="weekBox">금</div>
+                    <div class="weekBox">토</div>
+                </section>
+                <section id="dayArea" class="dayArea">
+                    <!-- <div class="dayBox"></div> -->
+                </section>
+            </article>
+        </section>
+    </div>
+    <script>
+        class Date {
+            constructor(id) {
+                this.id = id;
+            }
+        }
+
+
+        class Calender {
+            constructor(id) {
+                this.id = id;
+            }
+            dayInputValues(weekObj) {
+                const dayInputObj = {
+                    year: Number(document.getElementById("yearValue").value),
+                    month: Number(weekObj[document.getElementById("month").value])
+                };
+                return dayInputObj;
+            }
+            eventListener(weekObj) {
+                window.addEventListener("click", (e) => {
+                    switch (e.target.id) {
+                        case "calenderBtn":
+                            this.drawDays(this.dayInputValues(weekObj));
+                            break;
+                    }
+                });
+            }
+            drawDays(dayInputObj) {
+                document.getElementById("dayArea").innerHTML = "";
+                const { year, month } = { ...dayInputObj };
+                const boxNumber = 35;
+                let [htmlString, endDay] = [String(''), Number(0)];
+                for (let i = 1; i < boxNumber; i++) {
+                    const date = new Date(`${year}/${month}/${i}`);
+                    if (isNaN(date.getDate()) || (date.getDate() == 1 && i != 1)) {
+                        endDay = i - 1;
+                        break;
+                    } else {
+                        htmlString += `<div class="dayBox">${i}</div>`;
+                    }
+                }
+                document.getElementById("dayArea").innerHTML = htmlString;
+            }
+            run() {
+                const weekObj = {
+                    jan: 1,
+                    feb: 2,
+                    mar: 3,
+                    apr: 4,
+                    may: 5,
+                    jun: 6,
+                    jul: 7,
+                    aug: 8,
+                    sep: 9,
+                    oct: 10,
+                    nov: 11,
+                    dec: 12
+                }
+                this.eventListener(weekObj);
+            }
+        }
+
+        const main = (() => {
+            const calender = new Calender("calender");
+            calender.run();
+        })();
+
+    </script>
+</body>
+
+</html>

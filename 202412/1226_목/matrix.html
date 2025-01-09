@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        const [firstArray, secondArray] = [
+            [
+                [1, 2, 3],
+                [4, 5, 6]
+            ],
+            [
+                [7, 10],
+                [8, 11],
+                [9, 12]
+            ]
+        ];
+
+        class Matrix {
+            constructor(id) {
+                this.id = id;
+            }
+            matrixCalculator(firstArray, secondArray) {
+                const resultArray = [];
+
+                for (let i = 0; i < firstArray.length; i++) {
+                    const tempArr = [];
+                    for (let j = 0; j < firstArray.length; j++) {
+                        let value = 0;
+                        for (let k = 0; k < secondArray.length; k++) {
+                            value += firstArray[i][k] * secondArray[k][j];
+                        }
+                        tempArr.push(value);
+                    }
+                    resultArray.push(tempArr);
+                }
+
+                console.log(resultArray)
+            }
+        }
+        const matrixCal = new Matrix("matrixCal");
+        matrixCal.matrixCalculator(firstArray, secondArray)
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        const randomHundred = [...new Array(100)].map((_, i) => Math.floor(Math.random() * (100 + 1)));
+
+// console.log(randomHundred);
+
+const sortedList = [...randomHundred].sort((a, b) => a-b);
+
+console.log(sortedList);
+
+const result = [];
+
+let key = undefined;
+
+for (let i=0; i<sortedList.length; i++) {
+    if (key === sortedList[i]) {
+        result[result.length - 1][1] += 1;
+    } else {
+        key = sortedList[i];
+        result.push( [key, 1] ); // [value, count]
+    }
+}
+
+console.log(result);
+    </script>
+</body>
+
+</html>

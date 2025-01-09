@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clock</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="wrapper" class="wrapper">
+        <canvas id="canvas" class="canvas" width="500" height="500"></canvas>
+    </div>
+    <script>
+        class Clock {
+            constructor(id) {
+                this.id = id;
+                this.canvas = null;
+                this.pen = null;
+                this.scaleFactor = 20;
+            }
+            domId(element) {
+                return document.getElementById(element);
+            }
+            initSettings() {
+                this.canvas = this.domId("canvas");
+                this.pen = this.canvas.getContext("2d");
+            }
+            modiDot(x, y) {
+                this.pen.fillRect(x + this.canvas.width / 2, -y + this.canvas.height / 2, 1, 1);
+            }
+            drawCircle() {
+                const r = 230;
+                for (let i = 0; i <= 360; i++) {
+                    const cos = Math.cos(i * Math.PI / 180) * r;
+                    const sin = Math.sin(i * Math.PI / 180) * r;
+                    this.modiDot(cos, sin);
+                }
+
+                for (let i = 0; i <= 360; i+=30) {
+                    for(let j = 200; j<=210; j+=0.02){
+                        const deg = i * Math.PI / 180
+                        const cos = Math.cos(deg) * j;
+                        const sin = Math.sin(deg) * j;
+                        this.modiDot(cos, sin);
+                    }
+                }
+            }
+            nowTime(deg, r) {
+                const changerDeg = (radian) => {
+                    return radian * 180 / Math.PI;
+                }
+                const time = deg % 360;
+                const radian = time * Math.PI / 180;
+                // console.log(Math.floor(changerDeg(Math.abs(Math.cos(radian)))))
+                if (Math.cos(radian) >= 0)
+                    if (Math.floor(changerDeg(Math.abs(Math.cos(radian)))) === 0) {
+                        for (let i = 0; i <= r; i++) {
+                            this.modiDot(0, i);
+                        }
+                    } else {
+                        for (let i = 0; i <= Math.cos(radian) * r; i += 0.1) {
+                            const f = Math.tan(radian) * i;
+                            this.modiDot(i, f);
+                        }
+                    } else {
+                    if (Math.floor(changerDeg(Math.abs(Math.cos(radian)))) === 0) {
+                        for (let i = 0; i <= r; i++) {
+                            this.modiDot(0, -i);
+                        }
+                    } else {
+                        for (let i = 0; i >= Math.cos(radian) * r; i -= 0.1) {
+                            const f = Math.tan(radian) * i;
+                            this.modiDot(i, f);
+                        }
+                    }
+                }
+            }
+            getTime() {
+                const time = new Date();
+                const minutes = ((60 - Number(time.getMinutes())) * 6) + 90;
+                const seconds = ((60 - Number(time.getSeconds())) * 6) + 90;
+                const hours = ((12 - Number(time.getHours()) - (Number(time.getMinutes()) / 60))* 30) + 90 ;
+                this.pen.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+                this.drawCircle();
+                this.nowTime(hours, 120);
+                this.nowTime(minutes, 130); 
+                this.nowTime(seconds, 150);
+            }
+            run() {
+                this.initSettings();
+                const loop = () => {
+                    this.getTime();
+                    setTimeout(loop, 1000); // 1초에 한번씩 loop함수 호출출
+                }
+                loop(); // 처음 호출출
+            }
+        }//END_Clock
+        const main = (() => {
+            const clock = new Clock("clock");
+            clock.run();
+        })();
+    </script>
+</body>
+
+</html>

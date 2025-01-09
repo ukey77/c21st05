@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body><input type="number" id="secondValue">
+    <button id="resultBtn">change</button>
+    <script>
+        const change = document.getElementById("resultBtn");
+        change.addEventListener("click",(e)=>{
+            const second = Number(document.getElementById("secondValue").value);
+            // 초를 각도로 변환
+            console.log( (((360 - second* 6) + 90))%360);
+
+        });
+    </script>
+</body>
+
+</html>

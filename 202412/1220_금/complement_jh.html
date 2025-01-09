@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binary Calculator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jua&family=Rubik+Bubbles&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: "Jua", serif;
+            font-weight: 400;
+            font-style: normal;
+            color: #3c3c3c;
+        }
+    </style>
+</head>
+
+<body>
+    <section id="main" class="main"></section>
+    <script>
+        class BinaryCalculator {
+            constructor(id) {
+                this.id = id;
+            }
+
+            dom(id) {
+                return document.getElementById(id);
+            }
+
+            init() {
+                const html = `
+                    <h2 class="title center">0부터 255사이의 숫자만 입력해주세요.</h2>
+                    <article class="insertArea ">
+                        <p class="">십진수 : <input type="number" placeholder="0 ~ 255" id="bigger" class="numberInput"></p>
+                        <button id="biggerChange" class="btn">Change</button>
+                        <p>이진수 : <span id="binaryBigger"></span></p>
+                    </article>
+                    <article class="insertArea ">
+                        <p>십진수 : <input type="number" placeholder="0 ~ 255" id="smaller" class="numberInput"></p>
+                        <button id="smallerChange" class="btn">Change</button>
+                        <br>
+                        <p>이진수 : <span id="binarySmaller"></span></p>
+                    </article>
+                    <article class="resultArea ">
+                        <button id="minus" class="btn result-btn">Minus</button>
+                        <p>이진수 결과 : <span id="binaryResult"></span></p>
+                        <p>십진수 결과 : <span id="decimalResult"></span></p>
+                    </article>
+                `;
+                const css = `
+                    body {
+                        background-color: #F5EFFF;
+                    }
+                    .main {
+                        text-align: center;
+                        border: 5px solid #A294F9;
+                        border-radius: 20px;
+                        margin: 10px 10px;
+                    }
+                    .title {
+                        margin-top: 20px;
+                    }
+                    .numberInput {
+                        width: 70px;
+                        height: 30px;
+                        border: 1px solid #A294F9;
+                        border-radius: 5px;
+                        text-align: right;
+                    }
+                    .insertArea {
+                        margin-top: 10px;
+                    }
+                    .btn {
+                        background-color: #CDC1FF;
+                        border: none;
+                        border-radius: 15px;
+                        width: 70px;
+                        height: 30px;
+                        margin: 5px 0;
+                    }
+                        .btn:hover {
+                            background-color: #E5D9F2;
+                        }
+                    .resultArea {
+                        margin-bottom: 20px;
+                    }
+                    .result-btn {
+                        margin-bottom: 10px;
+                        font-size: 20px;
+                        background-color: #A294F9;
+                        color: white;
+                    }
+                        .result-btn:hover {
+                            background-color: #CDC1FF;
+                        }
+                    .center {
+                        text-align: center;
+                    }
+                `;
+
+                this.dom("main").innerHTML = `${html}<style>${css}</style>`;
+            }
+
+            decimalToBinary(decimal) {
+                let result = "";
+
+                while (decimal > 0 || result.length < 8) {
+                    result = `${decimal % 2}${result}`;
+                    decimal = Math.floor(decimal / 2);
+                }
+
+                return result;
+            }
+            binaryToDecimal(binary) {
+                return binary.split("").reduce((acc, cur, index, arr) => acc + (Number(cur) * (2 ** (arr.length - index - 1))), 0);
+            }
+
+            calcMinus(bigger, smaller) {
+                const strToArr = (str) => {
+                    return str.split("").map(v => Number(v));
+                }
+                const [biggerArr, smallerArr] = [strToArr(bigger), strToArr(smaller)];
+
+                const complementArr = this.complement(smallerArr);
+
+                const sumArr = complementArr.map((digit, index) => {
+                    return digit + biggerArr[index];
+                });
+
+                return this.makeBinaryForm(sumArr).join("");
+            }
+
+            complement(num_arr) {
+                const complementedArr = num_arr.map((digit) => { // 1의 보수
+                    return digit === 0 ? 1 : 0;
+                });
+                complementedArr[complementedArr.length - 1] += 1; // 2의 보수
+
+                this.makeBinaryForm(complementedArr);
+
+                return complementedArr;
+            }
+
+            makeBinaryForm(arr) {
+                for (let i = arr.length - 1; i >= 0; i--) {
+                    if (arr[i] > 1) {
+                        arr[i] -= 2;
+                        if (i > 0) {
+                            arr[i - 1]++;
+                        }
+                    }
+                }
+                return arr;
+            }
+
+            eventManager() {
+                const buttonList = ["biggerChange", "smallerChange", "minus"]
+                window.addEventListener("click", (e) => {
+                    if (buttonList.includes(e.target.id)) {
+                        switch (e.target.id) {
+                            case "biggerChange":
+                                this.dom("binaryBigger").innerText = this.decimalToBinary(Number(this.dom("bigger").value));
+                                break;
+                            case "smallerChange":
+                                this.dom("binarySmaller").innerText = this.decimalToBinary(Number(this.dom("smaller").value));
+                                break;
+                            case "minus":
+                                const result = this.calcMinus(this.dom("binaryBigger").innerText, this.dom("binarySmaller").innerText);
+                                this.dom("binaryResult").innerText = result;
+                                this.dom("decimalResult").innerText = this.binaryToDecimal(result);
+                                break;
+                        }
+                    }
+                });
+            }
+
+            run() {
+                this.init();
+                this.eventManager();
+            }
+        }
+
+        const binaryCalculator = new BinaryCalculator("main");
+        binaryCalculator.run();
+    </script>
+</body>
+
+</html>

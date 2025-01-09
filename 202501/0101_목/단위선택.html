@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<div id="wrapper" class="wrapper">
+</div>
+
+<body>
+    <script>
+        class ChangeDeg {
+            constructor(id) {
+                this.id = id;
+            }
+            domId(element) {
+                return document.getElementById(element);
+            }
+            initDisplay() {
+                const htmlTemplate = `
+                <input type="number" id="numberValue">
+                <select name="degOption" id="degOption">
+                    <option value="degree">deg</option>
+                    <option value="radian">radian</option>
+                    <option value="mil">mil</option>
+                </select>
+                <button id="changeBtn">Change</button>
+                <div>
+                    <h2>각도</h2>
+                    <p><label>Degree: </label><input type="number" id="degValue"></p>
+                    <p><label>Radian: </label><input type="number" id="radianValue"></p>
+                    <p><label>Mil: </label><input type="number" id="millValue"></p>
+                </div>
+                <canvas id="canvas" class="canvas" width="500" height="500"></canvas>
+                `;
+                const cssTEmplate = `
+                <style>
+                .canvas {
+                    border: 1px solid palevioletred;
+                }
+                </style>
+                `;
+
+                this.domId("wrapper").innerHTML = `${htmlTemplate}${cssTEmplate}`
+            }
+            eventManage() {
+                window.addEventListener("click", (e) => {
+                    switch (e.target.id) {
+                        case "changeBtn":
+                            const [angleValue, option] = [
+                                Number(this.domId("numberValue").value),
+                                this.domId("degOption").value
+                            ];
+                            const reusultObj = this.convertAngle(angleValue, option);
+                            this.outputDisplay(reusultObj);
+                            this.drawCanvas(this.domId("canvas"), (reusultObj["deg"] % 360));
+                    }
+                });
+            }
+            convertAngle(angleValue, option) {
+                const degObj = { deg: 0, radian: 0, mil: 0 }
+                switch (option) {
+                    case "degree":
+                        degObj["deg"] = angleValue;
+                        degObj["radian"] = angleValue * Math.PI / 180;
+                        degObj["mil"] = angleValue * 6400 / 360;
+                        break;
+
+                    case "radian":
+                        degObj["deg"] = angleValue * 180 / Math.PI;
+                        degObj["radian"] = angleValue;
+                        degObj["mil"] = degObj["deg"] * 6400 / 360;
+                        break;
+
+                    case "mil":
+                        degObj["deg"] = angleValue * 360 / 6400;
+                        degObj["radian"] = degObj["deg"] * Math.PI / 180;
+                        degObj["mil"] = angleValue;
+                        break;
+                }
+                return degObj;
+            }
+            outputDisplay(resultObj) {
+                const { deg, radian, mil } = { ...resultObj };
+                this.domId("degValue").value = deg % 360;
+                this.domId("radianValue").value = radian % (2 * Math.PI);
+                this.domId("millValue").value = mil % 6400;
+            }
+            drawCanvas(canvasElement, degree) {
+                // == Canvas == 
+                class Canvas {
+                    constructor(id) {
+                        this.id = id;
+                        this.canvas = null;
+                        this.pen = null;
+                        this.scaleFactor = 20;
+
+                    }
+                    initSetting(canvasElement) {
+                        this.canvas = canvasElement;
+                        this.canvas.style.display = "block";
+                        this.pen = this.canvas.getContext("2d");
+                    }
+                    domId(element) {
+                        return document.getElementById(element);
+                    }
+                    renderAxisCrosshair() {
+                        // 범위 설정값
+                        const [width, height] = [Math.floor(this.canvas.width / 2), Math.floor(this.canvas.height / 2)];
+                        // == 십자선 ==
+                        const crossLine = (range, isX) => {
+                            for (let i = -(range); i < (range); i++) {
+                                (isX) && (this.modiDot(i / this.scaleFactor, 0)); // x축-line
+                                (isX) || (this.modiDot(0, i / this.scaleFactor)); // y축
+                            }
+                        }
+                        crossLine(width, true); // x축
+                        crossLine(height, false); // y축
+                    }
+                    drawLine(degree) {
+                        const r = 10;
+                        console.log(degree);
+                        if (Math.cos(degree * Math.PI / 180) >= 0) {
+                            for (let i = 0; i <= Math.cos(degree * Math.PI / 180) * r; i += 0.01) {
+                                const f = Math.tan(degree * Math.PI / 180) * i;
+                                this.modiDot(i, f)
+                            }
+                        } else {
+                            for (let i = Math.cos(degree * Math.PI / 180) * r; i <= 0; i += 0.01) {
+                                const f = Math.tan(degree * Math.PI / 180) * i;
+                                this.modiDot(i, f)
+                            }
+                        }
+                        for (let i = 0; i <= degree; i += 0.01) {
+                            const deg = i * Math.PI / 180;
+                            this.modiDot(Math.cos(deg) * r, Math.sin(deg) * r);
+                        }
+                    }
+                    modiDot(x, y) {
+                        this.pen.fillRect((x * this.scaleFactor + this.canvas.width / 2), (-y * this.scaleFactor + this.canvas.height / 2), 1, 1);
+                    }
+                    control(canvasElement, degree) {
+                        this.initSetting(canvasElement);
+                        this.pen.clearRect(0, 0, this.canvas.width, this.canvas.height)
+                        this.renderAxisCrosshair();
+                        this.drawLine(degree);
+                    }
+                }//END_Canvas
+                const canvas = new Canvas("canvas");
+                canvas.control(canvasElement, degree);
+            }
+            run() {
+                this.initDisplay();
+                this.eventManage();
+            }
+        }
+        const main = (() => {
+            const changeDeg = new ChangeDeg("changeDeg");
+            changeDeg.run();
+        })();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ko">
+<meta charset="UTF-8">
+<meta name="view-port" content="width=device-width, initial-scale=1.0">
+<title>DataMetrics</title>
+
+<body>
+    <div id="wrapper" class="wrapper">
+    </div>
+    <script>
+
+        class DataMetrics {
+            constructor(id) {
+                this.id = id;
+                this.randomList = [];
+            }
+            randomNum(createLength) {
+                while (createLength > 0) {
+                    const randomNum = Math.floor(Math.random() * 101);
+                    this.randomList.push(randomNum);
+                    createLength--;
+                }
+            }
+            initDisplay() {
+                const htmlTemplate = `
+                        <h1 class="title">Random Number</h1>
+                        <section id="randomnumArea"></section>
+                        <section id="resultArea"></section>
+			`;
+                const cssTemplate = `
+			<style>
+                	*{
+                        	margin: 0;
+                        	padding: 0;
+                        	font-size: 15px;
+                	}
+                	.wrapper{
+                        	width: 60vw;
+                        	height: 80vh;
+                        	background-color: #f2f2f2;
+                        	margin: 5vh auto;
+                        	padding: 2rem;
+                        	border-radius: 1rem;
+                	}
+                	.title{
+                        	font-size: 2.2rem;
+                        	margin: 2rem;
+                	}
+                	.randomnumArea{
+                        	width: 56vw;
+               		}
+                	.random{
+                        	width: calc(100% / 11);
+                        	height: 1.5rem;
+                        	text-align: right;
+
+                	}
+                	p{
+                        	margin: .5rem;
+                	}</style>`;
+
+                this.domId("wrapper").innerHTML = `${htmlTemplate}${cssTemplate}`;
+            }
+            displayDom() {
+                let inputTemplate = ``;
+                [...this.randomList].forEach((value) => {
+                    inputTemplate += `<input type="number" value="${value}" class="random" readonly>`;
+                });
+
+                this.domId("randomnumArea").innerHTML = inputTemplate;
+            }
+
+            calculateStats() {
+                const [randomList, sortList] = [[...this.randomList], [...this.randomList]];
+                // == Stack ==	
+                class Stack {
+                    constructor(id) {
+                        this.id = id;
+                        this.storage = [];
+                    }
+                    pushItem(item) { this.storage.push(item); }
+                    popItem() { return this.storage.pop(); }
+                }//End_Stack
+
+                const calculateObj = {
+                    average: Number(0),
+                    medianValue: Number(0),
+                    maxValue: Number(0),
+                    minValue: Number(0),
+                    length: Number(0)
+                }; // 객체 정의
+
+
+                // == 평균 ==
+                const sum = randomList.reduce((accumulator, currentValue) => {
+                    calculateObj["length"] += 1;  // 보증된 length 구하기
+                    return (accumulator + currentValue)
+                }, 0);
+
+                calculateObj["average"] = (sum / calculateObj["length"]);
+
+                // == 최대/최소 ==
+                [calculateObj["maxValue"], calculateObj["minValue"]] = [
+                    Math.max(...randomList), Math.min(...randomList)];
+
+                // 정렬---------------------------------------------------
+
+                // == [0] 확인용 ==
+                const testArr = [...randomList].sort((a, b) => a - b);
+                console.log("Test Array: ", testArr);
+
+                // == [1] Selection Sort (선택정렬) ==---------------------
+                /*
+                for(let i=0; i<calculateObj["length"]; i++){
+                    let minValue = Math.max(...sortList);
+                    //console.log(minValue);
+                    for(let j=i; j<calculateObj["length"]; j++){		
+                        (minValue > sortList[j]) && (minValue = sortList[j]);
+                    }
+                    const index = sortList.indexOf(minValue,i);
+                    sortList.splice(index,1);
+                    sortList.splice(i,0,minValue);
+                }
+                */
+
+
+                for (let i = 0; i < calculateObj["length"]; i++) {
+                    let minValueIndex = i;
+                    for (let j = i; j < calculateObj["length"]; j++) {
+                        (sortList[j] < sortList[minValueIndex]) && (minValueIndex = j)
+                    }
+
+                    [sortList[i], sortList[minValueIndex]] = [sortList[minValueIndex], sortList[i]];
+
+                }
+
+                // == [2]  Bubble Sort (버블정렬) ==---------------------
+                /*
+            	
+                for(let i=0; i<calculateObj["length"]-1; i++){
+                    for(let j=0; j<calculateObj["length"]-1;j++){
+                        (sortList[j] > sortList[j+1]) &&
+                        ([sortList[j], sortList[j+1]] = [sortList[j+1], sortList[j]]);
+                    }
+                }
+                */
+
+                // == [3]  Insert Sort (삽입정렬) ==---------------------
+                //for(let i=0; i<calculateObj["length"]; i++){
+                //}
+
+
+
+                console.log("Result Array:", sortList);
+
+                // ---------------------------------------------------------
+                // == 중위값(중앙값) ==
+                // test
+                console.log("Test Data_medianValue:", (testArr[49] + testArr[50]) / 2);
+                const [sortListCopy, leftStack, rightStack] = [[...sortList], new Stack("leftStack"), new Stack("rightStack")];
+                while (true) {
+                    if (sortListCopy.length === 1) {
+                        calculateObj["medianValue"] = selectionSortList[0];
+                        break;
+                    } else if (sortListCopy.length === 0) {
+                        calculateObj["medianValue"] = ((leftStack.popItem() + rightStack.popItem()) / 2);
+                        break;
+                    } else {
+                        leftStack.pushItem(sortListCopy.pop());
+                        rightStack.pushItem(sortListCopy.shift());
+                    }
+                }
+                return calculateObj;
+
+            }
+            outputResultDisplay(resultObj) {
+                let htmlTemplate = ``;
+                for (let key in resultObj) {
+                    (key !== "length") && (htmlTemplate += `
+				<p><label>${key}</label> <input type="number" value="${resultObj[key]}"></p>`);
+                }
+                this.domId("resultArea").innerHTML = htmlTemplate;
+            }
+            domId(element) {
+                return document.getElementById(element);
+            }
+            run(createLength) {
+                this.initDisplay();
+                this.randomNum(createLength);
+                this.displayDom();
+                const resultObj = this.calculateStats();
+                this.outputResultDisplay(resultObj);
+            }
+
+        }
+
+        const dataMetrics = new DataMetrics("dataMetrics");
+        dataMetrics.run(100);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,4 @@
+
+.codegpt
+# node_modules 내부의 모든 파일 제외
+node_modules/**

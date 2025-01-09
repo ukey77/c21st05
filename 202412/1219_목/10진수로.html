@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .wrapper {
+            display: flex;
+        }
+
+        input[type="number"],
+        [type="text"] {
+            width: 70px;
+        }
+
+        .subBox {
+            margin-top: 5px;
+        }
+
+        .subBox>input {
+            width: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <div>
+            <input type="text" id="value">
+        </div>
+        <div class="subBox">
+            <input type="number" id="subValue">
+        </div>
+    </div>
+    <button id="resultBtn">=</button>
+    <div class="wrapper">
+        <div>
+            <input type="number" id="resultValue">
+        </div>
+        <div class="subBox">
+            <input type="number" value="10" disabled>
+        </div>
+    </div>
+    <script>
+        class Antilogarithm {
+            constructor(id) {
+                this.id = id;
+            }
+            getDom() {
+                const domValue = {
+                    value: (document.getElementById("value").value),
+                    subValue: Number(document.getElementById("subValue").value),
+                }
+                return domValue;
+            }
+            eventListener() {
+                window.addEventListener("click", (e) => {
+                    switch (e.target.id) {
+                        case "resultBtn":
+                            this.antilogCalc(this.getDom());
+                            break;
+                    }
+                })
+            }
+            antilogCalc(domValue) {
+                const { value, subValue } = { ...domValue }
+                const hexNum = {
+                    A: 10,
+                    B: 11,
+                    C: 12,
+                    D: 13,
+                    E: 14,
+                    F: 15
+                };
+                let resultNumber = 0;
+
+                if (subValue === 16) {
+                    for (let i = 0; i < value.length; i++) {
+                        if (value[i] in hexNum) {
+                            const num = hexNum[value[i]] * subValue ** (value.length - i - 1);
+                            resultNumber += num;
+                        } else {
+                            const num = value[i] * subValue ** (value.length - i - 1);
+                            resultNumber += num;
+                        }
+                    }
+                } else {
+                    for (let i = 0; i < value.length; i++) {
+                        const num = value[i] * subValue ** (value.length - i - 1);
+                        resultNumber += num;
+                    }
+                }
+
+                this.outputDom(resultNumber);
+            }
+            outputDom(resultNumber) {
+                document.getElementById("resultValue").value = 0; // 초기화
+                document.getElementById("resultValue").value = resultNumber;
+            }
+            run() {
+                this.eventListener();
+            }
+        }
+        const antilog = new Antilogarithm("antilog");
+        antilog.run();
+    </script>
+</body>
+
+</html>

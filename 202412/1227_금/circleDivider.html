@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circle Divider</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-size: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="wrapper" class="wrapper"></div>
+    <script>
+        // == CircleDivider == 
+        class CircleDivider {
+            constructor(id) {
+                this.id = id;
+            }
+            domId(element) {
+                return document.getElementById(element);
+            }
+            initDisplay() {
+                const htmlTemplate = `
+				<canvas id="${this.id}Canvas" class="canvas" width="600" height="600"></canvas>
+				<p><label>숫자 입력: </label><input type="number" id="dividerLength" value="4"><button id="dividerBtn">DIVIDER<button></p>
+				`;
+                const cssTemplate = `
+				<style>
+				.wrapper{
+					padding: 1rem;
+				}
+				.canvas{
+					border: .1rem solid orange;
+					box-shadow: .2rem .2rem .4rem #ddd;
+					border-radius: 1rem;
+				}
+
+				</style>
+				`;
+
+                this.domId("wrapper").innerHTML = `${htmlTemplate}${cssTemplate}`;
+            }
+            drawCanvas(canvasElement) {
+                // == Canvas == 
+                class Canvas {
+                    constructor(id) {
+                        this.id = id;
+                        this.canvas = null;
+                        this.pen = null;
+                        this.scaleFactor = 20;
+
+                    }
+                    initSetting(canvasElement) {
+                        this.canvas = canvasElement;
+                        this.pen = this.canvas.getContext("2d");
+                    }
+                    domId(element) {
+                        return document.getElementById(element);
+                    }
+                    renderAxisCrosshair() {
+                        // 범위 설정값
+                        const [width, height, size] = [Math.floor(this.canvas.width / 2), Math.floor(this.canvas.height / 2), Number(4)];
+
+                        // == 십자선 ==
+                        const crossLine = (range, isX) => {
+                            for (let i = -(range); i < (range); i++) {
+                                (isX) && (this.modiDot(i / this.scaleFactor, 0)); // x축-line
+                                (isX) || (this.modiDot(0, i / this.scaleFactor)); // y축
+                            }
+                        }
+
+                        // == scale표시 + text ==
+                        const drawScale = (range, isX) => {
+                            for (let i = -(range); i <= (range); i++) {
+                                for (let j = -size; j < size; j++) {
+                                    (isX) && (this.modiDot(i, j / this.scaleFactor)); // x축-scale
+                                    (isX) || (this.modiDot(j / this.scaleFactor, i)); // y축
+                                }
+                                (isX) && (this.pen.fillText(i, i * this.scaleFactor + this.canvas.width / 2 - 4, this.canvas.height / 2 + 14, 10)); // x축-text
+                                (isX) || (i !== 0) && (this.pen.fillText(i, this.canvas.width / 2 + 5, -i * this.scaleFactor + this.canvas.height / 2 + 3, 10)); // y축
+
+                            }
+                        }
+
+                        crossLine(width, true); // x축
+                        crossLine(height, false); // y축
+
+                        drawScale(width, true); // x축
+                        drawScale(height, false); // y축
+
+                    }
+                    drawCircle() {
+                        const r = 10;
+                        for (let i = 0; i < 360; i += 0.01) {
+                            const deg = (i * Math.PI / 180);
+                            this.modiDot(Math.cos(deg) * r, Math.sin(deg) * r);
+                        };
+                    }
+                    eventHandler() {
+                        window.addEventListener("click", (e) => {
+                            switch (e.target.id) {
+                                case "dividerBtn":
+                                    // alert("event접근")
+                                    const dividerValue = Number(this.domId("dividerLength").value);
+                                    this.refreshCanvas()
+                                    this.drawCircleDivider(dividerValue);
+                                    break;
+                            }
+                        });
+                    }
+                    drawCircleDivider(value) {
+                        const [divideDeg, r] = [Number(360 / value), Number(10)];
+                        let degree = 0;
+                        while (360 > degree) {
+                            const cosValue = Math.cos(degree * Math.PI / 180);
+                            if (cosValue >= 0) {
+                                if (degree === 90) {
+                                    for (let i = 0; i <= r; i += 0.01) {
+                                        this.modiDot(0, i);
+                                    }
+                                } else {
+                                    for (let i = 0; i <= cosValue * r; i += 0.01) {
+                                        const tan = Math.tan(degree * Math.PI / 180) * i;
+                                        this.modiDot(i, tan);
+                                    }
+                                }
+                            } else {
+                                if (degree === 270) {
+                                    for (let i = 0; i <= r; i += 0.01) {
+                                        this.modiDot(0, -i);
+                                    }
+                                }
+                                for (let i = cosValue * r; i <= 0; i += 0.01) {
+                                    const tan = Math.tan(degree * Math.PI / 180) * i;
+                                    this.modiDot(i, tan);
+                                }
+                            }
+                            console.log(degree);
+                            degree += divideDeg;
+                        }
+                    }
+                    modiDot(x, y) {
+                        this.pen.fillRect((x * this.scaleFactor + this.canvas.width / 2), (-y * this.scaleFactor + this.canvas.height / 2), 1, 1);
+                    }
+                    refreshCanvas() {
+                        this.pen.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                        this.drawCircle();
+                    }
+                    control(canvasElement) {
+                        this.initSetting(canvasElement);
+                        // this.renderAxisCrosshair();
+                        this.drawCircle();
+                        this.eventHandler();
+                    }
+                }//END_Canvas
+
+                const canvas = new Canvas("canvas");
+                canvas.control(canvasElement);
+            }
+            run() {
+                this.initDisplay();
+                const canvasElement = this.domId(`${this.id}Canvas`);
+                this.drawCanvas(canvasElement);
+            }
+        }//END_CircleDivider
+
+        const main = (() => {
+            const circleDivider = new CircleDivider("circleDivider");
+            circleDivider.run();
+        })();
+    </script>
+</body>
+
+</html>

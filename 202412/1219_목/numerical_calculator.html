@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>진수계산기</title>
+</head>
+
+<body>
+    <div class="wrapper" id="wrapper"></div>
+    <script>
+        class Antilogarithm {
+            constructor(id) {
+                this.id = id;
+                this.hexObj = { A: 10, B: 11, C: 12, D: 13, E: 14, F: 15 };
+            }
+            initDom(domArea) {
+                const htmlTemplate = `
+                    <div class="numBox">
+                        <div>
+                            <input type="text" id="numValue">
+                        </div>
+                        <div class="subBox">
+                            <input type="number" id="subValue">
+                        </div>
+                    </div>
+
+                    <div class="btnArea">
+                        <button id="binaryBtn">Binary</button>
+                        <button id="octalBtn">Octal</button>
+                        <button id="decimalBtn">Decimal</button>
+                        <button id="hexBtn">Hex</button>
+                    </div>
+                    <div class="numBox">
+                        <div>
+                            <span>Result= </span> <input type="text" id="resultNumValue">
+                        </div>
+                        <div class="subBox">
+                            <input type="number" id="resultSubValue">
+                        </div>
+                    </div>
+                `;
+                const cssTemplate = `
+                    <style>
+                        * {
+                            margin: 0;
+                            padding: 0;
+                            font-size: 40px;
+                        }
+                        .wrapper{
+                            width: 30rem;
+                            border: 1px solid lavender;
+                            margin: 3rem auto;
+                            text-align: center;
+                            border-radius: 1rem;
+                            padding: 3rem;
+                        }
+                        .numBox {
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                        }
+
+                        .subBox {
+                            margin-top: .5rem;
+                        }
+
+                        input[type="number"],
+                        [type="text"] {
+                            width: 6rem;
+                        }
+
+                        .btnArea {
+                            margin: 1rem 0;
+                        }
+                    </style>
+                `;
+
+                document.getElementById(domArea).innerHTML = `${htmlTemplate}${cssTemplate}`
+            }
+            eventListener() {
+                window.addEventListener("click", (e) => {
+                    const domValue = {
+                        numValue: document.getElementById("numValue").value,
+                        subValue: Number(document.getElementById("subValue").value),
+                    }
+
+                    switch (e.target.id) {
+                        case "binaryBtn":
+                            this.numericalCalc(this.changeDecimal(domValue), 2);
+                            break;
+
+                        case "octalBtn":
+                            this.numericalCalc(this.changeDecimal(domValue), 8);
+                            break;
+
+                        case "decimalBtn":
+                            this.outputAnswer(this.changeDecimal(domValue), 10)
+                            break;
+
+                        case "hexBtn":
+                            this.numericalCalc(this.changeDecimal(domValue), 16);
+                            break;
+                    }
+                });
+            }
+            numericalCalc(decimalValue, subValue) {
+                // == class_Queue 선언 ==
+                class Queue {
+                    constructor(id) {
+                        this.id = id;
+                        this.storage = [];
+                    }
+                    unshiftItem(item) { this.storage.push(item); }
+                    popItem() { return this.storage.pop(); }
+                    get storageLen() { return this.storage.length; }
+                }// End_Queue
+
+                const queue = new Queue("queue");
+                let resultValue = ''; // 결과 담을 string
+                if (subValue === 16) {
+                    while(decimalValue>0){
+                        if(decimalValue % subValue >= 10){
+                            for(let key in this.hexObj){
+                                (this.hexObj[key] === decimalValue % subValue) && queue.unshiftItem(key);
+                            }
+                        }else{
+                            queue.unshiftItem(decimalValue % subValue);
+                        }
+                        decimalValue = Math.floor(decimalValue / subValue);
+                    }
+                } else {
+                    while(decimalValue > 0){
+                        queue.unshiftItem(decimalValue % subValue);
+                        decimalValue = Math.floor(decimalValue / subValue);
+                    }
+                }
+
+                const storageLen = queue.storageLen; // storage의 length값
+                for (let i = 0; i < storageLen; i++) {
+                    resultValue += String(queue.popItem());
+                }
+                this.outputAnswer(resultValue, subValue); // 결과 출력 메서드
+            }
+            changeDecimal(domValue) {
+                const { numValue, subValue} = { ...domValue };
+                const numArr = numValue.split(""); // numValue가지고 new 배열
+                let resultValue = 0;
+                if (subValue === 16) {
+                    numArr.forEach((item,i)=>{
+                        if (item in this.hexObj) {
+                            const tempCalcNum = this.hexObj[item] * subValue ** (numArr.length - i - 1);
+                            resultValue += tempCalcNum;
+                        } else {
+                            const tempCalcNum = item * subValue ** (numArr.length - i - 1);
+                            resultValue += tempCalcNum;
+                        }
+                    })
+                } else {
+                    numArr.forEach((item,i) => {
+                        const tempCalcNum = item * subValue ** (numArr.length - i - 1);
+                        resultValue += tempCalcNum;
+                    });
+                }
+                return resultValue;
+            }
+            outputAnswer(resultValue, subValue) {
+                document.getElementById("resultNumValue").value = resultValue;
+                document.getElementById("resultSubValue").value = subValue;
+            }
+            run() {
+                this.initDom("wrapper");
+                this.eventListener();
+            }
+        }
+        const main = (() => {
+            const antilog = new Antilogarithm("antilog");
+            antilog.run();
+        })();
+
+    </script>
+</body>
+
+</html>

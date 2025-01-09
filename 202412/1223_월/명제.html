@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        // const p = [true, false];
+        // const f = [false, false];
+        // const result = p.map((value, index) => {
+        //     return value && f[index] ? "T" : "F";
+        // })
+
+        // result.forEach((value, i) => {
+        //     const pValue = p[i] ? "T" : "F";
+        //     const fValue = f[i] ? "T" : "F";
+        //     console.log(`${pValue} $#x2227; ${fValue} = ${value}`)
+        // });
+
+        const p = [true, true, false, false];
+        const q = [true, false, true, false];
+        const result = p.map((pV, i) => {
+            return ((!pV) && q[i]) || (pV && (!q[i])) ? "T" : "F"
+        });
+        const changer = ( value ) => {
+            return value ? "T" : "F"; 
+        }
+        result.forEach((resultValue,i) => {
+           const output = `(&#172;${changer(p[i])} &#x2227; ${changer(q[i])}) &#x2228; (${changer(p[i])} &#x2227; &#172;${changer(q[i])}) = ${resultValue}`
+           document.write(output + "<br>")
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .canvas {
+            border: 1px solid purple;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="wrapper">
+        <canvas id="canvas" class="canvas" width="650" height="650"></canvas>
+    </div>
+    <script>
+        const dotCollection = [
+            {
+                dot:
+                    { x: -2, y: 5 }
+            },
+            {
+                line: [
+                    { x: -9, y: -10 },
+                    { x: 12, y: -15 },
+                ]
+            },
+            {
+                line: [
+                    { x: -6, y: -10 },
+                    { x: 3, y: -15 }
+                ]
+            },
+            {
+                triangle: [
+                    { x: 5, y: 8 },
+                    { x: -8, y: 0 },
+                    { x: 10, y: -10 },
+                    // { x: -8, y: 0 },
+                    // { x: 10, y: -10 },
+                    // { x: 3, y: -10 },
+                ]
+            },
+            {
+                rectangle: [
+                    { x: 15, y: 8 },
+                    { x: -8, y: 0 },
+                    { x: -10, y: -10 },
+                    { x: 10, y: -9 },
+                ]
+            }, {
+                rectangle: [
+                    { x: 4, y: 5 },
+                    { x: -8, y: 3 },
+                    { x: -20, y: -5 },
+                    { x: 13, y: -3 }
+                ]
+            },
+            {
+                circle: [
+                    { r: 9, a: -8, b: 10 },
+                ]
+            }
+        ];
+        console.log(dotCollection);
+
+        class Canvas {
+            constructor(id) {
+                this.id = id;
+                this.canvas = null;
+                this.pen = null;
+                this.scaleFactor = 10;
+            }
+            initSetting() {
+                this.canvas = this.domId("canvas");
+                this.pen = this.canvas.getContext("2d");
+            }
+            domId(element) {
+                return document.getElementById(element);
+            }
+            renderAxisCrosshair() {
+                // 범위 설정값
+                const [width, height, size] = [Math.floor(this.canvas.width / 2), Math.floor(this.canvas.height / 2), Number(4)];
+
+                // == 십자선 ==
+                const crossLine = (range, isX) => {
+                    for (let i = -(range); i < (range); i++) {
+                        (isX) && (this.modiDot(i / this.scaleFactor, 0)); // x축-line
+                        (isX) || (this.modiDot(0, i / this.scaleFactor)); // y축
+                    }
+                }
+
+                // == scale표시 + text ==
+                const drawScale = (range, isX) => {
+                    for (let i = -(range); i <= (range); i++) {
+                        for (let j = -size; j < size; j++) {
+                            (isX) && (this.modiDot(i, j / this.scaleFactor)); // x축-scale
+                            (isX) || (this.modiDot(j / this.scaleFactor, i)); // y축
+                        }
+                        (isX) && (this.pen.fillText(i, i * this.scaleFactor + this.canvas.width / 2 - 4, this.canvas.height / 2 + 14, 10)); // x축-text
+                        (isX) || (i !== 0) && (this.pen.fillText(i, this.canvas.width / 2 + 5, -i * this.scaleFactor + this.canvas.height / 2 + 3, 10)); // y축
+
+                    }
+                }
+
+                crossLine(width, true); // x축
+                crossLine(height, false); // y축
+
+                drawScale(width, true); // x축
+                drawScale(height, false); // y축
+
+            }
+            modiDot(x, y) {
+                this.pen.fillRect((x * this.scaleFactor + this.canvas.width / 2), (-y * this.scaleFactor + this.canvas.height / 2), 1, 1);
+            }
+            drawingDot(dotObj) {
+                const { x, y } = { ...dotObj }
+                this.penStyle = "red";
+                this.modiDot(x, y);
+            }
+            drawingLine(dotArray) {
+                console.log("line", dotArray);
+                const parsingArr = [];
+                [...dotArray].forEach((obj) => {
+                    for (let key in obj) {
+                        parsingArr.push(obj[key]);
+                    }
+                });
+                let [xV, yV, aV, bV] = [...parsingArr];
+                (aV > xV) && ([xV, yV, aV, bV] = [aV, bV, xV, yV]);
+
+                for (let i = aV; i <= xV; i += 0.01) {
+                    const m = (yV - bV) / (xV - aV);
+                    const f = m * (i - aV) + bV;
+                    this.modiDot(i, f);
+                }
+            }
+            drawingTriangle(triangleArr) {
+                this.pen.fillStyle = "blue";
+                for (let i = 0; i < triangleArr.length; i++) {
+                    (i === triangleArr.length - 1) && (this.drawingLine([triangleArr[i], triangleArr[0]]));
+                    (i !== triangleArr.length - 1) && (this.drawingLine([triangleArr[i], triangleArr[i + 1]]));
+                }
+            }
+            drawingRectangle(rectangleArr) {
+                this.pen.fillStyle = "red";
+                console.log("rectangle", rectangleArr);
+                for (let i = 0; i < rectangleArr.length; i++) {
+                    (i === rectangleArr.length - 1) && (this.drawingLine([rectangleArr[i], rectangleArr[0]]));
+                    (i !== rectangleArr.length - 1) && (this.drawingLine([rectangleArr[i], rectangleArr[i + 1]]));
+                }
+            }
+            drawingCircle(circleArr) {
+                this.pen.fillStyle = "green";
+                console.log(circleArr);
+                const [{ r, a, b }] = [...circleArr];
+                for (let i = 0; i <= 360; i += 0.01) {
+                    const cos = Math.cos(i * Math.PI / 180) * r + a;
+                    const sin = Math.sin(i * Math.PI / 180) * r + b;
+                    this.modiDot(cos, sin);
+                }
+            }
+            drawShapeCollection(collectionObject) {
+                console.log(collectionObject);
+                [...collectionObject].forEach((obj) => {
+                    for (let key in obj) {
+                        switch (key) {
+                            case "dot":
+                                this.drawingDot(obj[key]);
+                                break;
+                            case "line":
+                                this.drawingLine(obj[key]);
+                                break;
+                            case "circle":
+                                this.drawingCircle(obj[key]);
+                                break;
+                            case "triangle":
+                                this.drawingTriangle(obj[key]);
+                                break;
+                            case "rectangle":
+                                this.drawingRectangle(obj[key]);
+                                break;
+                        }
+                    }
+                });
+            }
+            control(collectionObject) {
+                this.initSetting();
+                this.renderAxisCrosshair();
+                this.drawShapeCollection(collectionObject);
+            }
+        }//END_Canvas	
+
+        const main = (() => {
+            const canvas = new Canvas("canvas");
+            canvas.control(dotCollection);
+        })();
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,75 @@
+* {
+  margin: 0;
+  padding: 0;
+  font-size: 15px; }
+  * .wrapper {
+    position: relative;
+    width: 100vw;
+    height: 100vh; }
+    * .wrapper .titleBox {
+      position: absolute;
+      left: 50%;
+      top: 20%;
+      transform: translate(-50%, -50%);
+      -webkit-transform: translate(-50%, -50%);
+      -moz-transform: translate(-50%, -50%);
+      -ms-transform: translate(-50%, -50%);
+      -o-transform: translate(-50%, -50%);
+      border: 2px solid rgba(255, 166, 0, 0);
+      border-radius: 1rem;
+      -webkit-border-radius: 1rem;
+      -moz-border-radius: 1rem;
+      -ms-border-radius: 1rem;
+      -o-border-radius: 1rem;
+      width: 15rem;
+      height: 8rem;
+      text-align: center;
+      line-height: 8rem; }
+    * .wrapper .title {
+      font-size: 3rem; }
+    * .wrapper .layoutArea {
+      width: 40%;
+      height: 50%;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      -webkit-transform: translate(-50%, -50%);
+      -moz-transform: translate(-50%, -50%);
+      -ms-transform: translate(-50%, -50%);
+      -o-transform: translate(-50%, -50%);
+      display: flex; }
+      * .wrapper .layoutArea .albumImg {
+        width: 33.3333%;
+        height: 100%;
+        border: 2px solid rgba(255, 166, 0, 0);
+        border-radius: 1rem;
+        -webkit-border-radius: 1rem;
+        -moz-border-radius: 1rem;
+        -ms-border-radius: 1rem;
+        -o-border-radius: 1rem; }
+      * .wrapper .layoutArea .img01 {
+        background: url("https://img.wkorea.com/w/2020/12/style_5fd81901cadbb-539x700.jpg") no-repeat;
+        background-size: cover;
+        background-position: 50% 50%; }
+      * .wrapper .layoutArea .img02 {
+        background: url("https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMDEwMTVfMTE1%2FMDAxNjAyNzI0OTc4NjUy.YxF0MOw1tRB51shEM3DGH74r0NLofY5dBLL6yBOGBw4g.XBl6GuA8R2HlHZDkLXtew1EKCq1_O6ZUZfTBuxOtyh0g.JPEG.gockdshdrn%2F121429387_2866721663558344_954940835443967636_o.jpg&type=a340") no-repeat;
+        background-size: cover;
+        background-position: 50% 50%; }
+      * .wrapper .layoutArea .img03 {
+        background: url("https://search.pstatic.net/common/?src=http%3A%2F%2Fimgnews.naver.net%2Fimage%2F5453%2F2018%2F06%2F25%2F0000046260_009_20180625100510271.jpg&type=sc960_832") no-repeat;
+        background-size: cover;
+        background-position: 50% 50%; }
+    * .wrapper .button-basic, * .wrapper .button-report, * .wrapper .button-submit {
+      border: none;
+      padding: 1.5rem 3rem;
+      text-align: center;
+      font-size: 1.6rem;
+      cursor: pointer; }
+    * .wrapper .button-report, * .wrapper .button-submit {
+      color: #fff;
+      background-color: #e1a9b2; }
+    * .wrapper .button-submit {
+      background: #afcb85; }
+
+/*# sourceMappingURL=style.css.map */

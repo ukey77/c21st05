@@ -1,0 +1,34 @@
+{
+    "list": [
+        {
+            "id": 1,
+            "singer": "zard",
+            "title": "cdr",
+            "like": 5
+        },
+        {
+            "id": 2,
+            "singer": "ive",
+            "title": "EMPATHY!",
+            "like": 5
+        },
+        {
+            "id": 3,
+            "singer": "itzy",
+            "title": "Imaginary Friend",
+            "like": 4
+        },
+        {
+            "id": 4,
+            "singer": "TWICE",
+            "title": "Strategy",
+            "like": 4
+        },
+        {
+            "id": 5,
+            "singer": "ILLIT",
+            "title": "Cherish",
+            "like": 3
+        }
+    ]
+}

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>평균보다 큰 숫자를 배열에 담아 출력</title>
+</head>
+
+<body>
+    <script>
+        const arr = [7, 8, 10, 100, 99, 44, 23, 40, 14, 80];
+
+        class NumberPicker {
+            constructor(id) {
+                this.id = id;
+                this.data = null;
+            }
+            setData(arr){
+                this.data = arr;
+                this.avg(this.data);
+            }
+            avg() {
+                const resultArr = {
+                    testArr : [...this.data],
+                    arrLength: 0,
+                    sum: 0,
+                    avg: 0
+                }
+                resultArr["testArr"].forEach((item, index)=>{
+                    resultArr["sum"] += Number(item);
+                    resultArr["arrLength"] = Number(index+1);
+                });
+                resultArr["avg"] =  resultArr["sum"] / resultArr["arrLength"];
+                this.chooseNumber(resultArr["avg"]);
+            }
+            chooseNumber(avg){
+                const resultArr = [...this.data].filter((item)=>{
+                    return item > avg;
+                });
+
+                this.ascendingData([...resultArr]);
+                // == result print == 
+                console.log(resultArr);
+            }
+            ascendingData(arr){
+                const ascendingArr = arr.sort((a,b)=>{return a-b});
+                // == result print == 
+                console.log(ascendingArr);
+            }
+            run(arr) {
+                this.setData(arr);
+            }
+        }
+        const numberPicker = new NumberPicker("numberPicker");
+        numberPicker.run(arr);
+
+    </script>
+</body>
+
+</html>

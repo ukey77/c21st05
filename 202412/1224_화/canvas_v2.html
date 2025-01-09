@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+
+    <title>Canvas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-size: 15px;
+            font-family: "Gowun Dodum", serif;
+            font-weight: 800;
+            font-style: normal;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="wrapper" class="wrapper">
+    </div>
+    <script>
+        class Canvas {
+            constructor(id) {
+                this.id = id;
+                this.canvas = null;
+                this.pen = null
+                this.scaleFactor = 21.5;
+            }
+            drawCanvas(width = 800, height = 800, isCanvasOutput = false) {
+                const canvasTemplate = `
+                    <canvas id="canvas" class="canvas" width="${width}" height="${height}"></canvas>`;
+                if (isCanvasOutput) {
+                    document.getElementById(`${this.id}CanvasArea`).innerHTML = canvasTemplate;
+                } else {
+                    return canvasTemplate;
+                }
+            }
+            initDom(element) {
+                const htmlTemplate = `
+                    <h1>Canvas</h1>
+                    <section>
+                        <article id="${this.id}CanvasArea">
+                            ${this.drawCanvas()}
+                        </article>
+                        <article>
+                            <p>A(<input type="number" id="xValue">,<input type="number" id="yValue">)</p>
+                            <p>B(<input type="number" id="aValue">,<input type="number" id="bValue">)</p>
+                            <p><label>Canvas X: </label><input type="number" id="canvasWidth"></p>
+                            <p><label>Canvas Y: </label><input type="number" id="canvasHeight"></p>
+                            <p><label>Scale: </label><input type="number" id="scale"></p>
+                            <button id="outputBtn" class="outputBtn">Draw</button>
+                        </article>   
+                    </section>
+                `;
+                const cssTemplate = `
+                    <style>
+                        .wrapper{
+                            padding: 1.5rem;
+                        }
+                        h1{
+                            font-size: 2.5rem;
+                        }
+                        section{
+                            margin: 1rem;
+                            display: flex;
+                        }
+                        .canvas {
+                            border: 1px solid blueviolet;
+                            margin-right: 1rem;
+                            border-radius: .5rem;
+                        }
+                        input{
+                            width: 4rem;
+                            height: 2rem;
+                            background-color: #f2f2f2s;
+                            border-radius: .5rem;
+                            margin: .3rem;
+                            text-align: right;
+                        }
+                        .outputBtn{
+                            padding: 0.5rem 1.5rem;
+                            background: lavender;
+                            border-radius: .5rem;
+                        }
+                    </style>
+                `;
+                document.getElementById(element).innerHTML = `${htmlTemplate}${cssTemplate}`;
+            }
+            initialSettings() {
+                this.canvas = document.getElementById("canvas");
+                this.pen = this.canvas.getContext("2d");
+            }
+            correctionModiDot(x, y) {
+                this.pen.fillRect((x * this.scaleFactor) + this.canvas.width / 2, (-y * this.scaleFactor) + (this.canvas.height / 2), 1, 1);
+            }
+            modiDot(x, y) {
+                this.pen.fillRect(x + (this.canvas.width / 2), -y + (this.canvas.height / 2), 1, 1);
+            }
+            drawFactor() {
+                const size = this.scaleFactor / 8;
+                // 너비
+                for (let i = -Math.floor(this.canvas.width / (this.scaleFactor * 2)); i <= Math.floor(this.canvas.width / (this.scaleFactor * 2)); i++) {
+                    for (let j = -size; j < size; j++) {
+                        this.pen.fillStyle = "red";
+                        this.pen.fillRect((i * this.scaleFactor) + (this.canvas.width / 2), j + (this.canvas.height / 2), 1, 1);
+                    }
+                    this.pen.fillText(i, (i * this.scaleFactor) + (this.canvas.width / 2) - 2.5, (this.canvas.height / 2) + 15, 10);
+                }
+
+                // 높이
+                for (let i = -Math.floor((this.canvas.height) / (this.scaleFactor * 2)); i <= Math.floor((this.canvas.height) / (this.scaleFactor * 2)); i++) {
+                    for (let j = -size; j < size; j++) {
+                        this.pen.fillStyle = "blue";
+                        this.pen.fillRect(j + this.canvas.width / 2, (-i * this.scaleFactor) + (this.canvas.height / 2), 1, 1);
+                    }
+                    (i !== 0) && (this.pen.fillText(i, this.canvas.width / 2 + 5, (-i * this.scaleFactor) + (this.canvas.height / 2) + 3.5, 10));
+                }
+            }
+            crosshair() {
+                for (let x = 1; x < this.canvas.width; x++) {
+                    this.pen.fillRect(x, (this.canvas.height / 2), 1, 1);
+                }
+                for (let y = 1; y < this.canvas.height; y++) {
+                    this.pen.fillRect((this.canvas.width / 2), y, 1, 1);
+                }
+            }
+            eventListener() {
+                window.addEventListener("click", (e) => {
+                    switch (e.target.id) {
+                        case "outputBtn":
+                            const domValues = [
+                                Number(this.domId("xValue").value),
+                                Number(this.domId("yValue").value),
+                                Number(this.domId("aValue").value),
+                                Number(this.domId("bValue").value)
+                            ];
+                            const [width, height, scale] = [
+                                Number(this.domId("canvasWidth").value),
+                                Number(this.domId("canvasHeight").value),
+                                Number(this.domId("scale").value),
+                            ];
+                            this.drawCanvas(width, height, true);
+                            this.scaleFactor = scale;
+                            this.refreshCanvas();
+                            this.drawLine(...domValues);
+                            break;
+                    }
+                });
+            }
+
+            domId(element) {
+                return document.getElementById(element);
+            }
+
+            drawLine(xV, yV, aV, bV) {
+                let [maxX, y, minX, b] = [xV, yV, aV, bV];
+                (aV > xV) && ([maxX, y, minX, b] = [minX, b, maxX, y]);
+
+                for (let x = minX; x <= maxX; x += 0.01) {
+                    const m = (y - b) / (maxX - minX);
+                    const f = m * (x - minX) + b;
+                    this.correctionModiDot(x, f);
+                }
+            }
+            refreshCanvas() {
+                this.initialSettings();
+                this.crosshair();
+                this.drawFactor();
+            }
+            run(element) {
+                this.initDom(element);
+                this.refreshCanvas();
+                this.eventListener();
+            }
+        }
+
+        const main = (() => {
+            const canvas = new Canvas("canvas");
+            canvas.run("wrapper");
+        })();
+
+    </script>
+</body>
+
+</html>

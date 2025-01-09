@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        const myA = { item: [{ hi: "hello world" }, 10, [20, { key: "value" }, 21, 22, 23, 24], 30, [40, 41, 42, 43, 44], [50, 51, 52, 53]] };
+
+        const traveling = (obj) => {
+            const result = []; // 반환 배열
+            const travel = (obj) => {
+                if (typeof obj === "object") {
+                    if (Array.isArray(obj)) {
+                        for (let value of obj) {
+                            travel(value);
+                        }
+                    } else {
+                        for (let key in obj) {
+                            travel(obj[key]);
+                        }
+                    }
+                } else {
+                    result.push(obj);
+                }
+            }
+            travel(obj);
+            return result;
+        }
+
+        // const travelList = traveling(myA);
+        // console.log(travelList);
+        // const travelString = ''.concat(...travelList);
+        // console.log(travelString)
+
+        // ================================================================
+
+        const arrayFunc = (item) => {
+            for (const itemValue of item) {
+                checkType(itemValue);
+            }
+        }
+
+        const objectFunc = (item) => {
+            for (let key in item) {
+                checkType(item[key]);
+            }
+        }
+
+        const primitiveFunc = (item) => {
+            console.log(`${item}`);
+        }
+
+        const checkType = item => {
+            if (typeof item == "object") {
+                if (Array.isArray(item)) {
+                    arrayFunc(item);
+                } else {
+                    objectFunc(item);
+                }
+            } else {
+                primitiveFunc(item);
+            }
+        }
+
+        // checkType(myA);
+
+        class Travel {
+            constructor(id) {
+                this.id = id;
+                this.resultArr = [];
+            }
+            arrayFunc(item){
+                for(const value of item){
+                    this.checkType(value);
+                }
+            }
+            objectFunc(item){
+                for(const key in item){
+                    this.checkType(item[key]);
+                }
+            }
+            primitiveFunc(item){
+                this.resultArr.push(item);
+            }
+            checkType(item) {
+                if (typeof item == "object") {
+                    if (Array.isArray(item)) {
+                        this.arrayFunc(item);
+                    } else {
+                        this.objectFunc(item);
+                    }
+                }else{
+                    this.primitiveFunc(item);
+                }
+            }
+            control(item) {
+                this.checkType(item);
+            }
+            get result(){
+                return [...this.resultArr];
+            }
+        }
+        
+        const travel = new Travel("travel");
+        travel.control(myA);
+        console.log(travel.result)
+    </script>
+</body>
+
+</html>

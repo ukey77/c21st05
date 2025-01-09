@@ -1,0 +1,97 @@
+@mixin center-display($top: 50%){
+    position: absolute;
+    left: 50%;
+    top: $top;
+    transform:translate(-50%,-50%);
+    -webkit-transform:translate(-50%,-50%);
+    -moz-transform:translate(-50%,-50%);
+    -ms-transform:translate(-50%,-50%);
+    -o-transform:translate(-50%,-50%);
+}
+@mixin borderd(){
+    border: 2px solid $point-color;
+    border-radius: 1rem;
+    -webkit-border-radius: 1rem;
+    -moz-border-radius: 1rem;
+    -ms-border-radius: 1rem;
+    -o-border-radius: 1rem;
+}
+$point-color: rgba(255, 166, 0, 0);
+
+@mixin img($url){
+    background: url($url) no-repeat;
+    background-size: cover;
+    background-position: 50% 50%;
+}
+*{
+    margin: 0;
+    padding: 0;
+    font-size: 15px;
+
+    .wrapper{
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+
+        .titleBox{
+            @include center-display(20%);
+            @include borderd();
+            width: 15rem;
+            $height: 8rem;
+            height: $height;
+            text-align: center;
+            line-height: $height;
+        }
+        .title{
+            font-size: 3rem;
+        }
+    
+        .layoutArea{
+            width: 40%;
+            height: 50%;
+            @include center-display();
+            display: flex;
+
+            .albumImg{
+                width: 33.3333%;
+                height: 100%;
+                @include borderd();
+            }
+
+            .img01{
+                @include img('https://img.wkorea.com/w/2020/12/style_5fd81901cadbb-539x700.jpg')
+            }
+            .img02{
+                @include img('https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMDEwMTVfMTE1%2FMDAxNjAyNzI0OTc4NjUy.YxF0MOw1tRB51shEM3DGH74r0NLofY5dBLL6yBOGBw4g.XBl6GuA8R2HlHZDkLXtew1EKCq1_O6ZUZfTBuxOtyh0g.JPEG.gockdshdrn%2F121429387_2866721663558344_954940835443967636_o.jpg&type=a340')
+            }
+            .img03{
+                @include img('https://search.pstatic.net/common/?src=http%3A%2F%2Fimgnews.naver.net%2Fimage%2F5453%2F2018%2F06%2F25%2F0000046260_009_20180625100510271.jpg&type=sc960_832')
+            }
+
+        }
+        .button-basic{
+            border: none;
+            padding: 1.5rem 3rem;
+            text-align: center;
+            font-size: 1.6rem;
+            cursor: pointer;
+        }
+        .button-report{
+            @extend .button-basic;
+            color: #fff;
+            background-color: rgb(225, 169, 178);
+        }
+
+        .button-submit{
+            @extend .button-report;
+            background: rgb(175, 203, 133);
+        }
+    }
+
+
+}
+
+
+
+
+

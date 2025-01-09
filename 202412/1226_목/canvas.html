@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xeicon@2.3.3/xeicon.min.css">
+    <title>Canvas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-size: 12px;
+        }
+
+        i {
+            pointer-events: none;
+            font-size: 1.7rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="wrapper" class="wrapper">
+    </div>
+
+    <script>
+        class Canvas {
+            constructor(id) {
+                this.id = id;
+                this.canvas = null;
+                this.pen = null;
+                this.scaleFactor = 20;
+                this.xAxis = 0;
+                this.yAxis = 0;
+            }
+            domId(element) {
+                return document.getElementById(element);
+            }
+            initDom(element) {
+                const htmlTemplate = `
+                    <h1>Canvas</h1>
+                    <div class="layout">
+                        <canvas id="canvas" class="canvas" width="600" height="600"></canvas>
+                        <section class="btnArea">
+                            <button id="Xsymmetry">X축 대칭</button>
+                            <button id="Ysymmetry">Y축 대칭</button>
+                            <button id="XYsymmetry">XY축 대칭</button>
+                        </section>
+                    </div>
+                    <section>
+                        <button id="left"><i class="xi-angle-left"></i></button>
+                        <button id="right"><i class="xi-angle-right"></i></button>
+                        <button id="up"><i class="xi-angle-up"></i></button>
+                        <button id="down"><i class="xi-angle-down"></i></button>
+                        <button id="scaleUp"><i class="xi-zoom-in"></i></button>
+                        <button id="scaleDown"><i class="xi-zoom-out"></i></button>
+                    </section>`;
+                const cssTemplate = `
+                <style>
+                    .wrapper {
+                        margin: 0 auto;
+                        padding: 2rem;
+                    }
+                    .layout {
+                        display: flex;
+                    }
+                    h1 {
+                        font-size: 4rem;
+                        margin-bottom: 2rem;
+                    }
+                    .canvas {
+                        border: .5rem double skyblue;
+                        box-shadow: .2rem .2rem 1rem #9d9d9d;
+                    }
+                    .btnArea {
+                        width: 15rem;
+                        margin-left: 1rem;
+                    }
+                    button {
+                        margin: 1rem;
+                        padding: .5rem 2rem;
+                        font-size: 1.8rem;
+                        border-radius: 1rem;
+                        outline: none;
+                        border: .2rem double skyblue;
+                        background: #e4f9ff;
+                        box-shadow: .2rem .2rem .6rem #9d9d9d;
+                    }</style>`;
+                this.domId(element).innerHTML = htmlTemplate + cssTemplate;
+            }
+            initSetting() {
+                this.canvas = this.domId("canvas");
+                this.pen = this.canvas.getContext("2d");
+            }
+            modiDot(x, y) {
+                this.pen.fillRect((x * this.scaleFactor) + this.canvas.width / 2, -(y * this.scaleFactor) + (this.canvas.height / 2), 1, 1);
+            }
+            crossHair() {
+                for (let x = -this.canvas.width / 2; x < this.canvas.width / 2; x++) {
+                    this.modiDot(x / this.scaleFactor, 0);
+                }
+                for (let y = -this.canvas.height / 2; y < this.canvas.height / 2; y++) {
+                    this.modiDot(0, y / this.scaleFactor);
+                }
+            }
+            eventListener(array) {
+                window.addEventListener("click", (e) => {
+                    let resultArr = null;
+                    const symmetryObj = {
+                        Xsmymetry: [
+                            [1, 0, 0],
+                            [0, -1, 0],
+                            [0, 0, 1]
+                        ],
+                        Ysymmetry: [
+                            [-1, 0, 0],
+                            [0, 1, 0],
+                            [0, 0, 1]
+                        ],
+                        XYsymmetry: [
+                            [-1, 0, 0],
+                            [0, -1, 0],
+                            [0, 0, 1]
+                        ]
+                    }
+                    // if()
+                    switch (e.target.id) {
+                        // x축 대칭
+                        case "Xsmymetry":
+                            const XsymmetryArr = [
+                                [1, 0, 0],
+                                [0, -1, 0],
+                                [0, 0, 1]
+                            ];
+                            resultArr = this.matrixCalc(XsymmetryArr, [...array]);
+                            this.drawSymmetry(resultArr);
+                            break;
+
+                        // Y축 대칭
+                        case "Ysymmetry":
+                            const YsymmetryArr = [
+                                [-1, 0, 0],
+                                [0, 1, 0],
+                                [0, 0, 1]
+                            ];
+                            resultArr = this.matrixCalc(YsymmetryArr, [...array]);
+                            this.drawSymmetry(resultArr);
+                            break;
+
+                        // XY축 대칭
+                        case "XYsymmetry":
+                            const XYsymmetryArr = [
+                                [-1, 0, 0],
+                                [0, -1, 0],
+                                [0, 0, 1]
+                            ];
+                            resultArr = this.matrixCalc(XYsymmetryArr, [...array]);
+                            this.drawSymmetry(resultArr);
+                            break;
+
+                        case "left":
+                            this.xAxis += 10;
+
+                            break;
+
+                        case "right":
+                            this.xAxis += 10;
+
+                            break;
+
+                        case "up":
+                            this.yAxis += 10;
+
+                            break;
+
+                        case "down":
+                            this.yAxis += 10;
+
+                            break;
+
+                        case "scaleUp":
+                            (this.scaleFactor <= 45) && (this.scaleFactor += 5);
+
+                            break;
+
+                        case "scaleDown":
+                            (this.scaleFactor >= 15) && (this.scaleFactor -= 5);
+
+                            break;
+                    }
+                });
+            }
+            drawFactor() {
+                const [width, height, size] = [
+                    Math.floor(this.canvas.width / this.scaleFactor),
+                    Math.floor(this.canvas.height / this.scaleFactor),
+                    Number(5)
+                ];
+
+                for (let x = -width; x <= width; x++) {
+                    for (let y = -size; y < size; y++) {
+                        this.pen.fillStyle = "red";
+                        this.modiDot(x, y / this.scaleFactor);
+                    }
+                    this.pen.fillText(x, ((x * this.scaleFactor) + (this.canvas.width / 2) - 3), (this.scaleFactor + (this.canvas.height / 2) - 2), 10);
+                }
+
+                for (let y = -height; y <= height; y++) {
+                    for (let x = -size; x <= size; x++) {
+                        this.pen.fillStyle = "purple";
+                        this.modiDot(x / this.scaleFactor, y);
+                    }
+                    (y !== 0) && (this.pen.fillText(y, (this.scaleFactor + (this.canvas.width / 2) - 10), ((-y * this.scaleFactor) + (this.canvas.height / 2) + 3), 10));
+                }
+            }
+            linearFunction(xV, yV, aV, bV) {
+                let [maxX, y, minX, b] = [xV, yV, aV, bV];
+                (minX >= maxX) && ([maxX, y, minX, b] = [aV, bV, xV, yV,]);
+                const m = ((y - b) / (maxX - minX));
+                for (let x = minX; x <= maxX; x += 0.01) {
+                    const f = m * (x - minX) + b;
+                    this.pen.fillRect(x * this.scaleFactor + this.canvas.width / 2, -f * this.scaleFactor + this.canvas.height / 2, 1, 1);
+                }
+            }
+            drawSymmetry(resultArr) {
+                for (let i = 0; i < resultArr.length - 1; i++) {
+                    const values = [
+                        resultArr[i][0], resultArr[i][1],
+                        (resultArr[i + 1][0]), (resultArr[i + 1][1])
+                    ];
+                    this.linearFunction(...values);
+                }
+            }
+            drawFunction(Xarr, Yarr) {
+                for (let i = 0; i < Xarr.length - 1; i++) {
+                    this.linearFunction(Xarr[i], Yarr[i], Xarr[i + 1], Yarr[i + 1]);
+                }
+            }
+            matrixCalc(matrix, array) {
+                const resultArr = [];
+                array.forEach((item) => {
+                    for (let i = 0; i < item.length; i++) {
+                        const tempArr = [];
+                        for (let j = 0; j < matrix.length; j++) {
+                            let result = 0;
+                            for (let k = 0; k < matrix[0].length; k++) {
+                                result += item[i][k] * matrix[k][j];
+                            }
+                            tempArr.push(result);
+                        }
+                        resultArr.push(tempArr);
+                    }
+                });
+                return resultArr;
+            }
+            symmetryCalc(Xarr, Yarr) {
+                const makeArray = [];
+                for (let i = 0; i < Xarr.length; i++) {
+                    this.linearFunction(Xarr[i], Yarr[i], Xarr[i + 1], Yarr[i + 1]);
+                    makeArray.push([[Xarr[i], Yarr[i], 0]]);
+                }
+                return makeArray;
+            }
+            run(Xarr, Yarr) {
+                this.initDom("wrapper");
+                this.initSetting();
+                this.crossHair();
+                this.drawFactor();
+                this.eventListener(this.symmetryCalc(Xarr, Yarr));
+                this.drawFunction(Xarr, Yarr);
+            }
+        }
+
+        const main = (() => {
+            const posX = [-1, -4, -3, -2, -1, 0, 1, 2, 3, 4, -1];
+            const posY = [-3, 2, 3, 2, 1, 0, -1, -2, -3, -6, -3];
+
+            const canvas = new Canvas("canvas");
+            canvas.run([...posX], [...posY]);
+        })();
+
+
+    </script>
+</body>
+
+</html>

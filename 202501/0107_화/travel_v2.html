@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        // Kpop인기차트 10위
+        const kpopList = {
+            kpop: {
+                list1: {
+                    id: 1,
+                    title: "HomeSweetHome",
+                    singer: "GD",
+                    like: 5,
+                    album: "HomeSweetHome.mp3"
+                },
+                list2: {
+                    id: 2,
+                    title: "나는 반딧불",
+                    singer: "황가람",
+                    like: 5,
+                    album: "나는 반딧불.mp3"
+                },
+                list3: {
+                    id: 3,
+                    title: "APT.",
+                    singer: "로제",
+                    like: 5,
+                    album: "APT.mp3"
+                },
+                list4: {
+                    id: 4,
+                    title: "HAPPY",
+                    singer: "DAY6",
+                    like: 5,
+                    album: "HAPPY.mp3"
+                },
+                list5: {
+                    id: 5,
+                    title: "Drowning",
+                    singer: "WOODZ",
+                    like: 5,
+                    album: "Drowning.mp3"
+                }
+            }
+        }
+
+        class Travel{
+            constructor(id){
+                this.id=id;
+                this.data=null;
+                this.resultList = [];
+            }
+            setData(data){
+                const {kpop:dataObj} = {...data};
+                this.data = dataObj;
+            }
+            objectParsing(item){
+                for(const key in item){
+                    this.checkType(item[key]);
+                }
+            }
+            arrayParsing(item){
+                for(const value in item){
+                    this.checkType(value);
+                }
+            }
+            primitiveData(item){
+                this.resultList.push(item);
+            }
+            checkType(item){
+                if(typeof item === "object"){
+                    if(Array.isArray(item)){
+                        this.arrayParsing(item);
+                    }else{
+                        this.objectParsing(item);
+                    }
+                }else{
+                    this.primitiveData(item);
+                }
+            }
+            get resultData(){
+                return [...this.resultList];
+            }
+            control(kpopList){
+                this.setData(kpopList);
+                this.checkType(this.data)
+            }
+        }
+
+        const main = (() => {
+            const travel = new Travel("travel");
+            travel.control(kpopList);
+            console.log(travel.resultData);
+        })();
+
+    </script>
+</body>
+
+</html>

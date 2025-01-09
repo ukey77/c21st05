@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>자료구조</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-size: 10px;
+        }
+
+        .wrapper {
+            padding: 2rem;
+        }
+
+        .myBox {
+            width: 20rem;
+            height: 20rem;
+            background-repeat: no-repeat;
+            background-size: cover;
+            float: left;
+        }
+
+        .myBox:first-child {
+            border-radius: 1rem 0 0 1rem;
+        }
+
+        .myBox:last-child {
+            border-radius: 0 1rem 1rem 0;
+        }
+    </style>
+</head>
+<div id="wrapper" class="wrapper">
+    <section id="myBoxArea" class="myBoxArea">
+    </section>
+</div>
+
+<body>
+    <script>
+        class PicBox {
+            constructor(id, picInfo) {
+                this.id = id;
+                this.picInfo = picInfo;
+            }
+            init(targetDom) {
+                const htmlTemplate = `
+                    <div id="${this.id}" class="myBox"></div>
+                `;
+                document.getElementById(targetDom).innerHTML += htmlTemplate;
+                document.getElementById(`${this.id}`).style.backgroundImage = `url("${this.picInfo}")`
+            }
+        }
+        const imgPath = [
+            "https://i.namu.wiki/i/1TKhICJY551woFdHg4kBfuBmtuA16SHW1C7Q1gw_6QLr8lVcV16dlubPiaIHn-NWHyQzCcytxYEeMnUB0obZTfA_gH0mZojs_ebnfN-YkIsb3LEeYNgBhSYSmwWVsGE-PLiz1yoSXBe9l4BBLemmQw.webp",
+            "https://i.namu.wiki/i/Zd1GVkt9Zzx9w6aOBZTkmAlCnTHNVpB8DxVx151IFFbTcLm23nvz1230-TU_CBa-0wcmOWfazQl1DlbShtAw9opvroOVTh5gyrds93y3QNXbZA2JAXYz6HBXUbWxLvcKWPaFNL0Y-3mnAN0MNP9g2Q.webp",
+            'https://i.pinimg.com/236x/bc/83/89/bc83896b8e0e6d6f424d61a4e2e32db4.jpg'
+
+        ]
+        const classObj = {}
+        imgPath.forEach((img, i) => {
+            const id = `img${i + 1}`
+            if (!(id in classObj)) {
+                classObj[id] = new PicBox(`${id}`, img);
+                classObj[id].init("myBoxArea");
+            }
+        })
+
+    </script>
+</body>
+
+</html>

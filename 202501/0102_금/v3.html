@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Graph</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .canvas {
+            border: 5px solid lavender;
+            border-radius: 1rem;
+            margin: 1rem 0;
+        }
+
+        .controls {
+            margin: 1rem;
+        }
+
+        label {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="wrapper">
+        <div class="controls">
+            <label>Y = </label>
+            <input type="number" id="xValue">
+            <select id="graphType">
+                <option value="sin">SIN</option>
+                <option value="cos">COS</option>
+                <option value="tan">TAN</option>
+            </select>
+            <input type="number" id="yValue">
+            <button id="graphBtn">Draw Graph</button>
+        </div>
+        <canvas id="canvas" class="canvas" width="800" height="400"></canvas>
+    </div>
+
+    <script>
+        class Canvas {
+            constructor(id) {
+                this.id = id;
+                this.canvas = null;
+                this.pen = null;
+                this.scaleFactor = 40;
+            }
+            domId(element) {
+                return document.getElementById(element);
+            }
+            settings() {
+                this.canvas = this.domId("canvas");
+                this.pen = this.canvas.getContext("2d");
+            }
+            modiDot(x, y) {
+                this.pen.fillRect(x * this.scaleFactor + this.canvas.width / 2, -(y * this.scaleFactor) + this.canvas.height / 2, 1, 1);
+            }
+            eventManager() {
+                window.addEventListener("click", (e) => {
+                    switch (e.target.id) {
+                        case "graphBtn":
+                            const domValues = [
+                                this.domId("graphType").value,
+                                Number(this.domId("xValue").value),
+                                Number(this.domId("yValue").value)
+                            ];
+                            console.log(domValues)
+                            this.drawGraph(domValues);
+                            break;
+                    }
+                });
+            }
+            renderAxisCrosshair() {
+                const [width, height, size] = [Math.floor(this.canvas.width / 2), Math.floor(this.canvas.height / 2), Number(5)];
+                this.pen.fillStyle = "#9d9d9d";
+                for (let x = -width; x < width; x++) {
+                    this.modiDot(x / this.scaleFactor, 0);
+                }
+                for (let y = -height; y < height; y++) {
+                    this.modiDot(0, y / this.scaleFactor);
+                }
+
+            }
+            drawGraph(domValues) {
+
+                this.init();
+                const [type, xValue, deg] = [...domValues];
+                const [width, height, size] = [Math.floor(this.canvas.width / 2), Math.floor(this.canvas.height / 2), Number(5)];
+
+                switch (type) {
+                    case "sin":
+                        // Sin 함수 그래프 그리기
+                        for (let x = -Math.PI * 3; x <= Math.PI * 3; x += 0.01) {
+                            this.pen.fillStyle = "red";
+                            const y = Math.sin(xValue * x + deg);
+                            this.modiDot(x, y);
+                        }
+
+                        // X축 눈금 그리기 (π 단위)
+                        for (let i = -3; i <= 3; i++) {
+                            const xPos = i * Math.PI * this.scaleFactor + this.canvas.width / 2;
+                            this.pen.fillRect(xPos, this.canvas.height / 2 - 5, 1, 10);
+                            let text = i === 0 ? "0" : i === 1 ? "π" : i === -1 ? "-π" : `${i}π`;
+                            this.pen.fillText(text, xPos, this.canvas.height / 2 + 10);
+                        }
+
+                        // Y축 눈금 그리기
+                        for (let i = -height; i <= height; i++) {
+                            this.pen.fillRect(this.canvas.width / 2 - 5, i * this.scaleFactor + this.canvas.height / 2, 10, 1);
+                        }
+                        break;
+
+                    case "cos":
+                        // Cosine 함수 그래프 그리기
+                        for (let y = -Math.PI * 2; y <= Math.PI * 2; y += 0.01) {
+                            this.pen.fillStyle = "blue";
+                            const x = Math.cos(xValue * y + deg);
+                            this.modiDot(x, y);
+                        }
+
+                        // X축 눈금 그리기 (π 단위)
+                        for (let i = -3; i <= 3; i++) {
+                            const xPos = i * Math.PI * this.scaleFactor + this.canvas.width / 2;
+                            this.pen.fillRect(xPos, this.canvas.height / 2 - 5, 1, 10);
+                            let text = i === 0 ? "0" : i === 1 ? "π" : i === -1 ? "-π" : `${i}π`;
+                            this.pen.fillText(text, xPos - 3, this.canvas.height / 2 + 10);
+                        }
+
+                        // Y축 눈금 그리기
+                        for (let i = -height; i <= height; i++) {
+                            this.pen.fillRect(this.canvas.width / 2 - 5, i * this.scaleFactor + this.canvas.height / 2, 10, 1);
+                        }
+                        break;
+                    case "tan":
+                        for (let y = -Math.PI * 2; y <= Math.PI * 2; y += 0.01) {
+                            this.pen.fillStyle = "blue";
+                            const x = Math.tan(xValue * y + deg);
+                            this.modiDot(y, x);
+                        }
+                        // X축 눈금 그리기 (π 단위)
+                        for (let i = -3; i <= 3; i++) {
+                            const xPos = i * Math.PI * this.scaleFactor + this.canvas.width / 2;
+                            this.pen.fillRect(xPos, this.canvas.height / 2 - 5, 1, 10);
+                            let text = i === 0 ? "0" : i === 1 ? "π" : i === -1 ? "-π" : `${i}π`;
+                            this.pen.fillText(text, xPos, this.canvas.height / 2 + 10);
+                        }
+
+                        // Y축 눈금 그리기
+                        for (let i = -height; i <= height; i++) {
+                            this.pen.fillRect(this.canvas.width / 2 - 5, i * this.scaleFactor + this.canvas.height / 2, 10, 1);
+                        }
+                        break;
+
+                }
+            }
+            init() {
+                this.pen.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                this.renderAxisCrosshair();
+            }
+            run() {
+                this.settings();
+                this.eventManager();
+                this.renderAxisCrosshair();
+            }
+        }
+
+        const main = (() => {
+            const canvas = new Canvas("canvas");
+            canvas.run();
+        })();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .wrapper {
+            display: flex;
+            align-items: center;
+        }
+
+        input[type="number"] {
+            width: 30px;
+        }
+
+        .lowestArea {
+            margin: 0 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <div>
+            <input type="number" id="molecule" tabindex="1"><br>
+            ———<br>
+            <input type="number" id="denominator" tabindex="3">
+        </div>
+        <div class="lowestArea">
+            <button id="lowestBtn" tabindex="5">Lowest</button> =
+        </div>
+        <div>
+            <input type="number" id="moleculeDividor" tabindex="7"><br>
+            ———<br>
+            <input type="number" id="denominatorDividor" tabindex="9">
+        </div>
+    </div>
+
+    <script>
+
+        class Lowest {
+            constructor(id) {
+                this.id = id;
+            }
+            getDom() {
+                window.addEventListener("click", (e) => {
+                    switch (e.target.id) {
+                        case "lowestBtn":
+                            const domValue = {
+                                molecule: Number(document.getElementById("molecule").value),
+                                denominator: Number(document.getElementById("denominator").value),
+                            }
+                            this.greatestCommon(domValue);
+                            break;
+                    }
+                });
+            }
+            greatestCommon(domValue) {
+                const { molecule, denominator } = { ...domValue };
+                const minValue = Math.min(molecule, denominator);
+                let dividor = 0;
+                for (let i = minValue; i > 1; i--) {
+                    if ((molecule % i === 0) && (denominator % i === 0)) {
+                        dividor = i;
+                        break;
+                    }
+                }
+                this.dividorNum(domValue, dividor);
+            }
+            dividorNum(domValue, dividor) {
+                const { molecule, denominator } = { ...domValue };
+                const resultObj = {
+                    moleculeDividor: molecule / dividor,
+                    denominatorDividor: denominator / dividor
+                };
+                this.outPutDom(resultObj);
+            }
+            outPutDom(resultObj) {
+                const { moleculeDividor, denominatorDividor } = { ...resultObj };
+                document.getElementById("moleculeDividor").value = moleculeDividor;
+                document.getElementById("denominatorDividor").value = denominatorDividor;
+            }
+            run() {
+                this.getDom();
+            }
+        }
+        const lowest = new Lowest("lowest");
+        lowest.run();
+    </script>
+</body>
+
+</html>

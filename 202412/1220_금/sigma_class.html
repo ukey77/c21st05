@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        let multi = [];
+        for(let i=1; i<=4; i++){
+            const calc = i - (i**2)
+            multi.push(calc);
+        }
+        console.log(multi);
+
+        const result = multi.reduce((accumulator, currentValue)=>{
+            return accumulator*currentValue;
+        });
+
+        console.log(result);
+
+    </script>
+</body>
+</html>

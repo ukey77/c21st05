@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complement</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-size: 30px;
+        }
+
+        .complementCalc {
+            width: 47rem;
+            border: .3rem solid rgb(0, 128, 126);
+            border-radius: 1rem;
+            margin: 0 auto;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        input[type="number"] {
+            width: 3rem;
+            height: 1.5rem;
+            text-align: right;
+            border: 2px solid rgb(0, 69, 68);
+            border-radius: 10px;
+            margin: 2px;
+        }
+
+        h1 {
+            margin: 1rem;
+        }
+
+        article {
+            margin: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        button {
+            margin: 0 10px;
+            padding: 5px 10px;
+            background-color: rgb(0, 128, 126);
+            border-radius: 10px;
+            color: #fff;
+        }
+
+        .complementBtn {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="wrapper" class="wrapper">
+        <section class="complementCalc">
+            <h1>보수 계산기</h1>
+            <article>
+                <div>
+                    <span>First Decimal: </span>
+                    <input type="number" id="firstDecimalNum">
+                    <button id="firstBinaryBtn">변환</button>
+                </div>
+                <div id="firstBinaryArea">
+                </div>
+            </article>
+            <article>
+                <div>
+                    <span>Second Decimal: </span>
+                    <input type="number" id="secondDecimalNum">
+                    <button id="secondBinaryBtn">변환</button>
+                </div>
+                <div id="secondBinaryArea">
+                </div>
+            </article>
+            <button id="complementBtn" class="complementBtn">Complement Result</button>
+            <article id="resultBinaryArea"></article>
+        </section>
+    </div>
+
+    <script>
+        // == Stack ==
+        class Stack {
+            constructor(id) {
+                this.id = id;
+                this.storage = [];
+            }
+            pushItem(item) { this.storage.push(item); }
+            popItem() { return this.storage.pop(); }
+            get stackStorage() { return this.storage; }
+            get stackLength() { return this.storage.length; }
+        }
+
+
+        class Complement {
+            constructor(id) {
+                this.id = id;
+            }
+            eventFunc() {
+                window.addEventListener("click", (e) => {
+                    const [firstDecimalNum, secondDecimalNum]
+                        = [
+                            Number(document.getElementById("firstDecimalNum").value),
+                            Number(document.getElementById("secondDecimalNum").value),
+                        ];
+
+                    switch (e.target.id) {
+                        case "firstBinaryBtn":
+                            this.outputDom(this.changeBianary(firstDecimalNum), "firstBinaryArea", false);
+                            break;
+                        case "secondBinaryBtn":
+                            this.outputDom(this.changeBianary(secondDecimalNum), "secondBinaryArea", false);
+                            break;
+                        case "complementBtn":
+                            const binaryArr = [
+                                this.changeBianary(firstDecimalNum),
+                                this.changeBianary(secondDecimalNum)
+                            ];
+                            this.outputDom(this.complementCalc(binaryArr), "resultBinaryArea", true);
+                            break;
+                    }
+                })
+            }
+            changeBianary(decimalValue) {
+                const binaryStack = new Stack("binaryStack"); // stack
+                const binaryResultArr = []; // 결과담을 배열
+
+                // 2진수로 변환한 값을 stack에 push
+                for (let i = 0; i < 8; i++) {
+                    if (decimalValue > 0) {
+                        binaryStack.pushItem(decimalValue % 2);
+                        decimalValue = Math.floor(decimalValue / 2);
+                    } else {
+                        binaryStack.pushItem(0);
+                    }
+                }
+                // 결과배열에 push
+                while (binaryStack.storage.length > 0) {
+                    binaryResultArr.push(binaryStack.popItem());
+                }
+                return binaryResultArr;
+            }
+            outputDom(binaryArr, domElement, isSecond) {
+                let secondTemplate = `<span>Decimal: </<span>`
+                if (isSecond) {
+                    let resultValue = 0;
+                    binaryArr.forEach((value, i) => {
+                        resultValue += value * 2 ** (binaryArr.length - i - 1);
+                    });
+                    secondTemplate += `<input type="number" value=${resultValue}>`
+                }
+
+                let htmlString = `<span>Binary: </<span>`;
+                binaryArr.forEach((value) => {
+                    htmlString += `<input type="number" value="${value}">`;
+                });
+
+                let final = isSecond ? secondTemplate : "";
+                document.getElementById(domElement).innerHTML = `${final}${htmlString}`;
+            }
+            complementCalc(binaryArr) {
+                const [firstBinary, secondBinary] = [...binaryArr];
+                const complementObj = {
+                    oneComplement: [], //1의 보수 변환,
+                    oneCarryArr: [],
+                    resultArr: [],
+                    twoCarryArr: [],
+                    final: []
+                }
+
+                // 1. 1의 보수 변환
+                secondBinary.forEach((value, index) => {
+                    const complementValue = (value === 0 ? 1 : 0);
+                    if (index === secondBinary.length - 1) {
+                        complementObj["oneComplement"].push(complementValue + 1);
+                    } else {
+                        complementObj["oneComplement"].push(complementValue);
+                    }
+                });
+
+                // 2. 2의 보수 변환
+                for (let i = 7; i >= 0; i--) {
+                    const value = complementObj["oneCarryArr"][i] === undefined ? 0 : complementObj["oneCarryArr"][i];
+                    if ((value + complementObj["oneComplement"][i]) === 2) {
+                        complementObj["resultArr"].unshift(0);
+                        complementObj["oneCarryArr"][i - 1] = 1;
+                    } else {
+                        complementObj["resultArr"].unshift(value + complementObj["oneComplement"][i]);
+                        complementObj["oneCarryArr"][i - 1] = 0;
+                    }
+                }
+
+                // 3. first + 2의 보수
+                for (let i = 7; i >= 0; i--) {
+                    const value = complementObj["twoCarryArr"][i] === undefined ? 0 : complementObj["twoCarryArr"][i];
+                    if ((value + complementObj["resultArr"][i] + firstBinary[i]) >= 2) {
+                        complementObj["final"].unshift((value + complementObj["resultArr"][i] + firstBinary[i]) - 2);
+                        complementObj["twoCarryArr"][i - 1] = 1;
+                    } else {
+                        complementObj["final"].unshift(value + complementObj["resultArr"][i] + firstBinary[i]);
+                        complementObj["twoCarryArr"][i - 1] = 0;
+                    }
+                }
+                console.log(complementObj["final"])
+                return [...complementObj["final"]];
+            }
+            run() {
+                this.eventFunc();
+            }
+        }
+        const complement = new Complement("complement");
+        complement.run();
+    </script>
+</body>
+
+</html>

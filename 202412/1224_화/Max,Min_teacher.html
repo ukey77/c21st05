@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="wrapper" class="wrapper"></div>
+    <script>
+        class MinMax {
+            constructor(id) {
+                this.id = id;
+                this.storage = [];
+                this.min = 0;
+                this.max = 0;
+            }
+            domId(element){
+                return document.getElementById(element);
+            }
+            init(element){
+                const htmlTemplate = `
+                    <p><label>V1: </label><input class="values" type="number"></p>
+                    <p<label>V2: </label><input class="values" type="number"></p>
+                    <p><label>V3: </label><input class="values" type="number"></p>
+                    <p><label>V4: </label><input class="values" type="number"></p>
+                    <button id="solveBtn">Solve</button>
+                    <p id="maxV">MAX: 0</p>
+                    <p id="minV">Min: 0</p>
+                `;
+                this.domId(element).innerHTML = `${htmlTemplate}`;
+            }
+            eventListener(){
+                window.addEventListener("click",(e)=>{
+                    switch(e.target.id){
+                        case "solveBtn":
+                        const domList = document.querySelectorAll(".values"); /// 배열로 반환됨.
+
+                        // console.log(typeof domList);
+                        // console.log("Array", Array.isArray(domList));
+
+                        // for(let key in domList){
+                        //     console.log(key)
+                        // }
+
+                        for(let i=0; i<domList.length; i++){
+                            this.storage.push(domList[i].value);
+                        }
+                        this.getMinMax();
+                        break;
+                    }
+                });
+            }
+            getMinMax(){
+                this.min = Math.min(...this.storage);
+                this.max = Math.max(...this.storage);
+                this.printValue();
+            }
+            printValue(){
+                this.domId("maxV").innerHTML = `MAX: ${this.max}`;
+                this.domId("minV").innerHTML = `MIN: ${this.min}`;
+            }
+            run(element){
+                this.init(element);
+                this.eventListener();
+            }
+        }
+
+        const main = (() => {
+            const minMax = new MinMax("minMax");
+            minMax.run("wrapper");
+        })();
+
+    </script>
+</body>
+
+</html>

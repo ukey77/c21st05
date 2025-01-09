@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- font -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <!-- xeicon -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xeicon@2.3.3/xeicon.min.css">
+    <title>Canvas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-size: 19px;
+            font-family: "Gowun Dodum", serif;
+            font-weight: 800;
+            font-style: normal;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="wrapper" class="wrapper"></div>
+    <script>
+        class Canvas {
+            constructor(id) {
+                this.id = id;
+                this.canvas = null;
+                this.pen = null
+                this.scaleFactor = 20;
+                this.xAxis = 0;
+                this.yAxis = 0;
+            }
+            drawCanvas(width = 800, height = 800) {
+                const canvasTemplate = `
+                    <canvas id="canvas" class="canvas" width="${width}" height="${height}"></canvas>`;
+                this.domId(`${this.id}CanvasArea`).innerHTML = canvasTemplate;
+            }
+            initDom(element) {
+                const buttonTemplate = `
+                <article class="allBtnArea">
+                    <article class="arrowBtnArea">
+                        <div>
+                            <button id="up"><i class="xi-arrow-up"></i></button>
+                        </div>
+                        <div>
+                            <button id="left"><i class="xi-arrow-left"></i></button>
+                            <button id="down"><i class="xi-arrow-down"></i></button>
+                            <button id="right"><i class="xi-arrow-right"></i></button>
+                        </div>
+                    </article>
+
+                    <div class="scaleBtnArea">
+                        <p><button id="plus"><i class="xi-plus"></i></button></p>
+                        <p><button id="minus"><i class="xi-minus"></i></button></p>
+                    </div>
+                </article>`;
+                const htmlTemplate = `
+                    <h1>Canvas</h1>
+                    <section>
+                        <article id="${this.id}CanvasArea">
+                            <canvas id="canvas" class="canvas" width="800" height="800}"></canvas>
+                        </article>
+                        <article>
+                            <p>A (<input type="number" id="xValue">,<input type="number" id="yValue">)</p>
+                            <p>B (<input type="number" id="aValue">,<input type="number" id="bValue">)</p>
+                            <p><label>Canvas X: </label><input type="number" id="canvasWidth"></p>
+                            <p><label>Canvas Y: </label><input type="number" id="canvasHeight"></p>
+                            <p><label>Scale: </label><input type="number" id="scale"></p>
+                            <button id="outputBtn" class="outputBtn btnStyle">Draw</button>
+                            <button id="resetBtn" class="resetBtn btnStyle">Reset</button>
+                            ${buttonTemplate}
+                        </article>
+                    </section>`;
+                const cssTemplate = `
+                    <style>
+                        .wrapper{
+                            padding: 1.5rem;
+                        }
+                        i {
+                            pointer-events: none;
+                        }
+                        h1{
+                            font-size: 2.5rem;
+                        }
+                        section{
+                            margin: 1rem;
+                            display: flex;
+                        }
+                        .canvas {
+                            border: 1px solid blueviolet;
+                            margin-right: 2rem;
+                            border-radius: .5rem;
+                            box-shadow: 3px 3px 7px #d9d9d9;
+                        }
+                        input{
+                            width: 4rem;
+                            height: 2rem;
+                            background-color: #f2f2f2s;
+                            border-radius: .5rem;
+                            margin: .3rem;
+                            text-align: right;
+                        }
+                        .btnStyle{
+                            padding: 0.5rem 1.5rem;
+                            background: lavender;
+                            border-radius: .5rem;
+                        }
+                        .resetBtn{
+                            background-color: #d7d7d7;
+                        }
+                        .allBtnArea{
+                            margin-top: 3rem;
+                            display: flex;
+                        }
+                        .arrowBtnArea,.scaleBtnArea {
+                            padding-top: 1rem;
+                            width: 15rem;
+                            height:8rem;
+                            text-align: center;
+                            background: rgb(239, 239, 255);
+                            border-radius: 2rem;
+                        }
+                        .scaleBtnArea{
+                            width: 5rem;
+                            border-radius: 1.5rem;
+                            margin-left: 1rem;
+                        }
+                        .arrowBtnArea button, .scaleBtnArea button {
+                            width: 3rem;
+                            height: 3rem;
+                            border-radius: 1rem;
+                            margin-top: .3rem;
+                            background: #fff;
+                        }
+                    </style>
+                `;
+                document.getElementById(element).innerHTML = `${htmlTemplate}${cssTemplate}`;
+            }
+            initialSettings() {
+                this.canvas = document.getElementById("canvas");
+                this.pen = this.canvas.getContext("2d");
+            }
+            modiDot(x, y) {
+                this.pen.fillRect((x * this.scaleFactor) + (this.canvas.width / 2) + this.xAxios, (-y * this.scaleFactor) + (this.canvas.height / 2) - this.yAxios, 1, 1);
+            }
+            drawFactor() {
+                const [width, height, size] = [
+                    Math.floor(this.canvas.width / (this.scaleFactor * 2) + Math.abs(this.xAxios)),
+                    Math.floor((this.canvas.height) / (this.scaleFactor * 2) + Math.abs(this.yAxios)),
+                    Number(3)
+                ];
+
+                // 너비
+                for (let i = -width; i <= width; i++) {
+                    for (let j = -size; j < size; j++) {
+                        this.pen.fillStyle = "red";
+                        this.modiDot(i, j / this.scaleFactor);
+                    }
+                    this.pen.fillText(i, (i * this.scaleFactor) + (this.canvas.width / 2) + this.xAxios - 2.5, (this.canvas.height / 2) - this.yAxios + 15, 10);
+                }
+
+                // 높이
+                for (let i = -height; i <= height; i++) {
+                    for (let j = -size; j < size; j++) {
+                        this.pen.fillStyle = "blue";
+                        this.modiDot(j / this.scaleFactor, i);
+                    }
+                    ((i !== 0) && (this.pen.fillText(i, (this.canvas.width / 2) + this.xAxios + 5, (-i * this.scaleFactor) + (this.canvas.height / 2) - this.yAxios + 3.5, 10)));
+                }
+            }
+            crosshair() {
+                for (let x = 1; x < this.canvas.width + Math.abs(this.xAxios); x++) {
+                    this.modiDot(x / this.scaleFactor, 0);
+                    this.modiDot(-x / this.scaleFactor, 0);
+                    // this.pen.fillRect(x, (this.canvas.height / 2), 1, 1);
+                }
+                for (let y = 1; y < this.canvas.height + Math.abs(this.yAxios); y++) {
+                    this.modiDot(0, y / this.scaleFactor);
+                    this.modiDot(0, -y / this.scaleFactor);
+                    // this.pen.fillRect((this.canvas.width / 2), y, 1, 1);
+                }
+            }
+            eventListener() {
+                window.addEventListener("click", (e) => {
+                    const domValues = [
+                        Number(this.domId("xValue").value),
+                        Number(this.domId("yValue").value),
+                        Number(this.domId("aValue").value),
+                        Number(this.domId("bValue").value)
+                    ];
+                    switch (e.target.id) {
+                        case "outputBtn":
+                            const [width, height, scale] = [
+                                Number(this.domId("canvasWidth").value),
+                                Number(this.domId("canvasHeight").value),
+                                Number(this.domId("scale").value),
+                            ];
+                            this.scaleFactor = (scale === 0) ? 20 : scale;
+                            (width * height !== 0) && this.drawCanvas(width, height);
+                            this.refreshCanvas();
+                            this.drawLine(...domValues);
+                            break;
+
+                        case "left":
+                            this.xAxios += 10;
+                            this.refreshCanvas();
+                            this.drawLine(...domValues);
+                            break;
+
+                        case "right":
+                            this.xAxios -= 10;
+                            this.refreshCanvas();
+                            this.drawLine(...domValues);
+                            break;
+
+                        case "up":
+                            this.yAxios -= 10;
+                            this.refreshCanvas();
+                            this.drawLine(...domValues);
+                            break;
+
+                        case "down":
+                            this.yAxios += 10;
+                            this.refreshCanvas();
+                            this.drawLine(...domValues);
+                            break;
+
+                        case "plus":
+                            (this.scaleFactor <= 45) && (this.scaleFactor += 5)
+                            this.refreshCanvas();
+                            this.drawLine(...domValues);
+                            break;
+
+                        case "minus":
+                            (this.scaleFactor >= 15) && (this.scaleFactor -= 5)
+                            this.refreshCanvas();
+                            this.drawLine(...domValues);
+                            break;
+
+                        case "resetBtn":
+                            const refreshDomIdArray = ["xValue", "yValue", "aValue", "bValue", "canvasWidth", "canvasHeight", "scale"];
+                            refreshDomIdArray.forEach((getDomId) => {
+                                this.domId(getDomId).value = '';
+                            })
+                            this.scaleFactor = 20;
+                            this.xAxios = 0;
+                            this.yAxios = 0;
+                            this.drawCanvas();
+                            this.refreshCanvas();
+                            break;
+                    }
+                });
+            }
+            domId(element) {
+                return document.getElementById(element);
+            }
+            drawLine(xV, yV, aV, bV) {
+                let [maxX, y, minX, b] = [xV, yV, aV, bV];
+                (aV > xV) && ([maxX, y, minX, b] = [minX, b, maxX, y]);
+
+                for (let x = minX; x <= maxX; x += 0.01) {
+                    const m = (y - b) / (maxX - minX);
+                    const f = m * (x - minX) + b;
+                    this.modiDot(x, f);
+                }
+            }
+            clearCanvas() {
+                this.pen.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            }
+            refreshCanvas() {
+                this.initialSettings();
+                this.clearCanvas();
+                this.crosshair();
+                this.drawFactor();
+            }
+            run(element) {
+                this.initDom(element);
+                this.initialSettings();
+                this.refreshCanvas();
+                this.eventListener();
+            }
+        }
+
+        const main = (() => {
+            const canvas = new Canvas("canvas");
+            canvas.run("wrapper");
+        })();
+
+    </script>
+</body>
+
+</html>

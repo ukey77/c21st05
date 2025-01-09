@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        class Solution {
+            constructor(id) {
+                this.id = id;
+                this.array = null;
+                this.answerArray = null;
+                this.avg = 0;
+            }
+            inputArray(items) {
+                this.array = [...items];
+            }
+            calAvg() {
+                let sum = 0;
+                this.array.forEach((v) => {
+                    sum += v;
+                });
+                this.avg = sum / this.array.length;
+            }
+            calThanAvg() {
+                this.answerArray = this.array.filter(v => v > this.avg);
+            }
+            printAnswer() {
+                this.answerArray.forEach((v) => {
+                    console.log(`${v}`);
+                });
+            }
+            run(items) {
+                this.inputArray(items);
+                this.calAvg();
+                this.calThanAvg();
+                this.printAnswer();
+            }
+        }
+
+        const mySolution = new Solution("mySolution");
+        mySolution.run([7, 8, 10, 100, 99, 44, 23, 40, 14, 80]);
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,49 @@
+<style>
+    * { margin: 0; padding: 0; }
+    .cal { width: 350px; }
+    .cal>.days{ width: 48px; height: 48px; border: 1px solid red; float: left; }
+    </style>
+    <div id="cal" class="cal"></div>
+    <script>
+    const pMonth = new Date("2024/10/01");
+    const yoil = ["일", "월", "화", "수", "목", "금", "토"];
+    const eventDay = new Date("2024/11/24");
+    let boxNumber = 35;
+    // document.write( pMonth.getMonth()+1 );
+    let lastDay = 0;
+    for(let i=1; i<40; i++) {
+        if( ( new Date(`2024/${pMonth.getMonth()+1}/${i}`).getDate() == 1 && i != 1 ) || isNaN(new Date(`2024/${pMonth.getMonth()+1}/${i}`).getDate()) ) {
+            lastDay = i-1;
+            break;
+        }
+        // document.write( new Date(`2024/${pMonth.getMonth()+1}/${i}`).getDate() + "<br>");
+    }
+    
+    // document.write( lastDay );
+    for(let i=0; i<7; i++) {
+        document.getElementById('cal').innerHTML += `<div class="days">${yoil[i]}</div>`;
+    }
+    
+    for(let j=0; j<(new Date(`${pMonth.getFullYear()}/${pMonth.getMonth()+1}/1/`).getDay()); j++) {
+            document.getElementById('cal').innerHTML += '<div class="days"></div>';
+            boxNumber--;
+    }
+    
+    for(let i=1; i<=lastDay; i++) {
+        let tempString = `<div class="days">`;
+        //document.write( `${pMonth.getFullYear()}/${pMonth.getMonth()+1}/${i}/`);
+        //document.write( yoil[(new Date(`${pMonth.getFullYear()}/${pMonth.getMonth()+1}/${i}/`).getDay())] + "<br>" );
+        tempString += String( (new Date(`${pMonth.getFullYear()}/${pMonth.getMonth()+1}/${i}/`).getDate() ) );
+        
+        const today = new Date();
+        tempString += "(-" + String( Math.ceil( (eventDay - (new Date(`${pMonth.getFullYear()}/${pMonth.getMonth()+1}/${i}/`))) / ( 1000 * 60 * 60 * 24 ) ) ) + ")";
+        tempString += "</div>";
+        document.getElementById('cal').innerHTML += tempString;
+        boxNumber--;
+    }
+    
+    for(let j=0; j<boxNumber; j++) {
+            document.getElementById('cal').innerHTML += '<div class="days"></div>';
+    }
+    </script>
+    

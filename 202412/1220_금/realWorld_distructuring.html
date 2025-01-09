@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        const superComplexObject = [
+            "SuperZARD",
+            {
+                details: {
+                    personalInfo: {
+                        name: {
+                            firstName: "Super",
+                            lastName: "ZARD",
+                        },
+                        age: 42,
+                        hobbies: ["singing", "composing", "traveling"],
+                    },
+                    address: {
+                        primary: {
+                            city: "도쿄",
+                            country: "Japan",
+                        },
+                        secondary: {
+                            locations: ["안산", "서울", "오사카"],
+                            coordinates: {
+                                latitude: 37.5,
+                                longitude: 127.0,
+                            },
+                        },
+                    },
+                },
+                discography: [
+                    {
+                        album: "First Impact",
+                        songs: ["song1", "song2", "song3"],
+                        releaseYear: 1991,
+                        awards: [{ name: "Best Album", year: 1992 }],
+                    },
+                    {
+                        album: "Final Wave",
+                        songs: ["songA", "songB", "songC", "songD"],
+                        releaseYear: 1999,
+                        chartPerformance: {
+                            top10Weeks: 12,
+                            highestPosition: 1,
+                        },
+                    },
+                ],
+            },
+            [
+                2048,
+                {
+                    metaInfo: {
+                        debug: true,
+                        environment: "production",
+                    },
+                    nestedArray: [
+                        {
+                            level1: {
+                                level2: {
+                                    level3: {
+                                        level4: {
+                                            finalValue: "Deep Dive",
+                                            numbers: [1, 2, 3, 4, 5],
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    ],
+                    randomData: [
+                        "Z",
+                        "A",
+                        {
+                            initials: ["R", "D"],
+                            codes: {
+                                secret: "XYZ123",
+                                nestedSecrets: {
+                                    level1: {
+                                        code: "ABC",
+                                        next: {
+                                            deeperCode: "DEF",
+                                            deepestCode: "GHI",
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    ],
+                },
+            ],
+            {
+                specialNotes: {
+                    rareFacts: [
+                        "ZARD stands for something mysterious!",
+                        "First album sold over a million copies.",
+                        {
+                            trivia: "Most popular in the 90s",
+                            nestedTrivia: {
+                                countryStats: [
+                                    { country: "Japan", sales: 1000000 },
+                                    { country: "Korea", sales: 500000 },
+                                ],
+                                fanBaseGrowth: ["steady", "rapid", "global"],
+                            },
+                        },
+                    ],
+                },
+            },
+        ];
+
+        const [, , [, { nestedArray: [{ level1: { level2: { level3: { level4: { numbers: [, , , , Five] } } } } }] }]] = superComplexObject; // 5
+        const [, , ,{ specialNotes: { rareFacts: [, , { nestedTrivia: { fanBaseGrowth: [, , globalValue] } }] } }] = superComplexObject; // global
+        console.log(globalValue);
+    </script>
+</body>
+
+</html>

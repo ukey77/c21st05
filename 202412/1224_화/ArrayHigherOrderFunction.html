@@ -1,0 +1,54 @@
+<script>
+    // Array Higher Order Function 배열고차함수(문법적 설탕 ==> 사용의 편이성을 높여주는 효과)
+    // 1. forEach - 순회
+    // 2. map - 순회를 통해 새로운 배열
+    // 3. filter - 순회를 통해 특정조건의 값만 새로운 배열로 만드는 것
+    //
+    const myA = [ 1004, 1005, 1006, 1007, 1008 ];
+    myA[20] = 100003;
+    let newA = [];
+    //for(let i=0; i<myA.length; i++) {
+    //	document.write( myA[i] + "<br>" );
+    //}
+    //myA.forEach(
+    //	( v, i, a )=>{ // v=>Value / i=Index / a=Array
+    //    	document.write(i+ " / "+ v + "<br>");
+    //    }
+    //);
+    
+    //newA = myA.map(
+    //	( v, i, a ) => {
+    //    	return ++v;
+    //    }
+    //);
+    //console.log( newA );
+    const arr = [1,2,3,4,5];
+    const obj = {
+        obj1:1,
+        obj2:2,
+        obj3:3,
+        obj4:4,
+        obj5:5
+    }
+    // for(let i of arr){
+    //     console.log(i)
+    // }
+    for(let i of obj){
+        console.log(i)
+    }
+
+    
+    // newA = myA.filter(
+    //     ( v, i, a ) => {
+    //         return v>1007;
+    //     }
+    // );
+    // console.log( newA );
+    
+    // let string = "23123123";
+    // // string.forEach((value)=>{
+    // //     console.log(value)
+    // // });
+    // let array = [...string];
+    // console.log(array)
+    </script>

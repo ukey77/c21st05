@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../styles/css/calender.css">
+    <title>Calender</title>
+</head>
+
+<body>
+    <div id="wrapper" class="wrapper">
+        <section id="layout" class="layout">
+        </section>
+    </div>
+    <script>
+        // == Queue ==
+        class Queue {
+            constructor(id) {
+                this.id = id;
+                this.storage = [];
+            }
+            pushItem(item) { this.storage.push(item); }
+            shiftItem() { return this.storage.shift(); }
+            get storageLength() { return this.storage.length; }
+        }//END_Queue
+
+        // == DateOperation ==
+        class DateOperation {
+            constructor(id) {
+                this.id = id;
+            }
+            getCalendar(year = 0, month = 0, day = 0, isToday = true) {
+                let date = null;
+                isToday && (date = new Date());
+                isToday || (date = new Date(`${year} / ${month} / ${day}`));
+                return date;
+            }
+            calculateDate(yearValue = 0, monthValue = '', isToday = true) {
+                let [year, month, maxData, endDay, tempArr] = [Number(0), Number(0), Number(35), Number(0), []];
+
+                const monthObj = {
+                    jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6,
+                    jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12
+                }
+
+                const [queue, resultArray] = [new Queue(`${this.id}`), []]; // queue 생성 , 결과 return 배열
+
+                isToday && ([year, month] = [this.getCalendar().getFullYear(), Number(this.getCalendar().getMonth()) + 1]);
+                isToday || ([year, month] = [yearValue, monthObj[monthValue]]);
+
+                // == 마지막일 구하기 & queue에 해당 월의 달력 형태로 2차원 배열 push == 
+                for (let day = 1; day <= maxData; day++) {
+                    const [getDate, getDay] = [
+                        this.getCalendar(year, month, day, false).getDate(),
+                        this.getCalendar(year, month, day, false).getDay(),
+                    ];
+
+                    if (isNaN(getDate) || (day !== 1 && getDate === 1)) {
+                        queue.pushItem(tempArr); // 마지막으로 push
+                        endDay = (day - 1); // 마지막일
+                        break;
+                    } else {
+                        tempArr[getDay] = getDate;
+                        // 1주일 단위로 queue에 push
+                        if (getDay === 6) {
+                            queue.pushItem(tempArr);
+                            tempArr = [];
+                        }
+                    }
+                }
+
+                // 결과배열 return
+                while (queue.storageLength > 0) {
+                    resultArray.push(queue.shiftItem());
+                }
+                return resultArray;
+            }
+        }//END_DateOperation
+
+        // == Calender ==
+        class Calender {
+            constructor(id) {
+                this.id = id;
+                this.dateOperation = new DateOperation("dateOperation");
+            }
+            domId(element) {
+                return document.getElementById(element);
+            }
+            initDisplay(element) {
+                const htmlTemplate = `
+                <article class="selectCalenderArea">
+                <input type="number" id="yearValue" value="2024">년도
+                <select name="month" id="monthValue">
+                    <option value="jan">1월</option>
+                    <option value="feb">2월</option>
+                    <option value="mar">3월</option>
+                    <option value="apr">4월</option>
+                    <option value="may">5월</option>
+                    <option value="jun">6월</option>
+                    <option value="jul">7월</option>
+                    <option value="aug">8월</option>
+                    <option value="sep">9월</option>
+                    <option value="oct">10월</option>
+                    <option value="nov">11월</option>
+                    <option value="dec">12월</option>
+                </select>
+                <button id="calenderBtn">달력보기</button>
+            </article>
+            <article class="calenderArea">
+                <section class="weekArea">
+                    <div class="weekBox">Sun</div>
+                    <div class="weekBox">Mon</div>
+                    <div class="weekBox">Tue</div>
+                    <div class="weekBox">Wed</div>
+                    <div class="weekBox">Thu</div>
+                    <div class="weekBox">Fri</div>
+                    <div class="weekBox">Sat</div>
+                </section>
+                <section id="dayArea" class="dayArea">
+                </section>
+            </article>
+            `;
+                this.domId(element).innerHTML += htmlTemplate;
+            }
+            eventManage() {
+                window.addEventListener("click", (e) => {
+                    switch (e.target.id) {
+                        case "calenderBtn":
+                            const yearMonthData = [
+                                Number(this.domId("yearValue").value),
+                                String(this.domId("monthValue").value),
+                            ];
+                            const resultArray = this.dateOperation.calculateDate(...yearMonthData, false);
+                            this.outputDisplay(resultArray);
+                            break;
+                    }
+                });
+            }
+            initOnloadEvent() {
+                const monthArray = [
+                    "jan", "feb", "mar", "apr", "may", "jun",
+                    "jul", "aug", "sep", "oct", "nov", "dec"
+                ];
+
+                window.onload = () => {
+                    const resultArray = this.dateOperation.calculateDate();
+                    this.outputDisplay(resultArray);
+                }
+                // =======이것은 사실 임시입니다. =====
+                this.domId("yearValue").value = this.dateOperation.getCalendar().getFullYear();
+                this.domId("monthValue").value = monthArray[this.dateOperation.getCalendar().getMonth()];
+            }
+            outputDisplay(resultArray) {
+                const styleArr = ["sun-style", "sat-style"];
+                let dateTemplate = ``;
+                resultArray.forEach((array) => {
+                    for (let i = 0; i < array.length; i++) {
+                        const style = (i === 0 || i == 6) ? styleArr[i === 0 ? 0 : 1] : "";
+                        if (array[i] === undefined) {
+                            dateTemplate += `<div class="dayBox ${style}"></div>`
+                        } else {
+                            dateTemplate += `<div class="dayBox ${style}">${array[i]}</div>`
+                        }
+                    }
+                });
+                this.domId("dayArea").innerHTML = dateTemplate;
+            }
+            run(element) {
+                this.initDisplay(element);
+                this.initOnloadEvent();
+                this.eventManage();
+            }
+        }//END_Calender
+
+        const main = (() => {
+            const calender = new Calender("calender");
+            calender.run("layout");
+        })();
+
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,86 @@
+* {
+  margin: 0;
+  padding: 0;
+  font-family: "Gowun Dodum", serif;
+  font-weight: 550;
+  font-style: normal;
+  font-size: 18px;
+  color: #333;
+  box-sizing: border-box;
+}
+
+.wrapper {
+  display: flex;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(to right, #FBCC88, #FF9E5D);
+}
+
+.layout {
+  width: 55%;
+  margin: 0 auto;
+  background: rgb(255, 249, 237);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-shadow: 3px 6px 7px rgba(71, 61, 45, 0.3843137255);
+}
+
+.selectCalenderArea {
+  padding: 0.8rem 1rem;
+}
+
+.weekArea {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.weekBox {
+  width: 14.2857142857%;
+  text-align: center;
+  padding: 0.5rem 0;
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #808080;
+  border-radius: 0.5rem;
+}
+
+.dayArea {
+  width: 100%;
+  height: 50vh;
+  overflow: hidden;
+}
+
+.dayBox {
+  text-align: center;
+  float: left;
+  width: 14.2857142857%;
+  height: 16.6666666667%;
+  font-size: 1.2rem;
+  padding: 2.2rem 0;
+}
+
+.sat-style {
+  color: rgb(1, 144, 233);
+}
+
+.sun-style {
+  color: rgb(255, 72, 0);
+}
+
+input, select, button {
+  border: 0.12rem solid #f8c9a2;
+  border-radius: 1rem;
+  padding: 0.3rem 0.5rem;
+  outline: none;
+  margin: 0.3rem;
+}
+
+button {
+  padding: 0.3rem 1rem;
+  background: #FDB573;
+  color: #fff;
+}
+
+/*# sourceMappingURL=calender.css.map */

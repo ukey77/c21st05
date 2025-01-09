@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KpopList</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-size: 20px;
+        }
+
+        .wrapper {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background: rgb(255, 248, 234);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 3px 3px 10px #9d9d9d;
+        }
+
+        p {
+            margin: .5rem 0;
+        }
+
+        h2 {
+            margin-top: 1.5rem;
+        }
+
+        h2:first-child {
+            margin-top: 0;
+        }
+    </style>
+</head>
+<div id="wrapper" class="wrapper"></div>
+
+<body>
+    <script>
+        const kpopFunction = (() => {
+            const xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = () => {
+                if (xhttp.readyState == 4 && xhttp.status == 200) {
+                    const { list: kpopList } = JSON.parse(xhttp.responseText);
+                    let htmlString = ``;
+                    kpopList.forEach((music, i) => {
+                        const {id, singer, title, like} = music;
+                        const likedString = [...new Array(like)].map((_ ,i) => "⭐").join("");
+                        // const likedString = new Array(like).fill("⭐").join("");
+                        htmlString += `
+                        <h2>${id}.</h2>
+                        <p>Artist: ${singer}  / Title: ${title}</p>
+                        <span>${likedString}</span>`;
+                    });
+                    document.getElementById("wrapper").innerHTML += htmlString;
+                }
+            }
+            xhttp.open("GET", "kpop10List.json", true);
+            xhttp.send();
+        })();
+
+    </script>
+</body>
+
+</html>

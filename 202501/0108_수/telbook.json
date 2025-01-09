@@ -1,0 +1,34 @@
+{
+    "telbook": [
+        {
+            "id": 1,
+            "name": "ZARD",
+            "tel": "01011112222",
+            "addr": "Tokyo"
+        },
+        {
+            "id": 2,
+            "name": "CDR",
+            "tel": "01011113333",
+            "addr": "AnSan"
+        },
+        {
+            "id": 3,
+            "name": "LOVE",
+            "tel": "01011114444",
+            "addr": "Seoul"
+        },
+        {
+            "id": 4,
+            "name": "IVE",
+            "tel": "01011115555",
+            "addr": "BuSan"
+        },
+        {
+            "id": 5,
+            "name": "BlackPink",
+            "tel": "01011116666",
+            "addr": "SuWon"
+        }
+    ]
+}

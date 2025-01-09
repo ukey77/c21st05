@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Graph</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .canvas {
+            border: 5px solid lavender;
+            border-radius: 1rem;
+            margin: 1rem 0;
+        }
+
+        #controls {
+            margin: 1rem;
+        }
+
+        label {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="wrapper">
+        <div id="controls">
+            <label for="graphType">Graph:</label>
+            <select id="graphType">
+                <option value="sin">SIN</option>
+                <option value="cos">COS</option>
+            </select>
+            <button id="graphBtn">Draw Graph</button>
+        </div>
+        <canvas id="canvas" class="canvas" width="800" height="400"></canvas>
+    </div>
+
+    <script>
+        class Canvas {
+            constructor(canvasElement) {
+                this.canvas = canvasElement;
+                this.pen = this.canvas.getContext("2d");
+                this.scaleFactor = 50; // Scale for graph
+            }
+
+            init() {
+                this.pen.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                this.renderAxisCrosshair();
+            }
+
+            renderAxisCrosshair() {
+                const centerX = this.canvas.width / 2;
+                const centerY = this.canvas.height / 2;
+
+                for (let x = 0; x < this.canvas.width; x++) {
+                    this.pen.fillStyle = "lightgray";
+                    this.pen.fillRect(x, centerY, 1, 1); // Horizontal axis
+                }
+
+                for (let y = 0; y < this.canvas.height; y++) {
+                    this.pen.fillStyle = "lightgray";
+                    this.pen.fillRect(centerX, y, 1, 1); // Vertical axis
+                }
+            }
+
+            drawGraph(type) {
+                this.init();
+                const centerX = this.canvas.width / 2;
+                const centerY = this.canvas.height / 2;
+                this.pen.fillStyle = type === "sin" ? "blue" : "red";
+
+                for (let x = -Math.PI * 2; x <= Math.PI * 2; x += 0.01) {
+                    const y = type === "sin" ? Math.sin(x) : Math.cos(x);
+                    const canvasX = centerX + x * this.scaleFactor;
+                    const canvasY = centerY - y * this.scaleFactor;
+
+                    this.pen.fillRect(canvasX, canvasY, 1, 1); // Plot each point manually
+                }
+            }
+        }
+
+        const main = (() => {
+            const canvasElement = document.getElementById("canvas");
+            const graphTypeSelect = document.getElementById("graphType");
+            const graphBtn = document.getElementById("graphBtn");
+
+            const canvas = new Canvas(canvasElement);
+
+            graphBtn.addEventListener("click", () => {
+                const graphType = graphTypeSelect.value;
+                canvas.drawGraph(graphType);
+            });
+        })();
+    </script>
+</body>
+
+</html>

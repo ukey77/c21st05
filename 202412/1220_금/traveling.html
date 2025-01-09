@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+
+    </style>
+</head>
+
+<body>
+    <div id="wrapper" class="wrapper"></div>
+    <script>
+        const myZard = {
+            name: "Zard",
+            age: 21,
+            job: 'singer',
+            album: [
+                "A1",
+                "A2",
+                "A3"
+            ],
+            hitSong: {
+                title: "HOHO",
+                song: "HAHA"
+            },
+            sing: () => {
+                document.write('LALALALALALL');
+            }
+        }
+
+        class Traveling {
+            constructor(id) {
+                this.id = id;
+            }
+            setTravel(data, outputDom) {
+                class Queue {
+                    constructor(id) {
+                        this.id = id;
+                        this.storage = [];
+                    }
+                    pushItem(item) { this.storage.push(item); }
+                    shiftItem() { return this.storage.shift(); }
+                    get storageLength() { return this.storage.length }
+                }
+                const queue = new Queue("queue");
+
+                const traveling = (data) => {
+                    if (typeof data === "object") {
+                        if (Array.isArray(data)) {
+                            data.forEach((item) => {
+                                traveling(item);
+                            })
+                        } else {
+                            for (let key in data) {
+                                traveling(data[key]);
+                            }
+                        }
+                    } else {
+                        queue.pushItem(data);
+                    }
+                }
+                traveling(data);
+                const resultArray = [];
+                let storageLength = queue.storageLength;
+                while (queue.storage.length > 0) {
+                    resultArray.push(queue.shiftItem());
+                }
+                console.log(resultArray);
+                this.outputDom(resultArray, outputDom);
+            }
+
+            outputDom(resultArray, outputDom) {
+                let htmlString = ``
+                htmlString += `<ul>`;
+                resultArray.forEach((item) => {
+                    htmlString += `<li>${item}</li>`
+                });
+                htmlString += `</ul>`;
+
+                document.getElementById(outputDom).innerHTML = `${htmlString}`;
+            }
+            run(data, outputDom) {
+                this.setTravel(data, outputDom);
+            }
+        }
+
+        const traveling = new Traveling("traveling");
+        traveling.run(myZard, "wrapper");
+
+    </script>
+</body>
+
+</html>

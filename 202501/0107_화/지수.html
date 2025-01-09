@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="wrapper" class="wrapper"></div>
+    <script>
+        class Canvas {
+            constructor(id) {
+                this.id = id;
+                this.canvas = null;
+                this.pen = null;
+                this.scaleFactor = 40;
+            }
+            $(element) {
+                return document.querySelector(element);
+            }
+            initDisplay() {
+                const htmlString = `
+                <canvas id="canvas" class="canvas" width="500" height="500"></canvas>
+                `;
+                const cssString = `
+                <style>
+                .canvas{
+                    border: 1px solid purple;
+                }    
+                </style>
+                `;
+                this.$("#wrapper").innerHTML = `${htmlString}${cssString}`;
+            }
+            setting() {
+                this.canvas = this.$("#canvas");
+                this.pen = this.canvas.getContext("2d");
+            }
+            modiDot(x, y) {
+                this.pen.fillRect(x * this.scaleFactor + 30, -y * this.scaleFactor + this.canvas.height - 20, 1, 1);
+            }
+            renderAxisCrossHair() {
+                const [width, height, size] = [
+                    Math.floor(this.canvas.width),
+                    Math.floor(this.canvas.height),
+                    Number(4)
+                ];
+
+                for (let i = -width; i < width; i++) {
+                    this.pen.fillStyle = "#9d9d9d";
+                    this.modiDot(i / this.scaleFactor, 0);
+                    this.modiDot(0, i / this.scaleFactor);
+                    for (let j = -size; j < size; j++) {
+                        this.pen.fillStyle = "purple";
+                        this.modiDot(i, j / this.scaleFactor);
+                        this.modiDot(j / this.scaleFactor, i);
+                    }
+                    this.pen.fillText(`2^${i}`, 5, -i * this.scaleFactor + this.canvas.height - 15, 20)
+                    this.pen.fillText(i, i * this.scaleFactor + 18, this.canvas.height - 6, 10)
+                }
+
+                // y = 4 ** x
+                for (let i = -width; i < width; i += 0.01) {
+                    const y = (4 ** i);
+                    this.modiDot(i, y);
+                }
+
+                for (let i = -width; i < width; i += 0.01) {
+                    const y = Math.log(i) / Math.log(4);
+                    this.modiDot(i, y);
+                }
+
+                for (let i = -width; i < width; i += 0.01) {
+                    const y = Math.log(4 ** i) / Math.log(4);
+                    this.modiDot(i, y);
+                }
+
+            }
+            run() {
+                this.initDisplay();
+                this.setting();
+                this.renderAxisCrossHair();
+            }
+        }
+
+        const main = (() => {
+            const canvas = new Canvas("canvas");
+            canvas.run();
+        })();
+    </script>
+</body>
+
+</html>

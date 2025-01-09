@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="wrapper" class="wrapper">
+
+    </div>
+    <script>
+        class CompareNumber {
+            constructor(id) {
+                this.id = id;
+            }
+            initDom(element){
+                const htmlTemplate = `
+                    <p><label>First: </label><input type="number" id="firstNumber" value="1"></p>
+                    <p><label>Second: </label><input type="number" id="secondNumber" value="2"></p>
+                    <p><label>Third: </label><input type="number" id="thirdNumber" value="3"></p>
+                    <p><button id="outputBtn">출력</button></p>
+                    <div id="outputArea"></div>
+                `;
+                this.domId(element).innerHTML = `${htmlTemplate}`;
+            }
+            domId(element) {
+                return document.getElementById(element);
+            }
+            eventListener() {
+                window.addEventListener("click", (e) => {
+                    switch (e.target.id) {
+                        case "outputBtn":
+                            const numbersArr = [
+                                Number(this.domId("firstNumber").value),
+                                Number(this.domId("secondNumber").value),
+                                Number(this.domId("thirdNumber").value)
+                            ];
+                            // this.compareNumbers(numbersArr)
+                            this.outputDisplay(this.compareNumbers(numbersArr));
+                            break;
+                    }
+                });
+            }
+            compareNumbers(numbersArr) {
+                const max = Math.max(...numbersArr);
+                const min = Math.min(...numbersArr);
+                const resultArr = [max, min];
+                return resultArr;
+            }
+            outputDisplay(resultArr) {
+                const [max, min] = [...resultArr];
+                this.domId("outputArea").innerHTML = `
+                    <hr>
+                    <h2>Result</h2>
+                    <p><label>Max: </label><input type="number" value="${max}"></p>
+                    <p><label>Min: </label><input type="number"  value="${min}"></p>
+                `;
+            }
+            run() {
+                this.initDom("wrapper");
+                this.eventListener();
+            }
+        }
+
+        const main = (() => {
+            const compareNumber = new CompareNumber("compareNumber");
+            compareNumber.run();
+        })();
+
+    </script>
+</body>
+
+</html>

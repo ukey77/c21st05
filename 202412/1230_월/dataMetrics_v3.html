@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ko">
+<meta charset="UTF-8">
+<meta name="view-port" content="width=device-width, initial-scale=1.0">
+<title>DataMetrics</title>
+
+<body>
+    <div id="wrapper" class="wrapper"></div>
+
+    <script>
+        // == DataCalculator ==
+        class DataCalculator {
+            constructor(id, randomList) {
+                this.id = id;
+                this.randomList = randomList;
+            }
+            calculateStats() {
+                const [randomList, sortList] = [[...this.randomList], [...this.randomList]];
+                // == Stack ==	
+                class Stack {
+                    constructor(id) {
+                        this.id = id;
+                        this.storage = [];
+                    }
+                    pushItem(item) { this.storage.push(item); }
+                    popItem() { return this.storage.pop(); }
+                }//End_Stack
+
+                const calculateObj = {
+                    average: Number(0), // 평균
+                    medianValue: Number(0), // 중위값
+                    maxValue: Number(0), // 최대
+                    minValue: Number(0), // 최소,
+                    modeNumber: [],
+                    standardDeviation: Number(0), //표준편차
+                    length: Number(0) // 보증길이
+                }; // 객체 정의
+
+                // == 평균 ==
+                const sum = randomList.reduce((accumulator, currentValue) => {
+                    calculateObj["length"] += 1;  // 보증된 length 구하기
+                    return (accumulator + currentValue)
+                }, 0);
+                calculateObj["average"] = (sum / calculateObj["length"]);
+
+                // == 최대/최소 ==
+                [calculateObj["maxValue"], calculateObj["minValue"]] = [
+                    Math.max(...randomList), Math.min(...randomList)];
+
+                // 정렬---------------------------------------------------
+
+                // == [0] 확인용 ==
+                const testArr = [...randomList].sort((a, b) => a - b);
+                console.log("Test Array: ", testArr);
+
+                // == [1] Selection Sort (선택정렬) ==---------------------
+                const selectionSort = () => {
+                    for (let i = 0; i < calculateObj["length"]; i++) {
+                        let minValueIndex = i;
+                        for (let j = i; j < calculateObj["length"]; j++) {
+                            (sortList[j] < sortList[minValueIndex]) && (minValueIndex = j)
+                        }
+                        [sortList[i], sortList[minValueIndex]] = [sortList[minValueIndex], sortList[i]];
+                    }
+                }
+
+                // == [2]  Bubble Sort (버블정렬) ==---------------------
+                const bubbleSort = () => {
+                    for (let i = 0; i < calculateObj["length"] - 1; i++) {
+                        for (let j = 0; j < calculateObj["length"] - 1; j++) {
+                            (sortList[j] > sortList[j + 1]) && ([sortList[j], sortList[j + 1]] = [sortList[j + 1], sortList[j]]);
+                        }
+                    }
+                }
+
+                // == [3]  Insertion Sort (삽입정렬) ==---------------------
+                const insertionSort = (() => {
+                    for(let i=1; i<calculateObj["length"]; i++){
+                        const value = sortList[i];
+                        let index = i;
+                        for(let j=i-1; j>=0; j--){
+                            if(sortList[j] > value){
+                                index = j;
+                                sortList[j+1] = sortList[j];
+                            }
+                        }
+                        sortList[index] = value;
+                    }
+                })();
+
+                console.log("Result Array:", sortList);
+
+                // ---------------------------------------------------------
+                // == 중위값(중앙값) ==
+                console.log("Test Data_medianValue:", (testArr[testArr.length / 2 - 1] + testArr[testArr.length / 2]) / 2);
+                const [sortListCopy, leftStack, rightStack] = [[...sortList], new Stack("leftStack"), new Stack("rightStack")];
+                while (true) {
+                    if (sortListCopy.length === 1) {
+                        calculateObj["medianValue"] = sortListCopy[0];
+                        break;
+                    } else if (sortListCopy.length === 0) {
+                        calculateObj["medianValue"] = ((leftStack.popItem() + rightStack.popItem()) / 2);
+                        break;
+                    } else {
+                        leftStack.pushItem(sortListCopy.pop());
+                        rightStack.pushItem(sortListCopy.shift());
+                    }
+                }
+
+                // ---------------------------------------------------------
+                // == MODE (최빈값) ==
+                const countArr = [];
+                let keyValue = null;
+                for (let i = 0; i < calculateObj["length"]; i++) {
+                    if (keyValue === sortList[i]) {
+                        countArr[countArr.length - 1][1] += 1;
+                    } else {
+                        keyValue = sortList[i];
+                        countArr.push([sortList[i], 1]);
+                    }
+                }
+                // console.log("countArr: ", countArr);
+
+                let maxFrequencyNum = 0;
+                countArr.forEach((arr) => { (maxFrequencyNum <= arr[1]) && (maxFrequencyNum = arr[1]) });
+                const modeArr = countArr.filter((arr) => (arr[1] === maxFrequencyNum));
+                modeArr.forEach((value) => { calculateObj["modeNumber"].push(value[0]) });
+
+                // ---------------------------------------------------------
+                // == 표준편차 ==
+                calculateObj["standardDeviation"] = Math.sqrt(sortList.reduce((acc, cur) => {
+                    return acc + ((cur - calculateObj["average"]) ** 2)
+                }, 0) / calculateObj["length"]);
+                console.log(calculateObj);
+                return calculateObj;
+            }
+        }//END_DataCalculator
+
+
+        // == DataMetrics ==
+        class DataMetrics {
+            constructor(id) {
+                this.id = id;
+                this.randomList = [];
+            }
+            initDisplay() {
+                const htmlTemplate = `
+                        <h1 class="title">Random Number</h1>
+                        <section class="layout">
+                        <div>
+                            <section id="randomnumArea"></section>
+                            <section id="resultArea"></section>
+                        </div>
+                        <div>
+                        <canvas id="canvas" class="canvas" width="500" height="500"></canvas>
+                        </div>
+                        </section>
+				`;
+                const cssTemplate = `
+			          <style>
+                	*{
+                        	margin: 0;
+                        	padding: 0;
+                        	font-size: 15px;
+                	}
+                	.wrapper{
+                        	width: 60vw;
+                        	background-color: #f2f2f2;
+                        	margin: 5vh auto;
+                        	padding: 2rem;
+                        	border-radius: 1rem;
+                	}
+                    .layout{
+                        display: flex;
+                    }
+                	.title{
+                        	font-size: 2.2rem;
+                        	margin: 1rem 0;
+                	}
+                	.randomnumArea{
+                        	width: 56vw;
+               		}
+                	.random{
+                        	width: calc(100% / 11);
+                        	height: 1.5rem;
+                        	text-align: right;
+                	}
+                	sp{
+                        	margin: .5rem;
+                	}
+					label::after{
+						content: ": ";
+					}
+                    .canvas{
+                        border: 2px solid orange;
+                        border-radius: 1rem;
+                        background-color: #fff;
+                    }
+					</style>`;
+                this.domId("wrapper").innerHTML = `${htmlTemplate}${cssTemplate}`;
+            }
+            randomNum(createLength) {
+                while (createLength > 0) {
+                    const randomNum = Math.floor(Math.random() * 101);
+                    this.randomList.push(randomNum);
+                    createLength--;
+                }
+            }
+            displayDom() {
+                let inputTemplate = ``;
+                [...this.randomList].forEach((value) => {
+                    inputTemplate += `<input type="number" value="${value}" class="random" readonly>`;
+                });
+                this.domId("randomnumArea").innerHTML = inputTemplate;
+            }
+            outputResultDisplay(resultObj) {
+                const template = (title = "", value) => {
+                    return `<p><label>${title}</label><input type="text" value="${value}" readonly></p>`;
+                };
+                const htmlTemplate = `
+					${template("평균", resultObj["average"])}
+					${template("최대값", resultObj["maxValue"])}
+					${template("최소값", resultObj["minValue"])}
+					${template("중앙값", resultObj["medianValue"])}
+					${template("최빈값", resultObj["modeNumber"].join(", "))}
+					${template("표준편차", resultObj["standardDeviation"])}`;
+                this.domId("resultArea").innerHTML = htmlTemplate;
+            }
+            domId(element) {
+                return document.getElementById(element);
+            }
+            calculator() {
+                //  이렇게 해도 되는지 ... 모르겠지만 클래스 나누겠습니다!..
+                const dataCalculator = new DataCalculator("dataCalculator", [...this.randomList]);
+                const resultObj = dataCalculator.calculateStats();
+                this.outputResultDisplay(resultObj);
+            }
+            drawCanvas(canvasElement) {
+                // == Canvas == 
+                class Canvas {
+                    constructor(id) {
+                        this.id = id;
+                        this.canvas = null;
+                        this.pen = null;
+                        this.scaleFactor = 20;
+
+                    }
+                    initSetting(canvasElement) {
+                        this.canvas = canvasElement;
+                        this.pen = this.canvas.getContext("2d");
+                    }
+                    domId(element) {
+                        return document.getElementById(element);
+                    }
+                    renderAxisCrosshair() {
+                        // 범위 설정값
+                        const [width, height, size] = [Math.floor(this.canvas.width / 2), Math.floor(this.canvas.height / 2), Number(4)];
+
+                        // == 십자선 ==
+                        const crossLine = (range, isX) => {
+                            for (let i = -(range); i < (range); i++) {
+                                (isX) && (this.modiDot(i / this.scaleFactor, 0)); // x축-line
+                                (isX) || (this.modiDot(0, i / this.scaleFactor)); // y축
+                            }
+                        }
+
+                        // == scale표시 + text ==
+                        const drawScale = (range, isX) => {
+                            for (let i = -(range); i <= (range); i++) {
+                                for (let j = -size; j < size; j++) {
+                                    (isX) && (this.modiDot(i, j / this.scaleFactor)); // x축-scale
+                                    (isX) || (this.modiDot(j / this.scaleFactor, i)); // y축
+                                }
+                                (isX) && (this.pen.fillText(i, i * this.scaleFactor + this.canvas.width / 2 - 4, this.canvas.height / 2 + 14, 10)); // x축-text
+                                (isX) || (i !== 0) && (this.pen.fillText(i, this.canvas.width / 2 + 5, -i * this.scaleFactor + this.canvas.height / 2 + 3, 10)); // y축
+
+                            }
+                        }
+
+                        crossLine(width, true); // x축
+                        crossLine(height, false); // y축
+
+                        drawScale(width, true); // x축
+                        drawScale(height, false); // y축
+
+                    }
+                    modiDot(x, y) {
+                        this.pen.fillRect((x * this.scaleFactor + this.canvas.width / 2), (-y * this.scaleFactor + this.canvas.height / 2), 1, 1);
+                    }
+                    control(canvasElement) {
+                        this.initSetting(canvasElement);
+                        this.renderAxisCrosshair();
+                    }
+                }//END_Canvas
+
+                const canvas = new Canvas("canvas");
+                canvas.control(canvasElement);
+            }
+            run(createLength) {
+                this.initDisplay();
+                this.randomNum(createLength);
+                this.displayDom();
+                this.calculator();
+                this.drawCanvas(this.domId("canvas"));
+            }
+        }//END_DataMetrics
+
+        const main = (() => {
+            const dataMetrics = new DataMetrics("dataMetrics");
+            dataMetrics.run(100);
+        })();
+
+    </script>
+</body>
+
+</html>

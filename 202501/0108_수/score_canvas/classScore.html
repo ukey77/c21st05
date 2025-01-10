@@ -49,6 +49,7 @@
             getAverage() {
                 const data = [...this.data];
                 const sumArr = [];
+                // Map구조로 변환
                 data.forEach((obj) => {
                     const temp = [];
                     for (let key in obj) {
@@ -175,7 +176,7 @@
                                     }
                                     // 평균
                                     for (let i = 0; i <= this.width; i++) {
-                                        this.modiDot(i / this.scaleFactor, (height * avgValue) / this.scaleFactor)
+                                        this.modiDot(i / this.scaleFactor, (height * avgValue) / this.scaleFactor);
                                     }
                                     start += devideWidth;
                                 });

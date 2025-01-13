@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        class Queue {
+            constructor(id) {
+                this.id = id;
+                this.head = null;
+                this.tail = null;
+                this._classId = 0;
+            }
+            get increaseId() {
+                return ++this._classId;
+            }
+            pushItem(item) {
+                const newNode = new DoubleLinkedList(`${this.increaseId}`);
+                newNode.value = item;
+                // tail이 존재한다면
+                if (this.tail !== null) {
+                    // 현재 tail의 next는 새로들어온 newNode가 될것이고,
+                    this.tail.nextNode = newNode;
+                    // 현재 tail의 next의 prev는 현재 설정된 tail이 될것임.
+                    this.tail.nextNode.prevNode = this.tail;
+                } else {
+                    // tail이 존재하지 않는다면
+                    // head가 newNode가 되고
+                    this.head = newNode;
+                }
+                // 현재 tail이 newNode가 됨.
+                this.tail = newNode;
+            }
+            shiftItem() {
+                if (this.head === null) {
+                    return null;
+                }
+
+                const value = this.head.value; // 제거된 노드의 값 저장
+                this.head = this.head.nextNode;
+
+                if (this.head !== null) {
+                    this.head.prevNode = null;
+                } else {
+                    this.tail = null;
+                }
+
+                return value;
+            }
+        }
+
+        class DoubleLinkedList {
+            constructor(id) {
+                this.id = id;
+                this._value = null;
+                this._prevNode = null;
+                this._nextNode = null;
+            }
+            set value(value) { this._value = value; }
+            get value() { return this._value; }
+            set prevNode(node) { this._prevNode = node; }
+            get prevNode() { return this._prevNode; }
+            set nextNode(node) { this._nextNode = node; }
+            get nextNode() { return this._nextNode; }
+        }
+
+        const queue = new Queue("queue");
+        queue.pushItem("A");
+        queue.pushItem("B");
+        queue.pushItem("C");
+        queue.shiftItem();
+        queue.shiftItem();
+        queue.shiftItem();
+        console.log(queue)
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log - Extends</title>
+    <style>
+        * {margin: 0; padding: 0;}
+    </style>
+</head>
+
+<body>
+    <div id="main" class="main"></div>
+    <script>
+        class GraphDrawer {
+            constructor(id) {
+                this.id = id;
+                this.canvas = null;
+                this.pen = null;
+
+                this.scale = 30;
+                this.blank = 30;
+            }
+
+            initCanvas() {
+                const canvas = document.createElement("canvas");
+                canvas.width = 500;
+                canvas.height = 500;
+                canvas.style = "border: 1px solid green";
+                canvas.id = "canvas"
+
+                this.canvas = canvas;
+                this.pen = canvas.getContext("2d");
+
+                document.getElementById("main").append(canvas);
+            }
+
+            printDot(x, y) {
+                this.pen.fillRect((x * this.scale) + this.blank, this.canvas.height - (y * this.scale + this.blank), 1, 1);
+            }
+
+            printText(content, x, y) {
+                this.pen.fillText(content, x, this.canvas.height - (y));
+            }
+
+            drawForm() {
+                for (let i = 0; i < this.canvas.width; i += (1 / this.scale)) {
+                    this.printDot(i, 0);
+                }
+                for (let i = 0; i < this.canvas.height; i += (1 / this.scale)) {
+                    this.printDot(0, i);
+                }
+
+                this.pen.fillStyle = "lightgray";
+                for (let i = 1; i < this.canvas.width / this.scale; i++) {
+                    for (let j = 1; j < this.canvas.height; j++) {
+                        this.printDot(i, j / this.scale);
+                    }
+                }
+                for (let i = 1; i < this.canvas.height / this.scale; i++) {
+                    for (let j = 1; j < this.canvas.width; j++) {
+                        this.printDot(j / this.scale, i);
+                    }
+                }
+                this.pen.fillStyle = "black";
+            }
+
+            formula(x) {
+                return 2 ** x;
+            }
+
+            drawLogScaleCanvas(base) {
+                this.textScaleForm(base);
+                this.pen.fillStyle = "green";
+
+                for (let i = 0; i < this.canvas.width / this.scale; i += (1 / this.scale)) {
+                    // 2**i
+                    this.logScaleDot(i, this.formula(i), base);
+                }
+            }
+
+            ready() {
+                this.initCanvas();
+                this.drawForm();
+            }
+        }
+
+        class Exponent extends GraphDrawer {
+            constructor(id) {
+                super(id);
+                this.yGap = 100;
+            }
+
+            textForm() {
+                for (let i = 0; i < this.canvas.width; i += this.scale) {
+                    super.printText((i / this.scale), i + this.blank - 2, 5);
+                }
+                for (let i = 0; i < this.canvas.height; i += this.scale) {
+                    super.printText((i / this.scale) * this.yGap, 5, i + this.blank - 2);
+                }
+            }
+
+            drawCanvas() {
+                this.textForm();
+                this.pen.fillStyle = "red";
+                for (let i = 0; i < this.canvas.width / this.scale; i += (1 / this.scale) / 5) {
+                    // 2**i
+                    this.printDot(i, super.formula(i) / this.yGap);
+                }
+            }
+
+            run() {
+                super.ready();
+                this.drawCanvas();
+            }
+        }
+
+        class ExponentLog extends GraphDrawer {
+            constructor(id) {
+                super(id);
+            }
+
+            logDot(x, y) {
+                super.printDot(x, Math.log(y) / Math.log(2));
+            }
+
+            textScaleForm() {
+                for (let i = 0; i < this.canvas.width; i += this.scale) {
+                    super.printText((i / this.scale), i + this.blank - 2, 5);
+                }
+                for (let i = 0; i < this.canvas.height; i += this.scale) {
+                    super.printText(`2`, 5, i + this.blank - 2); // 밑
+                    super.printText(`${(i / this.scale)}`, 11, i + this.blank - 2 + 5); // 승
+                }
+            }
+
+            drawLogCanvas() {
+                this.textScaleForm();
+                this.pen.fillStyle = "blue";
+
+                for (let i = 0; i < this.canvas.width / this.scale; i += (1 / this.scale)) {
+                    // 2**i
+                    this.logDot(i, super.formula(i));
+                }
+            }
+
+            run() {
+                super.ready();
+                this.drawLogCanvas();
+            }
+        }
+
+        class ExponentLogScale extends GraphDrawer {
+            constructor(id) {
+                super(id);
+            }
+
+            logScaleDot(x, y, base) {
+                super.printDot(x, Math.log(y) / Math.log(base));
+            }
+            
+            textScaleForm(scale = 2) {
+                for (let i = 0; i < this.canvas.width; i += this.scale) {
+                    super.printText((i / this.scale), i + this.blank - 2, 5);
+                }
+                for (let i = 0; i < this.canvas.height; i += this.scale) {
+                    super.printText(`${scale}`, 5, i + this.blank - 2); // 밑
+                    super.printText(`${(i / this.scale)}`, 11, i + this.blank - 2 + 5); // 승
+                }
+            }
+
+            drawLogScaleCanvas(base) {
+                this.textScaleForm(base);
+                this.pen.fillStyle = "green";
+
+                for (let i = 0; i < this.canvas.width / this.scale; i += (1 / this.scale)) {
+                    // 2**i
+                    this.logScaleDot(i, super.formula(i), base);
+                }
+            }
+
+            run(base) {
+                super.ready();
+                this.drawLogScaleCanvas(base);
+            }
+        }
+
+        const exponent = new Exponent("exponent");
+        exponent.run();
+
+        const exponentLog = new ExponentLog("exponentLog");
+        exponentLog.run();
+
+        const exponentLogScale = new ExponentLogScale("exponentLogScale");
+        exponentLogScale.run(3);
+    </script>
+</body>
+
+</html>

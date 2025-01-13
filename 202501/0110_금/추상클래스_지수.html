@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-size: 10px;
+        }
+
+        .canvas {
+            border: 1px solid purple;
+            border-radius: 1rem;
+            margin: 1rem;
+            box-shadow: .3rem .3rem 1rem #a5a5a5;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="wrapper" class="wrapper"></div>
+    <script>
+        class Canvas {
+            constructor(id) {
+                this.id = id;
+                this.canvas = null;
+                this.pen = null;
+                this.start = 30;
+                this.scaleFactor = 45;
+            }
+            $(element) {
+                return document.querySelector(element);
+            }
+            initDisplay() {
+                const canvas = document.createElement("canvas");
+                canvas.setAttribute("class", "canvas");
+                canvas.setAttribute("width", "500");
+                canvas.setAttribute("height", "500");
+                canvas.id = this.id;
+                this.$("#wrapper").append(canvas);
+            }
+            setting() {
+                this.canvas = this.$(`#${this.id}`);
+                this.pen = this.canvas.getContext("2d");
+            }
+            modiDot(x, y) {
+                this.pen.fillRect(x * (this.scaleFactor) + this.start, -y * this.scaleFactor + this.canvas.height - this.start, 1, 1);
+            }
+            textDraw(text, xPos, yPos, yChange = 0) {
+                this.pen.fillStyle = "purple";
+                this.pen.fillText(text, this.start - xPos, -yPos * this.scaleFactor + this.canvas.height - this.start + yChange, 20);
+            }
+            formula(x) {
+                return (2 ** x);
+            }
+            renderAxisCrossHair() {
+                for (let i = 0; i < this.canvas.width; i++) {
+                    this.pen.fillStyle = "#9d9d9d";
+                    this.modiDot(i / this.scaleFactor, 0); // x축
+                    this.modiDot(0, i / this.scaleFactor); // y축
+                    for (let j = 0; j < this.canvas.width; j++) {
+                        this.pen.fillStyle = "#FFD0D7";
+                        (i !== 0) && this.modiDot(i, j / this.scaleFactor); // x_scale 축
+                        (i !== 0) && this.modiDot(j / this.scaleFactor, i); // y_scale 축
+                    }
+                    // == x축 text ==
+                    this.pen.fillStyle = "purple";
+                    this.pen.fillText(i, i * this.scaleFactor + this.start - 2, this.canvas.height - 10, 10);
+                }
+            }
+            run() {
+                this.initDisplay();
+                this.setting();
+                this.renderAxisCrossHair();
+            }
+        }
+
+        // == ^Exponent ==
+        class Exponent extends Canvas {
+            constructor(id, yAxisGap) {
+                super(id);
+                this.yAxisGap = 100;
+            }
+            renderText() {
+                for (let i = 0; i < this.canvas.width; i++) {
+                    super.textDraw((i * this.yAxisGap), 20, i);
+                }
+            }
+            drawCanvas() {
+                for (let i = 0; i < this.canvas.width; i += 0.01) {
+                    this.pen.fillStyle = "red";
+                    super.modiDot(i, super.formula(i) / this.yAxisGap);
+                }
+            }
+            run() {
+                super.run();
+                this.renderText();
+                this.drawCanvas();
+            }
+        }//$Exponent
+
+        // == ^LogNExponent ==
+        class LogNExponent extends Canvas {
+            constructor(id) {
+                super(id);
+            }
+            renderText(base) {
+                for (let i = 0; i < this.canvas.width; i++) {
+                    super.textDraw((base), 18, i);
+                    super.textDraw((i), 12, i, -5);
+                }
+            }
+            drawCanvas(base) {
+                for (let i = 0; i < this.canvas.width; i += 0.01) {
+                    this.pen.fillStyle = "red";
+                    super.modiDot(i, Math.log(super.formula(i)) / Math.log(base));
+                }
+            }
+            run(base) {
+                super.run();
+                this.renderText(base);
+                this.drawCanvas(base);
+            }
+        }//$LogNExponent
+
+        const main = (() => {
+            const exponent = new Exponent("exponent", 100);
+            exponent.run();
+
+            const logNExponent = new LogNExponent("logNExponent");
+            logNExponent.run(3);
+        })();
+
+
+    </script>
+</body>
+
+</html>

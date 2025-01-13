@@ -52,19 +52,11 @@
         },
         {
             "no": 7,
-            "name": "World",
-            "kor": 34,
-            "math": 49,
-            "eng": 78,
-            "soc": 77
-        },
-        {
-            "no": 8,
-            "name": "Hello",
-            "kor": 30,
-            "math": 88,
-            "eng": 85,
-            "soc": 90
+            "name": "KYJ",
+            "kor": 89,
+            "math": 85,
+            "eng":88,
+            "soc": 79
         }
     ]
 }

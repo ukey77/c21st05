@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log</title>
+</head>
+
+<body>
+    <div id="main" class="main"></div>
+    <script>
+        class Canvas {
+            constructor(id) {
+                this.id = id;
+
+                this.canvas = null;
+                this.pen = null;
+
+                this.scale = 30;
+                this.blank = 30;
+            }
+
+            initCanvas() {
+                const canvas = document.createElement("canvas");
+                canvas.width = 500;
+                canvas.height = 500;
+                canvas.style = "border: 1px solid green";
+                canvas.id = "canvas"
+
+                this.canvas = canvas;
+                this.pen = canvas.getContext("2d");
+
+                document.getElementById("main").append(canvas);
+            }
+
+            printDot(x, y) {
+                this.pen.fillRect((x * this.scale) + this.blank, this.canvas.height - (y * this.scale + this.blank), 1, 1);
+            }
+
+            printText(content, x, y) {
+                this.pen.fillText(content, x, this.canvas.height - (y));
+            }
+
+            logDot(x, y) {
+                this.printDot(x, Math.log(y) / Math.log(2));
+            }
+
+            logScaleDot(x, y, base) {
+                this.printDot(x, Math.log(y) / Math.log(base));
+            }
+
+            drawForm() {
+                for (let i = 0; i < this.canvas.width; i += (1 / this.scale)) {
+                    this.printDot(i, 0);
+                }
+                for (let i = 0; i < this.canvas.height; i += (1 / this.scale)) {
+                    this.printDot(0, i);
+                }
+
+                this.pen.fillStyle = "lightgray";
+                for (let i = 1; i < this.canvas.width/this.scale; i ++) {
+                    for (let j=1; j<this.canvas.height; j++) {
+                        this.printDot(i, j/this.scale);
+                    }
+                } 
+                for (let i = 1; i < this.canvas.height/this.scale; i ++) {
+                    for (let j=1; j<this.canvas.width; j++) {
+                        this.printDot(j/this.scale, i);
+                    }
+                } 
+                this.pen.fillStyle = "black";
+            }
+
+            textForm() {
+                for (let i = 0; i < this.canvas.width; i += this.scale) {
+                    this.printText((i / this.scale), i + this.blank - 2, 5);
+                }
+                for (let i = 0; i < this.canvas.height; i += this.scale) {
+                    this.printText((i / this.scale)*100, 5, i + this.blank - 2);
+                }
+            }
+
+            textScaleForm(scale = 2) {
+                for (let i = 0; i < this.canvas.width; i += this.scale) {
+                    this.printText((i / this.scale), i + this.blank - 2, 5);
+                }
+                for (let i = 0; i < this.canvas.height; i += this.scale) {
+                    this.printText(`${scale}`, 5, i + this.blank - 2); // 밑
+                    this.printText(`${(i / this.scale)}`, 11, i + this.blank - 2 + 5); // 승
+                }
+            }
+
+            formula(x) {
+                return 2 ** x;
+            }
+
+            drawCanvas() {
+                this.textForm();
+                this.pen.fillStyle = "red";
+                for (let i = 0; i < this.canvas.width/this.scale; i += (1 / this.scale)/5) {
+                    // 2**i
+                    this.printDot(i, this.formula(i)/100);
+                }
+            }
+
+            drawLogCanvas() {
+                this.textScaleForm();
+                this.pen.fillStyle = "blue";
+
+                for (let i = 0; i < this.canvas.width/this.scale; i += (1 / this.scale)) {
+                    // 2**i
+                    this.logDot(i, this.formula(i));
+                }
+            }
+
+            drawLogScaleCanvas(base) {
+                this.textScaleForm(base);
+                this.pen.fillStyle = "green";
+
+                for (let i = 0; i < this.canvas.width/this.scale; i += (1 / this.scale)) {
+                    // 2**i
+                    this.logScaleDot(i, this.formula(i), base);
+                }
+            }
+
+            setVersion(version) {
+                switch (version) {
+                    case "default":
+                        this.drawCanvas();
+                        break;
+                    case "2scale":
+                        this.drawLogCanvas();
+                        break;
+                    case "otherScale":
+                        this.drawLogScaleCanvas(5);
+                        break;
+                }
+            }
+
+            run(version) {
+                this.initCanvas();
+                this.drawForm();
+                this.setVersion(version);
+            }
+        }
+
+        const defaultGraph = new Canvas("default");
+        defaultGraph.run("default");
+        const logGraph = new Canvas("log");
+        defaultGraph.run("2scale");
+        const logScaleGraph = new Canvas("logScale");
+        defaultGraph.run("otherScale");
+    </script>
+</body>
+
+</html>

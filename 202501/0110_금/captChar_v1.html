@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>captChar</title>
+    <style>
+
+    </style>
+</head>
+
+<body>
+    <div id="wrapper" class="wrapper"></div>
+    <script>
+        class CaptChar {
+            constructor(id) {
+                this.id = id;
+                this.canvas = null;
+                this.pen = null;
+                this.CaptChar = "";
+            }
+            $(element) {
+                return document.querySelector(element);
+            }
+            initDisplay() {
+                const canvas = document.createElement("canvas");
+                canvas.id = `${this.id}Canvas`;
+                canvas.class = "canvas";
+                console.log(canvas);
+            }
+            randomInput() {
+
+            }
+            run() {
+                this.initDisplay();
+            }
+        }
+        const main = () => {
+            const captChar = new CaptChar("captChar");
+            captChar.run();
+        }
+
+    </script>
+</body>
+
+</html>

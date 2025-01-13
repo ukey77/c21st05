@@ -54,7 +54,7 @@
                     const temp = [];
                     for (let key in obj) {
                         if (key !== "no" && key != "name") {
-                            if (temp[0] === obj["name"]) {
+                            if (key !== "no" && key != "name" && temp[0] === obj["name"]) {
                                 temp[1] += obj[key];
                             } else {
                                 [temp[0], temp[1]] = [obj["name"], obj[key]];
@@ -69,19 +69,6 @@
             }
             drawCanvas(data) {
                 // canvas 동적 생성 함수
-                const makeCanvas = (key,size) => {
-                    const width = (size > 6) ? (size*70) : 420;
-                    const divElement = document.createElement("div");
-                    divElement.setAttribute("class", `canvas-area`);
-                    divElement.id = `${key}CanvasArea`;
-                    const canvas = document.createElement("canvas");
-                    canvas.setAttribute("id", `${key}Canvas`);
-                    canvas.setAttribute("class", `canvas`);
-                    canvas.setAttribute("width", `${width}`);
-                    canvas.setAttribute("height", `420`);
-                    divElement.append(canvas);
-                    document.getElementById("wrapper").append(divElement);
-                }
                 const [parsingObj, classObj] = [{}, {}];
 
                 // [parsingObj] 보기 편한 형태로 object 재배치
@@ -105,6 +92,23 @@
                         this.width = 0;
                         this.height = 0;
                         this.scaleFactor = 10;
+                    }
+                    getLength() {
+                        const length = this.data["name"].reduce((acc) => acc += 1, 0);
+                        return length;
+                    }
+                    makeCanvas() {
+                        const width = (this.getLength() > 6) ? (this.getLength() * 70) : 420;
+                        const divElement = document.createElement("div");
+                        const canvas = document.createElement("canvas");
+                        divElement.setAttribute("class", `canvas-area`);
+                        divElement.id = `${this.id}Area`;
+                        canvas.setAttribute("id", `${this.id}`);
+                        canvas.setAttribute("class", `canvas`);
+                        canvas.setAttribute("width", `${width}`);
+                        canvas.setAttribute("height", `420`);
+                        divElement.appendChild(canvas);
+                        document.getElementById("wrapper").append(divElement);
                     }
                     setting() {
                         this.canvas = document.getElementById(`${this.id}`);
@@ -132,7 +136,7 @@
                             Math.floor(this.width),
                             Math.floor(this.height),
                             Number(4),
-                            Number(this.data["name"].length) + 1
+                            Number(this.getLength()) + 1
                         ];
                         // console.log(devideWidth);
                         const crossHair = (range, isX) => {
@@ -142,7 +146,8 @@
                                 for (let j = -size; j <= size; j++) {
                                     (isX) || this.modiDot(j / this.scaleFactor, (i + 1) / this.scaleFactor * ((range - this.start) / 11)); // y축 scaleFactor
                                 }
-                                (isX) || this.pen.fillText((i * 10), this.start - 20, -i * ((range - this.start) / 11) + range - this.start, 15); // y축 text
+                                this.pen.font = "13px serif";
+                                (isX) || this.pen.fillText((i * 10), this.start/2.3, -i * ((range - this.start) / 11) + range - this.start, 15); // y축 text
                             }
                         }
 
@@ -151,7 +156,7 @@
                     }
                     drawDataGraph() {
                         const chartColor = ["#FF6F61", "#6B5B95", "#88B04B", "#F7CAC9", "#92A8D1", "#FFD662", "#009B77", "#D65076", "#45B8AC", "#E94B3C"];
-                        const devideNum = (Number(this.data["name"].length) + 1);
+                        const devideNum = (Number(this.getLength()) + 1);
                         const devideWidth = ((this.width - 60) / devideNum);
                         const getAverage = (dataArr) => {
                             const averageValue = dataArr.reduce((acc, cur) => acc += cur, 0) / dataArr.length;
@@ -161,15 +166,15 @@
                         for (const key in this.data) {
                             if (key === "name") {
                                 for (let i = 0; i < this.data[key].length; i++) {
-                                    this.pen.fillText(this.data[key][i], ((i + 1) * (this.width - (this.start * 1.5)) / devideNum) + this.start, this.height - (this.start / 2), 30);
+                                    this.pen.fillText(this.data[key][i], ((i + 1) * (this.width - (this.start * 1.5)) / devideNum) + this.start, this.height - (this.start / 2), 30); // name Text
                                 }
                             } else {
                                 let start = devideWidth;
                                 const [height, avgValue] = [(this.height / 120), getAverage([...this.data[key]])];
                                 this.data[key].forEach((item, index) => {
                                     // 그래프
-                                    for (let i = start; i < (start + 20); i++) {
-                                        for (let j = 0; j < height * item; j++) {
+                                    for (let i = (start); i < (start + 20); i++) {
+                                        for (let j = 1; j < height * item; j++) {
                                             this.pen.fillStyle = chartColor[index % (chartColor.length)];
                                             this.pen.fillRect(i + this.start, -j + (this.height - this.start), 1, 1);
                                         }
@@ -185,8 +190,8 @@
                     }
                     control(data) {
                         this.data = data;
+                        this.makeCanvas();
                         this.setting();
-                        // this.updateSize();
 
                         this.displayTitle();
                         this.renderAxisCrossHair();
@@ -197,12 +202,14 @@
                 // Canvas 동적 생성
                 for (const key in parsingObj) {
                     if ((key !== "no") && (key != "name") && !(key in classObj)) {
-                        makeCanvas(key,parsingObj[key].length);
+                        // canvas 생성
                         classObj[key] = new Canvas(`${key}Canvas`);
+                        // canvas에 전달할 data
                         const resourceObj = {}
                         resourceObj["name"] = parsingObj["name"];
                         resourceObj[key] = parsingObj[key];
-                        classObj[key].control({ ...resourceObj })
+                        // canvas 실행
+                        classObj[key].control({ ...resourceObj });
                     }
                 }
             }//

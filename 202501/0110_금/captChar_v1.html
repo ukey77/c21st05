@@ -6,7 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>captChar</title>
     <style>
-
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        .canvas{
+            border: 1px solid red;
+        }
     </style>
 </head>
 
@@ -26,20 +32,43 @@
             initDisplay() {
                 const canvas = document.createElement("canvas");
                 canvas.id = `${this.id}Canvas`;
-                canvas.class = "canvas";
-                console.log(canvas);
+                canvas.setAttribute("class","canvas");
+                canvas.setAttribute("width","400");
+                canvas.setAttribute("height","200");
+                this.$("#wrapper").append(canvas);
+            }
+            setting(){
+                this.canvas = this.$(`#${this.id}Canvas`);
+                this.pen = this.canvas.getContext("2d");
+                // console.log(this.pen)
+            }
+            makeCaptChar(){
+                let captChar = '';
+                for(let i=0; i<4; i++){
+                    captChar += (Math.ceil(Math.random() * 10)-1);
+                }
+                this.captChar = captChar;
+                return captChar;
+            }
+            cavasText(){
+                this.pen.font = "40px Comic Sans MS";
+                this.pen.fillStyle = "red";
+                this.pen.textAlign = "center";
+                this.pen.fillText(this.makeCaptChar(),this.canvas.width/2,this.canvas.height/2 + 10,200);
             }
             randomInput() {
 
             }
             run() {
                 this.initDisplay();
+                this.setting();
+                this.cavasText();
             }
         }
-        const main = () => {
+        const main = (() => {
             const captChar = new CaptChar("captChar");
             captChar.run();
-        }
+        })();
 
     </script>
 </body>

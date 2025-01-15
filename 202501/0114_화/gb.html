@@ -1,0 +1,391 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix Transformation</title>
+    <style>
+        input {
+            width: 30px;
+        }
+
+        .inputText {
+            width: 50px;
+        }
+
+        #canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+
+<body>
+    <p>
+        (<input id="x1" type="text" placeholder="x1" value="0">,
+        <input id="y1" type="text" placeholder="y1" value="0">)
+        (<input id="x2" type="text" placeholder="x2" value="1">,
+        <input id="y2" type="text" placeholder="y2" value="1">)
+        <button id="drawBtn">사각형 그리기</button>
+    </p>
+    <br>
+    <p>
+        (<input id="lineX1" type="text" value="-2">, <input id="lineY1" type="text" value="2">)
+        (<input id="lineX2" type="text" value="-3">, <input id="lineY2" type="text" value="2.5">)
+        <button id="drawLineBtn">라인 그리기</button>
+
+    </p>
+    <p>
+        (<input id="triangleX1" type="text" value="1.5">, <input id="triangleY1" type="text" value="1.5">)
+        (<input id="triangleX2" type="text" value="2.5">, <input id="triangleY2" type="text" value="2.5">)
+        (<input id="triangleX3" type="text" value="1.5">, <input id="triangleY3" type="text" value="2.5">)
+        <button id="drawTriangleBtn">삼각형 그리기</button>
+    </p>
+    <br>
+    <p>
+        중점(<input id="circleA" type="text" placeholder="x" value="1">, <input id="circleB" type="text" placeholder="y" value="3">),
+        반지름 <input id="circleR" type="text" placeholder="r" value="0.5"> 
+        <button id="drawCircleBtn">원 그리기</button>
+    </p>
+    <br>
+    <p>
+        <input id="toXvalue" type="text" class="inputText" placeholder="x축방향"><input id="toYvalue" class="inputText" placeholder="y축방향" type="text">
+        <button id="moveBtn">이동</button>
+    </p>
+    <p>
+        <input id="toXscale" type="text" class="inputText" placeholder="x축방향"><input id="toYscale" class="inputText" type="text" placeholder="y축방향">
+        <button id="scaleBtn">스케일</button>
+    </p>
+        <button id="xBtn">x축대칭</button>
+        <button id="yBtn">y축대칭</button>
+        <button id="xyBtn">xy축대칭</button>
+    <p>        
+        <input id="degree" type="text" placeholder="각도">
+        <button id="rotateBtn">회전</button>
+        <button id="xSkew">X Skew</button>
+        <button id="ySkew">Y Skew</button>
+    </p>
+
+    <canvas id="canvas" width="500" height="500"></canvas>
+    <script>
+        class Rectangle {
+            constructor(id) {
+                this.id = id;
+                this.pen = document.getElementById('canvas').getContext('2d');
+                this.x1, this.y1, this.x2, this.y2 = 0;
+                this.toX, this.toY = 0;
+                this.sizeX, this.sizeY = 0;
+                this.sin, this.cos, this.tan = 0;
+                this.lineX1, this.lineX2 = 0;
+                this.triangleX1, this.triangleX2, this.triangleX3 = 0;
+                this.triangleY1, this.triangleY2, this.triangleY3 = 0;
+                this.circleA, this.circleB, this.circleR = 0;
+            }
+            init() {
+                for (let i = 0; i <= 500; i += 2) {
+                    this.pen.fillRect(i, 250, 1, 1);
+                    this.pen.fillRect(250, i, 1, 1);
+                }
+            }
+            printDot(x, y) {
+                this.pen.fillRect(250 + x * 50, 250 - y * 50, 1, 1);
+            }
+            draw() {
+                for (let x = this.x2; x <= this.x1; x += 0.01) {
+                    this.pen.fillStyle = "black"
+                    this.printDot(x, this.y1)
+                    this.printDot(x, this.y2)
+                }
+                for (let y = this.y2; y <= this.y1; y += 0.01) {
+                    this.pen.fillStyle = 'black';
+                    this.printDot(this.x1, y)
+                    this.printDot(this.x2, y)
+                }
+            }
+            drawLine(x1, y1, x2, y2) {
+                let a = (y1 - y2) / (x1 - x2);
+                let b = y1 - (a * x1);
+
+                if (x1 > x2) {
+                    for (let x = x2; x <= x1; x += 0.01) {
+                        this.printDot(x, a * x + b)
+                    }
+                } else if (x2 > x1) {
+                    for (let x = x1; x <= x2; x += 0.01) {
+                        this.printDot(x, a * x + b)
+                    }
+                } else {
+                    if (y1 > y2) {
+                        for (let y = y2; y <= y1; y += 0.01) {
+                            this.printDot(x1, y);
+                        }
+                    } else {
+                        for (let y = y1; y <= y2; y += 0.01) {
+                            this.printDot(x1, y);
+                        }
+                    }
+                }
+            }
+            drawCircle(a, b, r) {
+                for(let i=0; i<=360; i+=0.005) {
+                    let x = Math.cos(Math.PI * i) * r;
+                    let y = Math.sin(Math.PI * i) * r;
+                    this.printDot(x+a, y+b)
+                }
+            }
+            transDot(x, y, switcher) {
+                let defaultMatrix = null;
+
+                switch (switcher) {
+                    case "trans":
+                        defaultMatrix = [
+                            [1, 0, this.toX],
+                            [0, 1, this.toY],
+                            [0, 0, 1]
+                        ];
+                        break;
+                    case "size":
+                        defaultMatrix = [
+                            [this.sizeX, 0, 0],
+                            [0, this.sizeY, 0],
+                            [0, 0, 1]
+                        ]
+                        break;
+                    case "rotate":
+                        defaultMatrix = [
+                            [this.cos, this.sin, 0],
+                            [-this.sin, this.cos, 0],
+                            [0, 0, 1]
+                        ]
+                        break;
+                    case "xSkew":
+                        defaultMatrix = [
+                            [1, this.tan, 0],
+                            [0, 1, 0],
+                            [0, 0, 1]
+                        ]
+                        break;
+                    case "ySkew":
+                        defaultMatrix = [
+                            [1, 0, 0],
+                            [this.tan, 1, 0],
+                            [0, 0, 1]
+                        ]
+                        break;
+                    case "XY":
+                        defaultMatrix = [
+                            [-1, 0, 0],
+                            [0, -1, 0],
+                            [0, 0, 1]
+                        ]
+                        break;
+                    case "X":
+                        defaultMatrix = [
+                            [1, 0, 0],
+                            [0, -1, 0],
+                            [0, 0, 1]
+                        ]
+                        break;
+                    case "Y":
+                        defaultMatrix = [
+                            [-1, 0, 0],
+                            [0, 1, 0],
+                            [0, 0, 1]
+                        ]
+                        break;
+                }
+
+                const transMatrix = [
+                    [x],
+                    [y],
+                    [1]
+                ];
+                // console.log(x, y)
+
+                let resultArr = [];
+
+                for (let i = 0; i < defaultMatrix.length; i++) {
+                    for (let j = 0; j < transMatrix[0].length; j++) {
+                        let tempV = 0;
+                        for (let k = 0; k < defaultMatrix[0].length; k++) {
+                            tempV += defaultMatrix[i][k] * transMatrix[k][j];
+                        }
+                        resultArr.push(tempV);
+                    }
+                }
+                // console.log(resultArr)
+                this.printDot(resultArr[0], resultArr[1])
+            }
+            event() {
+                const drawing = (switcher) => {
+                    for (let x = this.x2; x <= this.x1; x += 0.01) {
+                        this.transDot(x, this.y2, switcher);
+                        this.transDot(x, this.y1, switcher);
+                    }
+                    for (let y = this.y2; y <= this.y1; y += 0.01) {
+                        this.transDot(this.x1, y, switcher);
+                        this.transDot(this.x2, y, switcher);
+                    }
+                }
+
+                const drawingLine = (x1, y1, x2, y2, switcher) => {
+                    let a = (y1 - y2) / (x1 - x2);
+                    let b = y1 - (a * x1);
+
+                    if (x1 > x2) {
+                        for (let x = x2; x <= x1; x += 0.01) {
+                            this.transDot(x, a * x + b, switcher)
+                        }
+                    } else if (x2 > x1) {
+                        for (let x = x1; x <= x2; x += 0.01) {
+                            this.transDot(x, a * x + b, switcher)
+                        }
+                    } else {
+                        if (y1 > y2) {
+                            for (let y = y2; y <= y1; y += 0.01) {
+                                this.transDot(x1, y, switcher);
+                            }
+                        } else if(y2> y1) {
+                            for (let y = y1; y <= y2; y += 0.01) {
+                                this.transDot(x1, y, switcher);
+                            }
+                        } 
+                    }
+                }
+
+                const drawingTriangle = (switcher) => {
+                    drawingLine(this.triangleX1, this.triangleY1, this.triangleX2, this.triangleY2, switcher);
+                    drawingLine(this.triangleX2, this.triangleY2, this.triangleX3, this.triangleY3, switcher);
+                    drawingLine(this.triangleX3, this.triangleY3, this.triangleX1, this.triangleY1, switcher);
+                }
+
+                const drawingCircle = (switcher) => {
+                    for(let i=0; i<=360; i+=0.005) {
+                    let x = Math.cos(Math.PI * i) * this.circleR;
+                    let y = Math.sin(Math.PI * i) * this.circleR;
+                    this.transDot(x+this.circleA, y+this.circleB, switcher);
+                }
+                }
+
+                addEventListener('click', e => {
+                    switch (e.target.id) {
+                        case "drawBtn":
+                            let x1 = Number(document.getElementById('x1').value);
+                            let y1 = Number(document.getElementById('y1').value);
+                            let x2 = Number(document.getElementById('x2').value);
+                            let y2 = Number(document.getElementById('y2').value);
+                            if (x1 > x2) { this.x1 = x1; this.x2 = x2; }
+                            else { this.x1 = x2; this.x2 = x1 }
+                            if (y1 > y2) { this.y1 = y1; this.y2 = y2; }
+                            else { this.y1 = y2; this.y2 = y1 }
+                            this.draw();
+                            break;
+                        case "drawLineBtn":
+                            this.lineX1 = Number(document.getElementById('lineX1').value);
+                            this.lineX2 = Number(document.getElementById('lineX2').value);
+                            this.lineY1 = Number(document.getElementById('lineY1').value);
+                            this.lineY2 = Number(document.getElementById('lineY2').value);
+                            this.drawLine(this.lineX1, this.lineY1, this.lineX2, this.lineY2);
+                            break;
+                        case "drawTriangleBtn":
+                            this.triangleX1 = Number(document.getElementById('triangleX1').value);
+                            this.triangleX2 = Number(document.getElementById('triangleX2').value);
+                            this.triangleX3 = Number(document.getElementById('triangleX3').value);
+                            this.triangleY1 = Number(document.getElementById('triangleY1').value);
+                            this.triangleY2 = Number(document.getElementById('triangleY2').value);
+                            this.triangleY3 = Number(document.getElementById('triangleY3').value);
+                            this.drawLine(this.triangleX1, this.triangleY1, this.triangleX2, this.triangleY2);
+                            this.drawLine(this.triangleX2, this.triangleY2, this.triangleX3, this.triangleY3);
+                            this.drawLine(this.triangleX3, this.triangleY3, this.triangleX1, this.triangleY1);
+                            break;
+                        case "drawCircleBtn":
+                            this.circleA = Number(document.getElementById('circleA').value);
+                            this.circleB = Number(document.getElementById('circleB').value);
+                            this.circleR = Number(document.getElementById('circleR').value);
+                            this.drawCircle(this.circleA, this.circleB, this.circleR);
+                            break;
+                        case "moveBtn":
+                            this.toX = Number(document.getElementById('toXvalue').value);
+                            this.toY = Number(document.getElementById('toYvalue').value);
+                            drawing("trans");
+                            drawingLine(this.lineX1, this.lineY1, this.lineX2, this.lineY2, "trans");
+                            drawingTriangle("trans");
+                            drawingCircle("trans");
+                            break;
+                        case "scaleBtn":
+                            this.sizeX = Number(document.getElementById('toXscale').value);
+                            this.sizeY = Number(document.getElementById('toYscale').value);
+                            drawing("size");
+                            drawingLine(this.lineX1, this.lineY1, this.lineX2, this.lineY2, "size");
+                            drawingTriangle("size");
+                            drawingCircle("size");
+                            break;
+                        case "rotateBtn":
+                            const degree = document.getElementById('degree').value;
+                            this.sin = Math.sin(Math.PI * degree / 180);
+                            this.cos = Math.cos(Math.PI * degree / 180);
+                            this.tan = Math.tan(Math.PI * degree / 180);
+                            drawing("rotate");
+                            drawingLine(this.lineX1, this.lineY1, this.lineX2, this.lineY2, "rotate");
+                            drawingTriangle("rotate");
+                            drawingCircle("roate");
+                            break;
+                        case "xBtn":
+                            drawing("X");
+                            drawingLine(this.lineX1, this.lineY1, this.lineX2, this.lineY2, "X");
+                            drawingTriangle("X");
+                            drawingCircle("X");
+                            break;
+                        case "yBtn":
+                            drawing("Y");
+                            drawingLine(this.lineX1, this.lineY1, this.lineX2, this.lineY2, "Y");
+                            drawingTriangle("Y");
+                            drawingCircle("Y");
+                            break;
+                        case "xyBtn":
+                            drawing("XY");
+                            drawingLine(this.lineX1, this.lineY1, this.lineX2, this.lineY2, "XY");
+                            drawingTriangle("XY");
+                            drawingCircle("XY");
+                            break;
+                        case "xSkew":
+                            const degree1 = document.getElementById('degree').value;
+                            this.sin = Math.sin(Math.PI * degree1 / 180);
+                            this.cos = Math.cos(Math.PI * degree1 / 180);
+                            this.tan = Math.tan(Math.PI * degree1 / 180);
+                            drawing("xSkew");
+                            drawingLine(this.lineX1, this.lineY1, this.lineX2, this.lineY2, "xSkew");
+                            drawingTriangle("xSkew");
+                            drawingCircle("xSkew");
+                            break;
+                        case "ySkew":
+                            const degree2 = document.getElementById('degree').value;
+                            this.sin = Math.sin(Math.PI * degree2 / 180);
+                            this.cos = Math.cos(Math.PI * degree2 / 180);
+                            this.tan = Math.tan(Math.PI * degree2 / 180);
+                            drawing("ySkew");
+                            drawingLine(this.lineX1, this.lineY1, this.lineX2, this.lineY2, "ySkew");
+                            drawingTriangle("ySkew");
+                            drawingCircle("ySkew");
+                            break;
+                    }
+                })
+            }
+            running() {
+                this.init();
+                this.event();
+                // this.draw();
+                // this.drawLine(2,4,2,1);
+                // this.drawCircle(0,0,2)
+            }
+        }
+
+        const main = (() => {
+            const rectangle = new Rectangle('rectangle');
+            rectangle.running();
+        })();
+    </script>
+</body>
+
+</html>

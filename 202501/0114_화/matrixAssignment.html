@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix</title>
+</head>
+
+<body>
+    <div id="wrapper" class="wrapper"></div>
+
+    <script>
+        class TransformMatrix {
+            constructor(id) {
+                this.id = id;
+                this.canvas = null;
+                this.pen = null;
+                this.scaleFactor = 20;
+            }
+            initDisplay() {
+                const htmlString = `
+                    <canvas id="canvas" class="canvas" width="700" height="700"></canvas>
+                    <div class="layout">
+                        <p>직선
+                            (<input type="number" class="line" value="3">,
+                            <input type="number" class="line" value="5">)
+                            (<input type="number" class="line" value="7">,
+                            <input type="number" class="line" value="2">)
+                        </p>
+
+                        <p>삼각형
+                            (<input type="number" class="triangle" value="1">,
+                            <input type="number" class="triangle" value="3">)
+                            (<input type="number" class="triangle" value="4">,
+                            <input type="number" class="triangle" value="6">)
+                            (<input type="number" class="triangle" value="2">,
+                            <input type="number" class="triangle" value="5">)
+                        </p>
+
+                        <p>사각형 S:
+                            (<input type="number" class="square" value="1">,
+                            <input type="number" class="square" value="2">),
+                            E: (<input type="number" class="square" value="7">,
+                            <input type="number" class="square" value="3">)
+                        </p>
+
+                        <p>원
+                            (<input type="number" class="circle" value="3">,
+                            <input type="number" class="circle" value="4">,
+                            <input type="number" class="circle" value="5">)
+                        </p>
+                        <hr>
+                        <p>
+                            Scale:
+                            (<input type="number" id="scaleW" placeholder="w" value="2">,
+                            <input type="number" id="scaleH" placeholder="h" value="3">)
+                        </p>
+                        <p>
+                            Rotate:
+                            <input type="number" id="rotateV" placeholder="Deg" value="45">
+                        </p>
+                        <p>
+                            Move:
+                            (<input type="number" id="moveX" placeholder="x" value="2">,
+                            <input type="number" id="moveY" placeholder="y" value="6">)
+                        </p>
+                        <p>
+                            Skew:
+                            <input type="number" id="skew" placeholder="skew" value="35">
+                        </p>
+                        <div>
+                            <button id="drawBtn">DRAW</button>
+                            <button id="scaleBtn">SCALE</button>
+                            <button id="moveBtn">MOVE</button>
+                            <button id="rotateBtn">ROTATE</button>
+                            <br>
+                            <button id="Xsymmetry">X symmetry</button>
+                            <button id="Ysymmetry">Y symmetry</button>
+                            <button id="XYsymmetry">XY symmetry</button>
+                            <button id="Xskew">X skew</button>
+                            <button id="Yskew">Y skew</button>
+                        </div>
+                    </div>
+                `;
+                const cssString = `
+                    <style>
+                    .canvas{
+                        border: 1px solid purple;
+                        border-radius: 0.5rem;
+                    }
+                    .wrapper{
+                        padding-top: 4rem;
+                        display: flex;
+                        justify-content: space-around;
+                    }
+                    input[type="number"]{
+                        width: 3rem;
+                        margin: 0.5rem;
+                    }
+                    button{
+                        width: 7rem;
+                        height: 2.5rem;
+                        background: purple;
+                        color: #fff;
+                        border: none;
+                        border-radius: 0.5rem;
+                        box-shadow: .3rem .3rem .5rem #9d9d9d;
+                        margin: 0.3rem;
+                    }
+                    button:hover{
+                        background: lavender;
+                        color: #333;
+                        transition: 0.3s;
+                    }
+                    </style>
+                `;
+                this.$("#wrapper").innerHTML += `${htmlString}${cssString}`;
+            }
+            setting() {
+                this.canvas = this.$("#canvas");
+                this.pen = this.canvas.getContext("2d");
+            }
+            $(element) {
+                return document.querySelector(element);
+            }
+            $All(element) {
+                return document.querySelectorAll(element);
+            }
+            modiDot(x, y) {
+                this.pen.fillRect(x * this.scaleFactor + this.canvas.width / 2, -y * this.scaleFactor + this.canvas.height / 2, 1, 1);
+            }
+            renderAxis() {
+                const [width, height, size] = [
+                    Math.floor(this.canvas.width / 2),
+                    Math.floor(this.canvas.height / 2),
+                    Number(4)
+                ];
+                const crossHair = (range, isX) => {
+                    for (let i = -range; i <= range; i++) {
+                        isX && (this.modiDot(i / this.scaleFactor, 0));
+                        isX || (this.modiDot(0, i / this.scaleFactor));
+                        for (let j = -size; j < size; j++) {
+                            isX && (this.modiDot(i, j / this.scaleFactor));
+                            isX || (this.modiDot(j / this.scaleFactor, i));
+                        }
+                    }
+                }
+                crossHair(width, true);
+                crossHair(height, false);
+            }
+            getDomArrValues(arr, type) {
+                const resultValue = [...arr].map((element) => {
+                    return Number(element.value);
+                });
+                return resultValue;
+            }
+            convertToMatrixArray(dataObj) {
+                const parseToMatrixObj = {};
+                for (const key in dataObj) {
+                    const [tempArr, dataArr] = [[], []];
+                    switch (key) {
+                        case "line":
+                            const [lx1, ly1, lx2, ly2] = [...dataObj[key]];
+                            tempArr.push(
+                                [lx1, lx2],
+                                [ly1, ly2],
+                                [1, 1]
+                            );
+                            break;
+                        case "triangle":
+                            const [tx1, ty1, tx2, ty2, tx3, ty3] = [...dataObj[key]];
+                            tempArr.push(
+                                [tx1, tx2, tx3],
+                                [ty1, ty2, ty3],
+                                [1, 1, 1]
+                            );
+                            break;
+                        case "square":
+                            const [x1, y1, x2, y2] = [...dataObj[key]];
+                            tempArr.push(
+                                [x1, x2, x2, x1],
+                                [y1, y1, y2, y2],
+                                [1, 1, 1, 1]
+                            );
+                            break;
+                        case "circle":
+                            const [x, y, r] = [...dataObj[key]];
+                            tempArr.push([x], [y], [1]);
+                            break;
+                        default:
+                            tempArr.push(...dataObj[key]);
+                    }
+                    parseToMatrixObj[key] = (tempArr);
+                }
+                console.log("parseToMatrix", parseToMatrixObj);
+
+                return parseToMatrixObj;
+            }
+            matrixMultiply(calcMatrix, domMatrixObj) {
+                const [matrix, domMatrix, resultMatrixObj] = [[...calcMatrix], { ...domMatrixObj }, {}];
+                const matrixMulti = (matrix, data) => {
+                    const resultArr = [];
+                    for (let i = 0; i < matrix.length; i++) {
+                        const temp = [];
+                        for (let j = 0; j < data[0].length; j++) {
+                            let resultV = 0;
+                            for (let k = 0; k < data.length; k++) {
+                                resultV += (matrix[i][k] * data[k][j]);
+                            }
+                            temp.push(resultV);
+                        }
+                        resultArr.push(temp);
+                    }
+                    return [...resultArr];
+                }
+                for (const key in domMatrix) {
+                    resultMatrixObj[key] = (matrixMulti(matrix, domMatrix[key]))
+                }
+                console.log("resultMatrixObj", resultMatrixObj);
+                return resultMatrixObj;
+            }
+            eventManage() {
+                let matrixObj = {};
+                let circleR = 0;
+                window.addEventListener("click", (e) => {
+                    switch (e.target.id) {
+                        case "drawBtn":
+                            const domValueObj = {
+                                line: this.getDomArrValues(this.$All(".line")),
+                                triangle: this.getDomArrValues(this.$All(".triangle")),
+                                square: this.getDomArrValues(this.$All(".square")),
+                                circle: this.getDomArrValues(this.$All(".circle"))
+                            }
+                            circleR = domValueObj["circle"][2];
+                            matrixObj = this.convertToMatrixArray({ ...domValueObj });
+                            this.drawAll({ ...matrixObj }, circleR);
+                            break;
+                        case "scaleBtn":
+                            const wValue = Number(this.$("#scaleW").value);
+                            const scaleMatrix = [
+                                [wValue, 0, 0],
+                                [0, Number(this.$("#scaleH").value), 0],
+                                [0, 0, 1]
+                            ];
+            
+                            const scaleResult = this.matrixMultiply(scaleMatrix, matrixObj);
+                            this.drawAll({ ...scaleResult }, circleR);
+                            break;
+
+                        case "rotateBtn":
+                            const deg = this.changeRadian(Number(this.$("#rotateV").value));
+                            const rotateMatrix = [
+                                [Math.cos(deg), Math.sin(deg), 0],
+                                [-Math.sin(deg), Math.cos(deg), 0],
+                                [0, 0, 1]
+                            ];
+                            const rotateMatrixResult = this.matrixMultiply(rotateMatrix, matrixObj);
+                            this.drawAll({ ...rotateMatrixResult }, circleR);
+                            break;
+
+                        case "moveBtn":
+                            const moveMatrix = [
+                                [1, 0, Number(this.$("#moveX").value)],
+                                [0, 1, Number(this.$("#moveY").value)],
+                                [0, 0, 1]
+                            ];
+                            const moveMatrixResult = this.matrixMultiply(moveMatrix, matrixObj);
+                            console.log("moveMatrix", moveMatrix);
+                            console.log("moveMatrixResult", moveMatrixResult);
+                            this.drawAll({ ...moveMatrixResult }, circleR);
+                            break;
+
+                        case "Xsymmetry":
+                            const XsymmetryMatrix = [
+                                [1, 0, 0],
+                                [0, -1, 0],
+                                [0, 0, 1]
+                            ];
+                            const XsymmetryResult = this.matrixMultiply(XsymmetryMatrix, matrixObj);
+                            this.drawAll({ ...XsymmetryResult }, circleR);
+                            break;
+
+                        case "Ysymmetry":
+                            const YsymmetryMatrix = [
+                                [-1, 0, 0],
+                                [0, 1, 0],
+                                [0, 0, 1]
+                            ];
+                            const YsymmetryResult = this.matrixMultiply(YsymmetryMatrix, matrixObj);
+                            this.drawAll({ ...YsymmetryResult }, circleR);
+                            break;
+
+                        case "XYsymmetry":
+                            const XYsymmetryMatrix = [
+                                [-1, 0, 0],
+                                [0, -1, 0],
+                                [0, 0, 1]
+                            ];
+                            const XYsymmetryResult = this.matrixMultiply(XYsymmetryMatrix, matrixObj);
+                            this.drawAll({ ...XYsymmetryResult }, circleR);
+                            break;
+
+                        case "Xskew":
+                            const XskewMatrix = [
+                                [1, Math.tan(this.changeRadian(Number(this.$("#skew").value))), 0],
+                                [0, 1, 0],
+                                [0, 0, 1]
+                            ];
+                            const XskewResult = this.matrixMultiply(XskewMatrix, matrixObj);
+                            this.drawAll({ ...XskewResult }, circleR);
+                            break;
+
+                        case "Yskew":
+                            const YskewMatrix = [
+                                [1, 0, 0],
+                                [Math.tan(this.changeRadian(Number(this.$("#skew").value))), 1, 0],
+                                [0, 0, 1]
+                            ];
+                            const YskewResult = this.matrixMultiply(YskewMatrix, matrixObj);
+                            this.drawAll({ ...YskewResult }, circleR);
+                            break;
+                    }
+                });
+            }
+            drawLine(data) {
+                let [x1, y1, x2, y2] = [...data];
+                (x2 < x1) && ([x1, y1, x2, y2] = [x2, y2, x1, y1]);
+
+                if (x1 === x2) {
+                    (y2 < y1) && ([x1, y1, x2, y2] = [x2, y2, x1, y1]);
+                    for (let i = y1; i <= y2; i += 0.01) {
+                        this.modiDot(x1, i);
+                    }
+                } else if (y1 === y2) {
+                    for (let i = x1; i <= x2; i += 0.01) {
+                        this.modiDot(i, y1);
+                    }
+                } else {
+                    const m = (y2 - y1) / (x2 - x1);
+                    for (let x = x1; x <= x2; x += 0.01) {
+                        const f = m * (x - x1) + y1;
+                        this.modiDot(x, f);
+                    }
+                }
+            }
+            makeDrawArr(domArr) {
+                const [makeArr, parsingData] = [[], []];
+                // console.log(domArr)
+                for (let i = 0; i < domArr.length; i += 2) {
+                    makeArr.push([domArr[i], domArr[i + 1]]);
+                }
+
+                for (let i = 0; i < makeArr.length; i++) {
+                    let secondArr = makeArr[i + 1];
+                    (i === makeArr.length - 1) && (secondArr = makeArr[0]);
+                    parsingData.push([...makeArr[i], ...secondArr])
+                }
+                parsingData.forEach((arr) => {
+                    this.drawLine(arr);
+                });
+            }
+            drawAll(objData, r) {
+                // circle: [Array(3)]
+                // line: (2)[Array(3), Array(3)]
+                for (const key in objData) {
+                    const [data, temp] = [objData[key], []];
+                    for (let i = 0; i < data[0].length; i++) {
+                        for (let j = 0; j < 2; j++) {
+                            temp.push(data[j][i]);
+                        }
+                    }
+                    switch (key) {
+                        case "line":
+                            this.pen.fillStyle = "orange";
+                            this.drawLine([...temp]);
+                            break;
+                        case "triangle":
+                            this.pen.fillStyle = "blue";
+                            this.makeDrawArr([...temp]);
+                            break;
+                        case "square":
+                            this.pen.fillStyle = "green";
+                            this.makeDrawArr([...temp]);
+                            break;
+                        case "circle":
+                            this.pen.fillStyle = "purple";
+                            temp.push(r);
+                            console.log("circle", temp);
+                            this.drawCircle([...temp])
+                            break;
+                    }
+                }
+
+            }
+            changeRadian(deg) {
+                return deg * Math.PI / 180;
+            }
+            drawCircle(domArr) {
+                const [x, y, r] = [...domArr];
+                for (let i = 0; i <= 360; i += 0.01) {
+                    const radian = this.changeRadian(i);
+                    this.modiDot((Math.cos(radian) * r) + x, (Math.sin(radian) * r) + y);
+                }
+            }
+            run() {
+                this.initDisplay();
+                this.setting();
+                this.renderAxis();
+                this.eventManage();
+            }
+        }
+
+        const transformMatrix = new TransformMatrix("transformMatrix");
+        transformMatrix.run();
+
+
+    </script>
+</body>
+
+</html>

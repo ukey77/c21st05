@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        const mixtureArr = [
+            [10, 20, 30],
+            [40, 50, 60],
+            [70, 80, 90],
+            [100, 110, 120]
+        ];
+
+        const result = [];
+
+        for (let i = 0; i < mixtureArr[0].length; i++) {
+            for (let j = 0; j < mixtureArr[i].length; j++) {
+                for (let k = 0; k < mixtureArr[i].length; k++) {
+                    for (let l = 0; l < mixtureArr[i].length; l++) {
+                        result.push([mixtureArr[0][i], mixtureArr[1][j], mixtureArr[2][k], mixtureArr[3][l]]);
+                    }
+                }
+            }
+        }
+
+        console.log(result)
+    </script>
+</body>
+
+</html>

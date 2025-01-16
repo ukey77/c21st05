@@ -1,97 +1,118 @@
 * {
   margin: 0;
   padding: 0;
-  font-size: 10px; }
+  font-size: 10px;
+}
 
 .wrapper {
-  width: 100vw; }
-  .wrapper .layout {
-    position: relative;
-    margin: 0 auto;
-    width: 1200px; }
-  .wrapper .title-area {
-    margin-top: 20rem;
-    width: 100%;
-    height: 50%;
-    text-align: center; }
-  .wrapper .title {
-    font-size: 11rem; }
-  .wrapper [class^=color] {
-    font-size: 11rem; }
-  .wrapper .color-green {
-    color: #34A853; }
-  .wrapper .color-blue {
-    color: #4386F4; }
-  .wrapper .color-red {
-    color: #EA4335; }
-  .wrapper .color-yellow {
-    color: #FBBC05; }
-  .wrapper .inputArea {
-    position: absolute;
-    left: 50%;
-    top: 120%;
-    transform: translate(-50%, -50%);
-    margin-top: 3rem; }
-  .wrapper .input {
-    position: relative;
-    text-align: center;
-    width: 70rem;
-    height: 5rem;
-    border-radius: 3rem;
-    border: none;
-    box-shadow: 0px 0px 7px #b9b9b9;
-    font-size: 1.3rem;
-    text-align: left;
-    text-indent: 6em; }
-  .wrapper .icon-area {
-    position: absolute;
-    left: 50%;
-    top: 210%;
-    transform: translate(-50%, -50%);
-    width: 50%;
-    height: 10rem;
-    display: flex;
-    justify-content: space-between; }
-  .wrapper .icon-box {
-    position: relative;
-    width: 7rem;
-    height: 7rem;
-    border-radius: 50%;
-    background: #F2F4F5; }
-  .wrapper .icon {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%); }
-  .wrapper .icon > i {
-    font-size: 4rem; }
-  .wrapper .input-icon {
-    font-size: 2.5rem;
-    color: #83868A; }
-  .wrapper .xi-search {
-    position: absolute;
-    left: 5%;
-    top: 50%;
-    transform: translate(-50%, -50%); }
-  .wrapper .xi-microphone {
-    position: absolute;
-    left: 95%;
-    top: 50%;
-    transform: translate(-50%, -50%); }
-  .wrapper .xi-focus-center {
-    position: absolute;
-    left: 90%;
-    top: 50%;
-    transform: translate(-50%, -50%); }
-  .wrapper .icon-title {
-    font-size: 1.8rem;
-    position: absolute;
-    left: 50%;
-    top: 130%;
-    transform: translate(-50%, -50%); }
-  .wrapper .xi-facebook-official {
-    color: #4386F4; }
-  .wrapper .xi-youtube-play {
-    color: #EA4335; }
-
-/*# sourceMappingURL=google.css.map */
+  width: 100vw;
+}
+.wrapper .layout {
+  position: relative;
+  margin: 0 auto;
+  width: 1200px;
+}
+.wrapper .title-area {
+  margin-top: 20rem;
+  width: 100%;
+  height: 50%;
+  text-align: center;
+}
+.wrapper .title {
+  font-size: 11rem;
+}
+.wrapper [class^=color] {
+  font-size: 11rem;
+}
+.wrapper .color-green {
+  color: #34A853;
+}
+.wrapper .color-blue {
+  color: #4386F4;
+}
+.wrapper .color-red {
+  color: #EA4335;
+}
+.wrapper .color-yellow {
+  color: #FBBC05;
+}
+.wrapper .inputArea {
+  position: absolute;
+  left: 50%;
+  top: 120%;
+  transform: translate(-50%, -50%);
+  margin-top: 3rem;
+}
+.wrapper .input {
+  position: relative;
+  text-align: center;
+  width: 70rem;
+  height: 5rem;
+  border-radius: 3rem;
+  border: none;
+  box-shadow: 0px 0px 7px #b9b9b9;
+  font-size: 1.3rem;
+  text-align: left;
+  text-indent: 6em;
+}
+.wrapper .icon-area {
+  position: absolute;
+  left: 50%;
+  top: 210%;
+  transform: translate(-50%, -50%);
+  width: 50%;
+  height: 10rem;
+  display: flex;
+  justify-content: space-between;
+}
+.wrapper .icon-box {
+  position: relative;
+  width: 7rem;
+  height: 7rem;
+  border-radius: 50%;
+  background: #F2F4F5;
+}
+.wrapper .icon {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+.wrapper .icon > i {
+  font-size: 4rem;
+}
+.wrapper .input-icon {
+  font-size: 2.5rem;
+  color: #83868A;
+}
+.wrapper .xi-search {
+  position: absolute;
+  left: 5%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+.wrapper .xi-microphone {
+  position: absolute;
+  left: 95%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+.wrapper .xi-focus-center {
+  position: absolute;
+  left: 90%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+.wrapper .icon-title {
+  font-size: 1.8rem;
+  position: absolute;
+  left: 50%;
+  top: 130%;
+  transform: translate(-50%, -50%);
+}
+.wrapper .xi-facebook-official {
+  color: #4386F4;
+}
+.wrapper .xi-youtube-play {
+  color: #EA4335;
+}/*# sourceMappingURL=google.css.map */

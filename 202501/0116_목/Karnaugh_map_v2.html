@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2️⃣ Karnaugh Map</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .wrap {
+            display: flex;
+        }
+
+        .mainBox {
+            width: 100px;
+        }
+
+        div[id^="a"] {
+            width: 48px;
+            height: 48px;
+            float: left;
+            border: 1px solid rgb(0, 149, 255);
+        }
+
+        .spanArea {
+            margin-left: 14px;
+        }
+
+        span {
+            display: inline-block;
+            width: 48px;
+            text-align: center;
+        }
+
+        .factor {
+            display: inline-block;
+            padding: 13px 3px;
+        }
+    </style>
+</head>
+
+<body>
+    <h3>Karnaugh Map 2️⃣</h3>
+    <div class="spanArea">
+        <span>0</span>
+        <span>0</span>
+    </div>
+    <div class="wrap">
+        <div class="factor">0 <br><br> 1</div>
+        <div class="mainBox">
+            <div id="a00"></div>
+            <div id="a01"></div>
+            <div id="a10"></div>
+            <div id="a11"></div>
+        </div>
+    </div>
+    <div id="resultArea">result</div>
+
+    <!-- ==script== -->
+    <script>
+        const kV = { t: true, f: false };
+        const kM = [
+            [kV.f, kV.f],
+            [kV.f, kV.f],
+        ];
+
+        const kME = [
+            ["a'b'", "ab'"],
+            ["a'b", "ab"]
+        ];
+
+        const kMP = {
+            "b'": [[true, true], [false, false]],
+            "b": [[false, false], [true, true]],
+            "a'": [[true, false], [true, false]],
+            "a": [[false, true], [false, true]],
+        };
+
+        // 패턴 큰거 > 작은거 
+        const checkV = () => {
+            kM.forEach((v1, i1, a1) => {
+                v1.forEach((v2, i2, a2) => {
+                    v2 && (document.getElementById(`a${i1}${i2}`).style.backgroundColor = "pink");
+                    !v2 && (document.getElementById(`a${i1}${i2}`).style.backgroundColor = "darkgrey");
+                })
+            });
+        }
+        // Click_Event
+        this.addEventListener("click", (e) => {
+            const [, a, b] = e.target.id.split(""); // 이런 표기도 되네?
+            // console.log(a + '/' + b);
+            const result = kM[a][b] == kV.t ? kV.f : kV.t ;
+            kM[a][b] = result;
+            checkV();
+        })
+
+    </script>
+</body>
+
+</html>

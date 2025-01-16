@@ -1,7 +1,8 @@
 [class^=box] {
   width: 50px;
   height: 50px;
-  border: 9px solid orange; }
+  border: 9px solid orange;
+}
 
 .box1 {
   background-color: red;
@@ -9,34 +10,42 @@
   -webkit-transform: rotate(30deg);
   -moz-transform: rotate(30deg);
   -ms-transform: rotate(30deg);
-  -o-transform: rotate(30deg); }
+  -o-transform: rotate(30deg);
+}
 
 .box2 {
-  background-color: #b2ad7f; }
+  background-color: #b2ad7f;
+}
 
 .box3 {
-  background-color: #878f99; }
+  background-color: #878f99;
+}
 
 h1 {
-  color: green; }
+  color: green;
+}
 
 p {
   color: red;
   color: red;
   font: 40px inherit bold;
-  border: 1px solid blue; }
+  border: 1px solid blue;
+}
 
 nav ul {
   margin: 0;
   padding: 0;
-  list-style: circle; }
+  list-style: circle;
+}
 nav li {
-  display: inline-block; }
+  display: inline-block;
+}
 nav a {
   display: block;
   padding: 6px 12px;
   text-decoration: none;
-  color: #878f99; }
+  color: #878f99;
+}
 
 .main {
   font-family: Helvetica, sans-serif;
@@ -44,6 +53,5 @@ nav a {
   font-weight: bold;
   text-align: center;
   text-overflow: hidden;
-  text-text-decoration: overline; }
-
-/*# sourceMappingURL=scss.css.map */
+  text-text-decoration: overline;
+}/*# sourceMappingURL=scss.css.map */

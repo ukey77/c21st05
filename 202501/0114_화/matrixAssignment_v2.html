@@ -53,8 +53,8 @@
                         <hr>
                         <p>
                             Scale:
-                            (<input type="number" id="scaleW" placeholder="w" value="2">,
-                            <input type="number" id="scaleH" placeholder="h" value="3">)
+                            (<input type="number" id="scaleW" placeholder="w" value="1.2">,
+                            <input type="number" id="scaleH" placeholder="h" value="1.3">)
                         </p>
                         <p>
                             Rotate:
@@ -212,7 +212,7 @@
                     }
                     parseToMatrixObj[key] = (tempArr);
                 }
-                console.log("referenceToOriginToOriginal", parseToMatrixObj);
+                // console.log("referenceToOriginToOriginal", parseToMatrixObj);
 
                 return parseToMatrixObj;
             }
@@ -247,19 +247,23 @@
                             break;
                         case "circle":
                             const [x, y, r] = [...dataObj[key]];
-                            tempArr.push([x], [y], [1]);
+                            tempArr.push(
+                                [x],
+                                [y],
+                                [1]
+                            );
                             break;
                         default:
                             tempArr.push(...dataObj[key]);
                     }
                     parseToMatrixObj[key] = (tempArr);
                 }
-                console.log("parseToMatrix", parseToMatrixObj);
+                // console.log("parseToMatrix", parseToMatrixObj);
 
                 return parseToMatrixObj;
             }
             matrixMultiply(calcMatrix, domMatrixObj) {
-                console.log("matrixMultiply", calcMatrix)
+                // console.log("matrixMultiply", calcMatrix)
                 const [matrix, domMatrix, resultMatrixObj] = [calcMatrix, { ...domMatrixObj }, {}];
                 const matrixMulti = (matrix, data) => {
                     const resultArr = [];
@@ -283,13 +287,71 @@
                         resultMatrixObj[key] = (matrixMulti(matrix[key], domMatrix[key]));
                     }
                 }
-                console.log("resultMatrixObj", resultMatrixObj);
+                // console.log("resultMatrixObj", resultMatrixObj);
                 return resultMatrixObj;
+            }
+            FixedMatrix(optionType) {
+                const data = {
+                    moveBtn: [
+                        [1, 0, Number(this.$("#moveX").value)],
+                        [0, 1, Number(this.$("#moveY").value)],
+                        [0, 0, 1]
+                    ],
+                    Xsymmetry: [
+                        [1, 0, 0],
+                        [0, -1, 0],
+                        [0, 0, 1]
+                    ],
+                    Ysymmetry: [
+                        [-1, 0, 0],
+                        [0, 1, 0],
+                        [0, 0, 1]
+                    ],
+                    XYsymmetry: [
+                        [-1, 0, 0],
+                        [0, -1, 0],
+                        [0, 0, 1]
+                    ]
+                }
+                if (optionType in data) {
+                    return data[optionType];
+                } else {
+                    return false;
+                }
+            }
+            ChangeableMatrix(optionType) {
+                const deg = this.changeRadian(Number(this.$("#rotateV").value));
+                const data = {
+                    rotateBtn: [
+                        [Math.cos(deg), Math.sin(deg), 0],
+                        [-Math.sin(deg), Math.cos(deg), 0],
+                        [0, 0, 1]
+                    ],
+                    scaleBtn: [
+                        [Number(this.$("#scaleW").value), 0, 0],
+                        [0, Number(this.$("#scaleH").value), 0],
+                        [0, 0, 1]
+                    ],
+                    Xskew: [
+                        [1, Math.tan(this.changeRadian(Number(this.$("#skew").value))), 0],
+                        [0, 1, 0],
+                        [0, 0, 1]
+                    ],
+                    Yskew: [
+                        [1, 0, 0],
+                        [Math.tan(this.changeRadian(Number(this.$("#skew").value))), 1, 0],
+                        [0, 0, 1]
+                    ]
+                }
+                if (optionType in data) {
+                    return data[optionType];
+                } else {
+                    return false;
+                }
             }
             eventManage() {
                 let [matrixObj, circleR] = [{}, Number(0)];
                 let [initialAxisMatrix, baseAxisMatrix] = [null, null];
-
                 window.addEventListener("click", (e) => {
                     switch (e.target.id) {
                         case "drawBtn":
@@ -299,104 +361,33 @@
                                 square: this.getDomArrValues(this.$All(".square")),
                                 circle: this.getDomArrValues(this.$All(".circle"))
                             }
-                            circleR = domValueObj["circle"][2];
                             matrixObj = this.convertToMatrixArray({ ...domValueObj });
-                            this.drawAll({ ...matrixObj }, circleR);
-                            [initialAxisMatrix, baseAxisMatrix] = [
+                            [initialAxisMatrix, baseAxisMatrix, circleR] = [
                                 this.referenceToOriginToOriginal(domValueObj, false),
-                                this.referenceToOriginToOriginal(domValueObj, true)
+                                this.referenceToOriginToOriginal(domValueObj, true),
+                                Number(domValueObj["circle"][2])
                             ];
+                            this.drawAll({ ...matrixObj }, circleR);
                             break;
+                    }
 
-                        case "moveBtn":
-                            const moveMatrix = [
-                                [1, 0, Number(this.$("#moveX").value)],
-                                [0, 1, Number(this.$("#moveY").value)],
-                                [0, 0, 1]
-                            ];
-                            const moveMatrixResult = this.matrixMultiply(moveMatrix, matrixObj);
-                            this.drawAll({ ...moveMatrixResult }, circleR);
-                            break;
+                    const [FixedMatrix, ChangeableMatrix] = [this.FixedMatrix(e.target.id), this.ChangeableMatrix(e.target.id)];
+                    // === 좌표 변환 없는 행렬 ===
+                    if (FixedMatrix) {
+                        const moveMatrixResult = this.matrixMultiply(FixedMatrix, matrixObj);
+                        this.drawAll({ ...moveMatrixResult }, circleR);
+                    }
 
-                        case "Xsymmetry":
-                            const XsymmetryMatrix = [
-                                [1, 0, 0],
-                                [0, -1, 0],
-                                [0, 0, 1]
-                            ];
-                            const XsymmetryResult = this.matrixMultiply(XsymmetryMatrix, matrixObj);
-                            this.drawAll({ ...XsymmetryResult }, circleR);
-                            break;
-
-                        case "Ysymmetry":
-                            const YsymmetryMatrix = [
-                                [-1, 0, 0],
-                                [0, 1, 0],
-                                [0, 0, 1]
-                            ];
-                            const YsymmetryResult = this.matrixMultiply(YsymmetryMatrix, matrixObj);
-                            this.drawAll({ ...YsymmetryResult }, circleR);
-                            break;
-
-                        case "XYsymmetry":
-                            const XYsymmetryMatrix = [
-                                [-1, 0, 0],
-                                [0, -1, 0],
-                                [0, 0, 1]
-                            ];
-                            const XYsymmetryResult = this.matrixMultiply(XYsymmetryMatrix, matrixObj);
-                            this.drawAll({ ...XYsymmetryResult }, circleR);
-                            break;
-                        // ===========================================================================
-                        case "rotateBtn":
-                            const deg = this.changeRadian(Number(this.$("#rotateV").value));
-                            const rotateMatrix = [
-                                [Math.cos(deg), Math.sin(deg), 0],
-                                [-Math.sin(deg), Math.cos(deg), 0],
-                                [0, 0, 1]
-                            ];
-                            // originalAxisMatrix
-
-                            const step1 = this.matrixMultiply(originAxisMatrix, matrixObj);
-                            const step2 = this.matrixMultiply(rotateMatrix, step1);        
-                            const step3 = this.matrixMultiply(originalAxisMatrix, step2); 
-
-                            this.drawAll({ ...step3 }, circleR);
-                            break;
-
-                        case "scaleBtn":
-                            const scaleMatrix = [
-                                [Number(this.$("#scaleW").value), 0, 0],
-                                [0, Number(this.$("#scaleH").value), 0],
-                                [0, 0, 1]
-                            ];
-
-                            const dstep1 = this.matrixMultiply(originAxisMatrix, matrixObj); // 기준점을 원점으로 이동
-                            const dstep2 = this.matrixMultiply(scaleMatrix, dstep1);        // 회전 적용
-                            const dstep3 = this.matrixMultiply(originalAxisMatrix, dstep2); // 기준점으로 복귀
-
-                            this.drawAll({ ...dstep3 }, circleR);
-                            break;
-
-                        case "Xskew":
-                            const XskewMatrix = [
-                                [1, Math.tan(this.changeRadian(Number(this.$("#skew").value))), 0],
-                                [0, 1, 0],
-                                [0, 0, 1]
-                            ];
-                            const XskewResult = this.matrixMultiply(XskewMatrix, matrixObj);
-                            this.drawAll({ ...XskewResult }, circleR);
-                            break;
-
-                        case "Yskew":
-                            const YskewMatrix = [
-                                [1, 0, 0],
-                                [Math.tan(this.changeRadian(Number(this.$("#skew").value))), 1, 0],
-                                [0, 0, 1]
-                            ];
-                            const YskewResult = this.matrixMultiply(YskewMatrix, matrixObj);
-                            this.drawAll({ ...YskewResult }, circleR);
-                            break;
+                    // === 좌표 보정 필요한 행렬 ===
+                    if (ChangeableMatrix) {
+                        const changeInitialMatrix = this.matrixMultiply(initialAxisMatrix, matrixObj);
+                        const changeFunctionMatrix = this.matrixMultiply(ChangeableMatrix, changeInitialMatrix);
+                        const changeBaseAxisMatrix = this.matrixMultiply(baseAxisMatrix, changeFunctionMatrix);
+                        if (e.target.id === "scaleBtn") {
+                            const [scaleW, scaleH] = [Number(this.$("#scaleW").value), Number(this.$("#scaleH").value)];
+                            circleR *= Math.sqrt(scaleW * scaleH); // 이게 맞나???
+                        }
+                        this.drawAll({ ...changeBaseAxisMatrix }, circleR);
                     }
                 });
             }
@@ -438,8 +429,7 @@
                 });
             }
             drawAll(objData, r) {
-                // circle: [Array(3)]
-                // line: (2)[Array(3), Array(3)]
+                console.log("drawAll", objData);
                 for (const key in objData) {
                     const [data, temp] = [objData[key], []];
                     for (let i = 0; i < data[0].length; i++) {
@@ -463,7 +453,6 @@
                         case "circle":
                             this.pen.fillStyle = "purple";
                             temp.push(r);
-                            console.log("circle", temp);
                             this.drawCircle([...temp])
                             break;
                     }
@@ -475,7 +464,7 @@
             }
             drawCircle(domArr) {
                 const [x, y, r] = [...domArr];
-                for (let i = 0; i <= 360; i += 0.01) {
+                for (let i = 0; i <= 360; i += 0.5) {
                     const radian = this.changeRadian(i);
                     this.modiDot((Math.cos(radian) * r) + x, (Math.sin(radian) * r) + y);
                 }

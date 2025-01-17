@@ -1,17 +1,36 @@
+// {
+// 	"version": "2.0.0",
+// 	"tasks": [
+// 		{
+// 			"type": "typescript",
+// 			"tsconfig": "./tsconfig.json",
+// 			"problemMatcher": [
+// 				"$tsc"
+// 			],
+// 			"group": {
+// 				"kind": "build",
+// 				"isDefault": true
+// 			},
+// 			"label": "TypeScript Build"
+// 		}
+// 	]
+// }
+
 {
 	"version": "2.0.0",
 	"tasks": [
-		{
-			"type": "typescript",
-			"tsconfig": "./tsconfig.json",
-			"problemMatcher": [
-				"$tsc"
-			],
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			},
-			"label": "TypeScript Build"
-		}
+	  {
+		"label": "Watch TypeScript",
+		"type": "shell",
+		"command": "tsc",
+		"args": ["-w"],
+		"group": {
+		  "kind": "build",
+		  "isDefault": true
+		},
+		"problemMatcher": "$tsc-watch",
+		"isBackground": true
+	  }
 	]
-}
+  }
+  

@@ -12,16 +12,15 @@
         const result = [];
         const allEvent = (count, oneEvent = []) => {
             const boolEvent = [true, false];
-            let temp = [...oneEvent];
-
-            if (temp.length === count) {
+            
+            if (oneEvent.length === count) {
                 result.push(temp);
                 return;
             } else {
                 boolEvent.forEach((bool) => {
+                    let temp = [...oneEvent];
                     temp.push(bool);
                     allEvent(count, temp);
-                    temp = [...oneEvent];
                 });
             }
         };

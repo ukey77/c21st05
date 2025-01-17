@@ -3,4 +3,9 @@ html
   head
     title Pug Template Example
   body
-    h1 Hello, #{loverName}!
+    h1 Hello, #{title}!
+      each value,index in [1,2,3,4,5]
+        div #{index+1}
+    div= time
+      
+

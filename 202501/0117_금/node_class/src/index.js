@@ -1,33 +1,57 @@
-const express = require("express");
-const app = express();
+class Daemon{
+    constructor(id){
+        this.id=id;
+        this.express = null;
+        this.app = null;
+    }
+    setDaemon(){
+        this.express = require("express");
+        this.app = this.express();
 
-app.use(express.static("public")); // public 폴더 내 정적 파일 서빙
+        this.app.set("view engine","pug");
+        this.app.set("views","./views");
+        this.app.use(this.express.static("public"));
+    }
+    runRoute(){
+        this.app.get("/",(req,res)=>{
+            res.send("Hello Root");
+        });
 
-app.set("views", "./views"); // 템플릿 파일 경로
-app.set("view engine", "pug"); // 템플릿 엔진으로 pug 설정
-app.locals.pretty = true; // 개발 환경에서 HTML 출력 정리
+        this.app.get("/img",(req,res)=>{
+            res.send(`<h1>Good Bye</h1><img src="./images/bye.png">`);
+        });
 
+        this.app.get("/dynamic",(req,res)=>{
+            const list = [...new Array(5)].reduce((acc,cur,i)=>{
+                return acc + `<li>HelloWorld${i+1}</li>`
+            }, "");
+            res.send(list);
+        });
 
-app.get("/",(req,res)=>{
-    res.send("Hello World!");
-});
+        this.app.get("/template",(req,res)=>{
+            res.render("template",{title: "Template", time: Date()})
+        });
 
-app.get("/dynamic",(req,res)=>{
-    const list = [...new Array(5)].reduce((acc, cur) => {
-        return acc + `<li>Beautiful Coding</li>`;
-    }, "");
-    res.send(list);
-});
+        this.app.get("/option",(req,res)=>{
+            const {select} = req.query;
+            console.log(req.query.select);
+            res.send(select);
+        });
+        
+    }
+    listen(){
+        this.app.listen(2000,()=>{
+            console.log(`http://localhost:2000`);
+        })
+    }
+    run(){
+        this.setDaemon();
+        this.runRoute();
+        this.listen();
+    }
+}
 
-app.get("/template",(req,res)=>{
-    res.render("template", { loverName: "Yujin" });
-});
-
-app.get("/option",(req,res)=>{
-    const nameList = ["111",'222','3333'];
-    res.send(nameList[req.query.select])
-});
-
-app.listen(3000,()=>{
-    console.log(`http://localhost:3000`);
-});
+const main = (() => {
+    const daemon = new Daemon();
+    daemon.run();
+})();

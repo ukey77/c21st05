@@ -29,3 +29,5 @@ abstract class Queue {
   
   console.log(queue.pop().toFixed()); // 0
   console.log(queue.pop().toFixed()); // 1
+
+  export {}

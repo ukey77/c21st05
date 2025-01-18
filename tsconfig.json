@@ -1,12 +1,15 @@
 {
   "compilerOptions": {
     "target": "es2016",
-    "module": "commonjs",
+    "module": "CommonJS",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "allowJs": false,
+    "noEmit": true, // 결과물 파일 생성을 방지
+    "noEmitOnError": true
   },
-  "include": ["**/*"],
-  "exclude": ["node_modules", "**/*.spec.ts"]
+  "include": ["**/*.ts"],
+  "exclude": ["node_modules", "**/*.spec.ts", "**/*.js"]
 }

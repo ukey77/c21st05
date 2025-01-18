@@ -1,0 +1,13 @@
+doctype html
+html
+    head
+        meta(charset="utf-8")
+        meta(name="viewport" content="widith=device-width, initial-scale=1.0")
+        title= title
+        link(href="/styles/score.css" rel="stylesheet")
+    body
+        #wrapper(class="wrapper")
+            each value, key in scoreData
+                P
+                    label #{value}: 
+                    input(type="text" id=key class="score-cell" )

@@ -8,10 +8,10 @@ var KarnaughMap = /** @class */ (function () {
     };
     KarnaughMap.prototype.eventManage = function () {
         window.addEventListener("click", function (e) {
-            var idValue = e.target.id;
-            if (/^a/.test(idValue)) {
-                console.log(idValue);
-            }
+            // const idValue: string = e.target.id;
+            // if(/^a/.test(idValue)){
+            //     console.log(idValue);
+            // }
         });
     };
     KarnaughMap.prototype.run = function () {

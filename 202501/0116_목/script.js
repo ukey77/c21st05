@@ -9,10 +9,10 @@ class KarnaughMap {
     }
     eventManage() {
         window.addEventListener("click", (e) => {
-            const idValue = e.target.id;
-            if (/^a/.test(idValue)) {
-                console.log(idValue);
-            }
+            // const idValue: string = e.target.id;
+            // if(/^a/.test(idValue)){
+            //     console.log(idValue);
+            // }
         });
     }
     run() {

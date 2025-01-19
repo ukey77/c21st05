@@ -7,7 +7,7 @@
     "strict": true,
     "skipLibCheck": true,
     "allowJs": false,
-    "noEmit": true, // 결과물 파일 생성을 방지
+    // "noEmit": true, // 결과물 파일 생성을 방지
     "noEmitOnError": true
   },
   "include": ["**/*.ts"],

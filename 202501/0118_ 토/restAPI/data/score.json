@@ -1,0 +1,54 @@
+{
+    "score": [
+        {
+            "id": "1",
+            "score": "88",
+            "name": "Alice"
+        },
+        {
+            "id": "2",
+            "score": "45",
+            "name": "Bob"
+        },
+        {
+            "id": "3",
+            "score": "60",
+            "name": "Charlie"
+        },
+        {
+            "id": "4",
+            "score": "79",
+            "name": "Diana"
+        },
+        {
+            "id": "5",
+            "score": "52",
+            "name": "Edward"
+        },
+        {
+            "id": "6",
+            "score": "98",
+            "name": "Fiona"
+        },
+        {
+            "id": "7",
+            "score": "77",
+            "name": "George"
+        },
+        {
+            "id": "8",
+            "score": "86",
+            "name": "Hannah"
+        },
+        {
+            "id": "9",
+            "score": "89",
+            "name": "Irene"
+        },
+        {
+            "id": "10",
+            "score": "78",
+            "name": "Jack"
+        }
+    ]
+}

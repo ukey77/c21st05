@@ -51,7 +51,7 @@ var Score = /** @class */ (function () {
         this.data = null;
     }
     Score.prototype.url = function (address) {
-        return "http://localhost:3001" + address;
+        return ("http://localhost:3001" + address);
     };
     Score.prototype.$ = function (element) {
         return document.querySelector(element);
@@ -77,7 +77,7 @@ var Score = /** @class */ (function () {
     };
     Score.prototype.displayDom = function (data) {
         for (var key in data) {
-            // console.log(this.$(`#${key}`))
+            // console.log(this.$(`#${key}`)
             var $input = this.$("#" + key);
             $input.value = data[key];
         }

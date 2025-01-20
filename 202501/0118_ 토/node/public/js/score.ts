@@ -14,7 +14,7 @@ class Score{
         this.data = null;
     }
     url(address: string): string{
-        return `http://localhost:3001${address}`;
+        return (`http://localhost:3001${address}`);
     }
     $(element: string): HTMLElement |  null{
         return document.querySelector(element);
@@ -27,10 +27,10 @@ class Score{
         const dataObject: DataMetrics = this.dataMetrics();
         this.displayDom({...dataObject});
     }
-    displayDom(data: object): void{
+    displayDom(data: DataMetrics): void{
         
         for(const key in data){
-            // console.log(this.$(`#${key}`))
+            // console.log(this.$(`#${key}`)
             const $input = this.$(`#${key}`) as HTMLInputElement | null;
             $input.value = data[key];
         }

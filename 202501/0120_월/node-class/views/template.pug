@@ -1,0 +1,16 @@
+doctype html
+html
+    head
+        meta(charset="utf-8")
+        title= title
+    body
+        h1= hello
+        h2= date
+        form(action="/sum" method="post")
+            p
+                label firstValue:
+                input(type="number" name="value1")
+            p
+                label secondValue:
+                input(type="number" name="value2")
+            input(type="submit")

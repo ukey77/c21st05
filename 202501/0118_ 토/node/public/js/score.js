@@ -8,13 +8,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+Object.defineProperty(exports, "__esModule", { value: true });
 class Score {
     constructor(id) {
         this.id = id;
         this.data = null;
     }
     url(address) {
-        return `http://localhost:3001${address}`;
+        return (`http://localhost:3001${address}`);
     }
     $(element) {
         return document.querySelector(element);
@@ -30,8 +31,9 @@ class Score {
     }
     displayDom(data) {
         for (const key in data) {
-            console.log(this.$(`#${key}`));
-            this.$(`#${key}`).value = data[key];
+            // console.log(this.$(`#${key}`)
+            const $input = this.$(`#${key}`);
+            // $input.value = data[key];
         }
     }
     dataMetrics() {

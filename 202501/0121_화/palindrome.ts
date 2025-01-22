@@ -5,7 +5,7 @@ class PalindromeControl{
     }
     palindrome(data: string){
         const dataArr: string[] = [...data];
-        const resultArr: any[] = [];
+        const resultArr: any[]= [];
         class Stack<T>{
             protected id: string;
             public storage: Array<T>;

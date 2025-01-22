@@ -8,7 +8,7 @@ class Matrix{
     constructor(id: string){
         this.id=id;
     }
-    matrixMulti(matrixData: MatrixData): any{
+    matrixMulti(matrixData: MatrixData){
         const {fisrtMatrix, secondMatrix} = matrixData;
         const resultMatrix: number[][] |  number[] = [];
         for(let i=0; i<fisrtMatrix.length;i++){
@@ -24,7 +24,7 @@ class Matrix{
             resultMatrix.push(temp)
         }
         console.log(resultMatrix);
-        return resultMatrix;
+        // return resultMatrix;
     }
     run(matrixData: MatrixData): void{
         this.matrixMulti(matrixData)

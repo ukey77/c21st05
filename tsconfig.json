@@ -7,9 +7,8 @@
     "strict": true,
     "skipLibCheck": true,
     "allowJs": false,
-    // "noEmit": true, // 결과물 파일 생성을 방지
     "noEmitOnError": true
   },
-  "include": ["**/*.ts"],
-  "exclude": ["node_modules", "**/*.spec.ts", "**/*.js"]
+  "include": ["**/*.ts"], // 모든 .ts 파일 포함
+  "exclude": ["node_modules", "**/*.spec.ts"] // node_modules와 테스트 파일 제외
 }

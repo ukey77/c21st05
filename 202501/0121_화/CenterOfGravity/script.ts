@@ -24,6 +24,9 @@ class CenterOfGravity{
     modiDot(x: number, y: number){
             this.pen?.fillRect((x*this.scaleFactor)+ (this.width / 2) , -(y*this.scaleFactor) + (this.height / 2) ,1,1);
     }
+    convertRadian(degree: number): number{
+        return (Math.PI * degree) / 180;
+    }
     eventManager(){
         window.addEventListener("click",(event)=>{
             const target = <HTMLElement>event.target;
@@ -55,9 +58,20 @@ class CenterOfGravity{
                     this.drawLine([0,0,domValues["base"],domValues["height"]]);
 
                     this.modiDot((domValues["base"]*2)/3, domValues["height"]/3);
+                    this.drawCircle();
                 break;
             }
         });
+    }
+    drawCircle(){
+        const r = 3;
+        for(let i=0; i<=360; i+=1){
+            const radian: number = this.convertRadian(i);
+
+            this.modiDot(Math.cos(radian) * r + 0, Math.sin(radian) * r + 0);
+            this.modiDot(Math.cos(radian) * r + 5, Math.sin(radian) * r + 0);
+        }
+
     }
     drawLine(arrData: number[]){
         let [x1,y1,x2,y2]: number[] = [...arrData];
@@ -82,7 +96,6 @@ class CenterOfGravity{
                 this.modiDot(i,f);
             }
         }
-
     }
     renderAxiosCrossHair(): void{
         for(let i=0; i<this.width; i+=1){

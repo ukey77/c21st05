@@ -22,6 +22,9 @@ class CenterOfGravity {
         var _a;
         (_a = this.pen) === null || _a === void 0 ? void 0 : _a.fillRect((x * this.scaleFactor) + (this.width / 2), -(y * this.scaleFactor) + (this.height / 2), 1, 1);
     }
+    convertRadian(degree) {
+        return (Math.PI * degree) / 180;
+    }
     eventManager() {
         window.addEventListener("click", (event) => {
             var _a, _b, _c;
@@ -48,9 +51,18 @@ class CenterOfGravity {
                     this.drawLine([domValues["base"], 0, domValues["base"], domValues["height"]]);
                     this.drawLine([0, 0, domValues["base"], domValues["height"]]);
                     this.modiDot((domValues["base"] * 2) / 3, domValues["height"] / 3);
+                    this.drawCircle();
                     break;
             }
         });
+    }
+    drawCircle() {
+        const r = 3;
+        for (let i = 0; i <= 360; i += 1) {
+            const radian = this.convertRadian(i);
+            this.modiDot(Math.cos(radian) * r + 0, Math.sin(radian) * r + 0);
+            this.modiDot(Math.cos(radian) * r + 5, Math.sin(radian) * r + 0);
+        }
     }
     drawLine(arrData) {
         let [x1, y1, x2, y2] = [...arrData];

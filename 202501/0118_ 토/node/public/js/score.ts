@@ -32,7 +32,7 @@ class Score{
         for(const key in data){
             // console.log(this.$(`#${key}`)
             const $input = this.$(`#${key}`) as HTMLInputElement | null;
-            $input.value = data[key];
+            // $input.value = data[key];
         }
     }
     dataMetrics(): DataMetrics{
@@ -75,3 +75,5 @@ class Score{
 
 const score = new Score("score");
 score.run(); 
+
+export{}

@@ -6,6 +6,7 @@ class Daemon {
         this.app = null;
         this.fs = null;
         this.os = null;
+        this.cors = null;
         this.port = 3333;
     }
     settings() {
@@ -13,12 +14,10 @@ class Daemon {
         this.app = this.express();
         this.fs = require("fs");
         this.os = require("os");
+        this.cors = require("cors");
 
+        this.app.use(this.cors());
         this.app.use(this.express.static("assets")); // static
-
-        this.app.set("views", "./views");
-        this.app.set("view engine", "pug");
-
         this.listenPort();
     }
     listenPort() {
@@ -33,6 +32,16 @@ class Daemon {
         this.app.get("/memory", (req, res) => {
             res.send(`freemem: ${this.os.freemem()}<br>totalmem:${this.os.totalmem()}`)
         });
+
+        this.app.get("/data", (req, res) => {
+            this.fs.writeFile("./assets/data/memoryData.json", this.osData(), (err) => {
+                if (err) throw err;
+                this.fs.readFile("./assets/data/memoryData.json", (err, data) => {
+                    res.send(JSON.parse(data));
+                    console.log(JSON.parse(data))
+                });
+            });
+        });
     }
     osData(){
         const osData = {
@@ -40,27 +49,11 @@ class Daemon {
             freemem: this.os.freemem(),
             totalmem: this.os.totalmem()
         }
-
-        return JSON.stringify(osData)
-    }
-    writeMemory() {
-        this.fs.writeFile("./assets/data/memoryData.json", this.osData(), (err) => {
-            if (err) throw err;
-            this.fs.readFile("./assets/data/memoryData.json", (err, data) => {
-                if (err) throw err;
-                console.log(JSON.parse(data));
-            })
-        });
-
+        return JSON.stringify(osData);
     }
     run() {
         this.settings();
         this.runDaemon();
-        const loop = () => {
-            this.writeMemory();
-            setTimeout(loop, 2000); 
-        }
-        loop();
     }
 }
 

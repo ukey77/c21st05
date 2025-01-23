@@ -1,0 +1,20 @@
+doctype html
+html(lang="ko")
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        title Document
+    body 
+        #wrapper
+            h1 Login
+            form(action="http://localhost:3000/login", method="post")
+                p 
+                    label ID
+                    input(type="text" name="id")
+                p 
+                    label PW
+                    input(type="text" name="pw")
+                p
+                    input(type="submit" value="로그인")
+
+            p= loginInfo

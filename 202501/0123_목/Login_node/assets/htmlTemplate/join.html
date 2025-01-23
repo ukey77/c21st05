@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입</title>
+</head>
+<body>
+    <div id="wrapper" class="wrapper">
+        <h1>회원가입</h1>
+        <form action="http://localhost:3000/join" method="post">
+            <p>
+                <label>ID</label>
+                <input type="text" name="id" pattern="^(?=.*\d)[A-Za-z0-9]{4,10}$">
+            </p>
+
+            <p>
+                <label>PW</label>
+                <input type="password" name="pw" pattern="^(?=.*\d)[A-Za-z0-9]{4,8}$">
+            </p>
+            <p>
+                <input type="submit" value="가입하기">
+            </p>
+        </form>
+    </div>
+</body>
+</html>

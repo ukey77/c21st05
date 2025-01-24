@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>회원가입</h1>
+    <form action="/createUser" method="post">
+        <p>
+            <label>ID</label>
+            <input type="text" name="inID" pattern="^(?=.*\d)[A-Za-z0-9]{4,10}$">
+        </p>
+        <p>
+            <label>PW</label>
+            <input type="text" name="inPW" pattern="^(?=.*\d)[A-Za-z0-9]{4,10}$">        </p>
+        <input type="submit" value="회원가입">
+    </form>
+</body>
+</html>

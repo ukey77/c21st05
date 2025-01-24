@@ -1,7 +1,6 @@
 class Daemon{
     constructor(id){
         this.id=id;
-        this.port = 3000;
         this.express = null;
         this.app = null;
         this.fs = null;

@@ -48,7 +48,6 @@ class Buffer {
         }
     }
     setNext(startSelector, nextSelector) {
-        nextLink
         for (let i = 0; i < this.storage.length; i++) {
             if (this.storage[i].id === startSelector) {
                 this.storage[i].next = this.searchNext(nextSelector); // 다음 link로 연결해야함.

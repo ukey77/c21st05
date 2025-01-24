@@ -11,8 +11,9 @@ class WebService extends Daemon{
         this.app.use("/login",require("./routes/login"));
     }
     listen(){
-        this.app.listen(this.port,()=>{
-            console.log(`http://localhost:${this.port}`);
+        const port = 3000;
+        this.app.listen(port,()=>{
+            console.log(`http://localhost:${port}`);
         });
     }
     run(){

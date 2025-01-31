@@ -1,0 +1,34 @@
+{
+  "posts": [
+    {
+      "id": "2",
+      "name": "ZARD",
+      "title": "Hello ZARD",
+      "body": "CDR LOVE ZARD"
+    },
+    {
+      "id": "3",
+      "name": "BJH",
+      "title": "Hello BJH",
+      "body": "Bye BJH"
+    },
+    {
+      "id": "4",
+      "name": "KYJ",
+      "title": "Hello WORLD",
+      "body": "Bye WORLD"
+    },
+    {
+      "id": 1,
+      "name": "ZARD",
+      "title": "Hello ZARD",
+      "body": "CDR LOVE ZARD"
+    },
+    {
+      "id": 1,
+      "name": "ZARD",
+      "title": "Hello ZARD",
+      "body": "CDR LOVE ZARD"
+    }
+  ]
+}
